@@ -1,0 +1,22 @@
+:root {
+  font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+  color: #273330;
+  background: #f3f5f4;
+  font-synthesis: none;
+  --ink: #17201f;
+  --muted: #697774;
+  --surface: #ffffff;
+  --line: #dfe5e3;
+  --teal: #258478;
+  --coral: #e16f50;
+  --gold: #c89534;
+}
+* { box-sizing: border-box; }
+body { min-width: 320px; min-height: 100vh; margin: 0; }
+button, input { font: inherit; }
+.page { padding: 24px 28px 36px; }
+.page-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.page-toolbar p { margin: 0; color: var(--muted); font-size: 13px; }
+.el-button { border-radius: 4px; }
+.el-input__wrapper, .el-select__wrapper { border-radius: 4px; }
+@media (max-width: 760px) { .page { padding: 16px 12px 28px; } }
