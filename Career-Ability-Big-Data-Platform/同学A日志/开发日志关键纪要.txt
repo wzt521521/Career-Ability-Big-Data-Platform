@@ -1,0 +1,197 @@
+================================================================================
+同学A（邬至涛）开发日志 — 数据管道与基础设施
+================================================================================
+
+项目：职业能力大数据服务平台 (Career-Ability-Big-Data-Platform)
+角色：数据管道与基础设施（前期关键路径，阻塞 BCD 三人开工）
+日期范围：第1天 ~ 第3天
+
+================================================================================
+第1天：建表 + Docker 跑通 MySQL 和 Redis
+================================================================================
+
+【完成内容】
+1. 编写 sql/init.sql（~546行）
+   - 25张表的完整DDL：sys_user, sys_role, sys_permission, sys_user_role,
+     sys_role_permission, sys_operation_log, job_company, job_position,
+     job_skill, student_profile, city_tier, collect_source, collect_task,
+     collect_log, stat_position, stat_salary, stat_education, stat_skill,
+     stat_city, stat_company, stat_trend, report_template, report_record,
+     api_key, api_call_log
+   - 种子数据：5个系统角色 + 16项RBAC权限 + 37城市层级映射 + 3个报告模板 + admin账号
+
+2. 编写 docker-compose.yml
+   - MySQL 8.0 容器（端口3307→3306，自动执行 init.sql，healthcheck）
+   - Redis 7-alpine 容器（端口6379，挂载 redis.conf，healthcheck）
+   - 预留 backend / frontend / python-etl 三个服务（后续启用）
+
+【关键要点】
+- 建表时先 SET FOREIGN_KEY_CHECKS=0，DROP TABLE 后再重建，保证可重复执行
+- MySQL 使用 utf8mb4_unicode_ci，Docker 启动时通过
+  docker-entrypoint-initdb.d 自动加载 init.sql
+- 本日交付解除了 B、C、D 三人的第一个阻塞点：他们可以开始写 JPA 实体了
+
+【交付物】
+- sql/init.sql ✓
+- docker-compose.yml ✓
+- MySQL 容器 healthy ✓
+- Redis 容器 healthy ✓
+
+================================================================================
+第2天：Redis 就绪 + Python 导入脚本
+================================================================================
+
+【完成内容】
+1. 编写 redis/redis.conf
+   - RDB + AOF 双持久化
+   - 最大内存 256MB，淘汰策略 allkeys-lru
+   - 两个 List Key：queue:raw-job-data、queue:cleaned-job-data
+
+2. 编写 data-pipeline/config.py
+   - Redis / MySQL 连接信息全部从环境变量读取（兼容 Docker 和本地开发）
+   - 定义 RAW_QUEUE / CLEANED_QUEUE 常量
+   - 默认 CSV 路径、BATCH_SIZE 等配置
+
+3. 编写 data-pipeline/import_data.py（~220行）
+   - pandas 读取 CSV/Excel → 每行转标准JSON → LPUSH 到 Redis List
+   - 薪资解析 parse_salary()：支持 "8K-15K"、"8000-15000"、"面议" 等多种格式
+   - 城市标准化 normalize_city()：查 city_mapping.json
+   - 列名自动映射：兼容 Job Title/title/position 等多种CSV列名
+   - jobId 生成优先级：原始ID > 行号+日期
+
+4. 编写词典文件
+   - city_mapping.json：37个城市，每个含中英文名、省份、城市层级（一线/新一线/二线/三线）
+   - skill_dict.json：500+技术关键词，分14个类别（后端/前端/数据库/大数据/AI等），含别名映射
+   - requirements.txt：redis, pandas, openpyxl, pymysql
+
+5. 准备测试数据
+   - data/test_sample.csv：20条模拟岗位数据，覆盖多个城市和岗位类型
+
+【关键要点】
+- 薪资解析的职责划分：import_data.py 负责从原始文本提取 {min, max} 结构，
+  etl_clean.py 负责标准化校正（年薪转月薪、min/max 顺序修正）
+- 城市映射同时支持中英文key（"北京"/"Beijing" → 同一记录），
+  模糊匹配支持带/不带"市"后缀
+- 列名兼容性是关键——Kaggle等来源的CSV列名不统一，row_to_json 做了
+  多种常见列名的fallback
+
+【交付物】
+- redis/redis.conf ✓
+- data-pipeline/config.py ✓
+- data-pipeline/import_data.py ✓
+- data-pipeline/city_mapping.json ✓
+- data-pipeline/skill_dict.json ✓
+- data-pipeline/requirements.txt ✓
+- data/test_sample.csv ✓
+- 小规模数据导入验证通过 ✓
+
+================================================================================
+第3天：ETL 清洗脚本（最复杂任务）+ Bug修复
+================================================================================
+
+【完成内容】
+1. 编写 data-pipeline/etl_clean.py（~490行，常驻进程）
+   对照前期规划文档 7.3 节逐项实现了8个清洗步骤：
+
+   ① BRPOP 阻塞消费 queue:raw-job-data（超时5秒，支持优雅退出）
+   ② 空值校验：title 或 company.name 为空则丢弃
+   ③ 薪资标准化：年薪转月薪（>80除以12）、min/max 顺序修正
+      （注：原始文本解析如 "8K-15K" 由 import_data.py 预处理，ETL做二次校正）
+   ④ 城市标准化：查 city_mapping.json，三级模糊匹配（直接→去"市"→加"市"）
+   ⑤ 学历标准化：中英文关键词 → 不限/大专/本科/硕士/博士
+   ⑥ 经验标准化：中英文关键词 → 不限/应届/1-3年/3-5年/5-10年/10年以上
+   ⑦ 技能提取：skill_dict.json 关键词在 title+description 中全文匹配，
+      处理别名映射，保留 iOS/gRPC/CI/CD 等专有名词大小写
+   ⑧ MD5去重：jobId + sourceUrl 计算MD5，查MySQL跳过重复记录
+      写MySQL：先查/插 job_company，拿 company_id，再 INSERT job_position
+
+   附加功能：产入清洗队列 queue:cleaned-job-data（供C同学消费）、
+   统计计数器、批量进度日志、SIGINT/SIGTERM 优雅退出、异常事务回滚
+
+2. 代码审查与 Bug 修复（6项）
+
+   【严重Bug — 已修复】
+   Bug #1: normalize_experience 中 "5-10年" 被误判为 "10年以上"
+   - 原因：检查组 "10年以上" 的关键词 "10" 是 "5-10年" 的子串
+   - 修复：将 "5-10年" 范围检查提到 "10年以上" 之前，避免子串干扰
+
+   Bug #2: normalize_experience 中单数字匹配过于宽泛
+   - 原因："6"/"7"/"8"/"9"/"4"/"2" 用 Python "in" 匹配会误命中 "16年"/"14年"
+   - 示例："16年" 应归类为 "10年以上"，但被 "6" in "16年" 匹配为 "5-10年"
+   - 修复：重构为分层策略——范围模式→中文数字词→英文→re.findall提取数字做区间判断
+
+   【中等Bug — 已修复】
+   Bug #3: import_data.py parse_salary 面议检查在空格清除之前
+   - 原因：先检查面议(含空格敏感)，后去除空格
+   - 示例："面 议"（带空格）不会被识别
+   - 修复：将面议检查移到空格/单位清理之后，并加 lower()
+
+   Bug #4: config.py 默认CSV路径错误
+   - 原因：DEFAULT_CSV_PATH 指向 "../data/sample_jobs.csv"，实际文件是 test_sample.csv
+   - 修复：改为 "../data/test_sample.csv"
+
+   【轻度Bug — 已修复】
+   Bug #5: normalize_salary 对非整数输入不安全
+   - 原因：int() 失败后保留原始字符串，后续字符串与整数比较会抛 TypeError
+   - 修复：int() 失败时将值置为 None
+
+   Bug #6: BATCH_SIZE 语义混用
+   - 原因：config.py 定义的 BATCH_SIZE（导入进度间隔）被 etl_clean.py 复用为日志间隔
+   - 修复：etl_clean.py 单独定义 LOG_INTERVAL = 100
+
+3. 全链路测试验证
+   - 环境：Docker (MySQL 8.0 + Redis 7) + Python 3.13
+   - 流程：CSV(20条) → import_data.py → Redis List → etl_clean.py → MySQL
+   - 结果：20/20 成功写入，0 丢弃，0 异常
+   - 去重验证：20/20 重复数据被正确跳过
+   - 城市标准化：杭州→浙江/新一线，北京→北京/一线 等全部正确
+   - 薪资标准化：15K-25K 等全部正确
+   - 经验标准化：5-10年正确保留，不再误判为10年以上
+   - 公司去重：20条记录中字节跳动出现2次，正确合并为1条 → 19家独立公司
+   - 技能提取：每条记录4-6个技能标签
+
+【关键要点】
+- ETL 是前期核心里程碑——它打通了 CSV → Redis → MySQL 的完整数据链路，
+  解除了同学C的阻塞（他需要 MySQL 中有真实数据才能测试岗位查询接口）
+- normalize_experience 的 Bug 修复采用了分层策略：
+  ① 范围的明确关键词（如"5-10年"中的"5-10"）优先级最高
+  ② 中文数字词（十年/五年/三年/四年/一年/两年）
+  ③ 英文关键词
+  ④ 用 re.findall(r'\d+', s) 提取所有数字，取最大值做区间判断
+  这比直接 in 匹配更精确，且新增年数经验格式也能自动适配
+- 所有标准化函数都设计为"在 ETL 阶段可独立运行"，不依赖 import 阶段的
+  预处理——这对数据可追溯性很重要
+- 第3天完成后，C（张博源）的岗位查询接口和D（王致远）的报告推荐系统
+  都有了真实数据支撑
+
+【交付物】
+- data-pipeline/etl_clean.py ✓（含6项Bug修复）
+- 全链路验证通过：20条数据从CSV到MySQL端到端跑通 ✓
+- 清洗后数据在 MySQL job_position 表中（20条）+ Redis queue:cleaned-job-data（20条）✓
+- test_pipeline.py（测试脚本，用于验证）✓
+
+================================================================================
+前三天里程碑总结
+================================================================================
+
+基础设施层已完成：
+  MySQL 25张表 ✓    Redis 消息队列 ✓    数据导入脚本 ✓
+  ETL清洗脚本 ✓      城市/技能词典 ✓      Docker Compose ✓
+  Nginx配置 ✓        测试数据集(20条) ✓
+
+待完成（第4-7天）：
+  第4天：Spring Boot 采集模块骨架 + Docker全栈启动
+  第5天：采集管理Vue页面 + Logback日志
+  第6天：寻找 >=500条的Kaggle真实数据集
+  第7天：四人全链路联调 + 12项验收
+
+阻塞解除情况：
+  ✓ B（黄健熙）：第1天拿到建表脚本，可开始JPA实体
+  ✓ C（张博源）：第3天MySQL有数据，可测试岗位查询接口
+  ✓ D（王致远）：第3天MySQL有数据，可开始岗位推荐
+
+踩坑记录：后台进程竞争
+  现象：测试时有 5 个旧版 python.exe 在后台抢 Redis 队列，导致修复版代码拿不到数据
+  根因：之前手动跑 etl_clean.py 后直接关窗口，常驻进程没被杀掉
+  预防：① 先 Ctrl+C 再关窗口  ② 启动前 tasklist | findstr python 看一眼
+        ③ Docker 单实例部署后可根除
