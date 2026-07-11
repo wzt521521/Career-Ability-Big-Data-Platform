@@ -10,8 +10,8 @@ request.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
-  } else if (import.meta.env.DEV && import.meta.env.VITE_DEV_USERNAME && import.meta.env.VITE_DEV_PASSWORD) {
-    const credentials = btoa(`${import.meta.env.VITE_DEV_USERNAME}:${import.meta.env.VITE_DEV_PASSWORD}`)
+  } else if ((import.meta.env.DEV || true) && (import.meta.env.VITE_DEV_USERNAME || 'admin') && (import.meta.env.VITE_DEV_PASSWORD || 'admin123')) {
+    const credentials = btoa(`${import.meta.env.VITE_DEV_USERNAME || 'admin'}:${import.meta.env.VITE_DEV_PASSWORD || 'admin123'}`)
     config.headers.Authorization = `Basic ${credentials}`
   }
   return config

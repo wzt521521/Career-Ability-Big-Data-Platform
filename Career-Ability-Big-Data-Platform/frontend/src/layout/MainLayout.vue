@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { DataAnalysis, Fold, Histogram, Menu as MenuIcon } from '@element-plus/icons-vue'
+import { DataAnalysis, Fold, Histogram, Menu as MenuIcon, Monitor, Document } from '@element-plus/icons-vue'
 
 const collapsed = ref(false)
 const route = useRoute()
@@ -24,6 +24,16 @@ const title = computed(() => route.meta.title || '职业能力大数据服务平
         </router-link>
         <router-link to="/positions" title="岗位分析">
           <el-icon><Histogram /></el-icon><span v-show="!collapsed">岗位分析</span>
+        </router-link>
+        <div class="nav-divider" v-show="!collapsed">采集管理</div>
+        <router-link to="/collect/sources" title="数据源管理">
+          <el-icon><Document /></el-icon><span v-show="!collapsed">数据源管理</span>
+        </router-link>
+        <router-link to="/collect/tasks" title="采集任务管理">
+          <el-icon><Monitor /></el-icon><span v-show="!collapsed">采集任务管理</span>
+        </router-link>
+        <router-link to="/collect/logs" title="采集执行日志">
+          <el-icon><DataAnalysis /></el-icon><span v-show="!collapsed">采集执行日志</span>
         </router-link>
       </nav>
       <button class="collapse-button" type="button" :title="collapsed ? '展开导航' : '收起导航'" @click="collapsed = !collapsed">
@@ -58,6 +68,7 @@ nav a { display: flex; height: 44px; align-items: center; gap: 12px; padding: 0 
 nav a:hover { background: rgba(255,255,255,.06); color: #fff; }
 nav a.router-link-active { border-left-color: #e16f50; background: rgba(255,255,255,.09); color: #fff; }
 nav .el-icon { flex: 0 0 18px; font-size: 18px; }
+.nav-divider { padding: 12px 14px 4px; color: #6a7d79; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
 .collapse-button { display: grid; width: 44px; height: 44px; margin: 0 14px 16px; place-items: center; border: 0; border-radius: 4px; background: transparent; color: #91a39f; cursor: pointer; }
 .collapse-button:hover { background: rgba(255,255,255,.08); color: #fff; }
 main { min-width: 0; }

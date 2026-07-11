@@ -1,0 +1,521 @@
+﻿jobId,title,companyName,companySize,industry,companyType,salaryMin,salaryMax,city,province,cityTier,education,experience,skills,welfare,publishDate,sourceUrl
+SYN-0001,Java开发工程师,网易,5000人以上,互联网/游戏,上市公司,10,20,西安,陕西,新一线,本科,3-5年,Linux|Spring Boot|Kafka,五险一金|年终奖,2026-04-03,https://synthetic.dataset/1
+SYN-0002,数据分析师,商汤科技,1000-2000人,人工智能,民营,30,55,青岛,山东,二线,本科,1-3年,Spark SQL|Matplotlib|NumPy|Seaborn,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-26,https://synthetic.dataset/2
+SYN-0003,Android开发工程师,字节跳动,5000人以上,互联网/IT,民营,10,20,合肥,安徽,二线,本科,1-3年,Git|Java|Gradle|Retrofit,五险一金|年终奖|弹性工作,2026-06-28,https://synthetic.dataset/3
+SYN-0004,推荐系统工程师,米哈游,2000-5000人,游戏/互联网,民营,30,55,西安,陕西,新一线,硕士,5-10年,协同过滤|TensorFlow|推荐算法,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-19,https://synthetic.dataset/4
+SYN-0005,前端开发工程师,科大讯飞,2000-5000人,人工智能,上市公司,10,18,上海,上海,一线,大专,1-3年,TypeScript|Webpack|CSS|React,五险一金|年终奖|带薪年假|弹性工作,2026-05-12,https://synthetic.dataset/5
+SYN-0006,iOS开发工程师,米哈游,2000-5000人,游戏/互联网,民营,15,25,西安,陕西,新一线,本科,应届,Objective-C|Git|CoreData|Combine,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-22,https://synthetic.dataset/6
+SYN-0007,Python开发工程师,拼多多,5000人以上,互联网/电商,上市公司,12,20,南京,江苏,新一线,本科,5-10年,Django|MySQL|Redis|Celery|Linux,五险一金|年终奖|弹性工作|餐补,2026-07-21,https://synthetic.dataset/7
+SYN-0008,C++开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,30,55,西安,陕西,新一线,硕士,5-10年,Docker|Qt|多线程|Boost|STL,五险一金|年终奖|股票期权,2026-07-03,https://synthetic.dataset/8
+SYN-0009,Go后端开发工程师,华为,5000人以上,通信/IT,民营,40,70,杭州,浙江,新一线,本科,5-10年,Kubernetes|PostgreSQL|Linux,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-18,https://synthetic.dataset/9
+SYN-0010,Go后端开发工程师,字节跳动,5000人以上,互联网/IT,民营,12,22,大连,辽宁,二线,本科,3-5年,Kubernetes|gRPC|Linux|Go|Docker,五险一金|年终奖|补充商业保险,2026-05-17,https://synthetic.dataset/10
+SYN-0011,算法工程师(NLP/CV),美团,5000人以上,互联网/O2O,上市公司,10,20,青岛,山东,二线,本科,3-5年,PyTorch|BERT|Python|OpenCV|模型部署,五险一金|年终奖|弹性工作|餐补,2026-04-04,https://synthetic.dataset/11
+SYN-0012,算法工程师(NLP/CV),莉莉丝,1000-2000人,游戏/互联网,民营,35,60,南京,江苏,新一线,硕士,3-5年,TensorFlow|深度学习|模型部署,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-05,https://synthetic.dataset/12
+SYN-0013,数据仓库工程师,小米集团,5000人以上,消费电子/互联网,上市公司,40,70,成都,四川,新一线,本科,3-5年,Flink|Python|数据治理|ETL|Spark SQL|Hadoop,五险一金|年终奖|带薪年假|弹性工作,2026-07-17,https://synthetic.dataset/13
+SYN-0014,Go后端开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,8,14,南京,江苏,新一线,本科,1-3年,PostgreSQL|Kafka|MySQL,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-01,https://synthetic.dataset/14
+SYN-0015,Python开发工程师,百度,5000人以上,互联网/IT,上市公司,8,14,南京,江苏,新一线,本科,1-3年,FastAPI|MySQL|MongoDB,五险一金|年终奖|弹性工作|餐补,2026-05-18,https://synthetic.dataset/15
+SYN-0016,运维开发工程师,快手,2000-5000人,互联网/短视频,民营,25,45,宁波,浙江,二线,本科,3-5年,Kubernetes|Go|GitOps|Terraform|Prometheus|Docker,五险一金|年终奖|股票期权|带薪年假,2026-07-15,https://synthetic.dataset/16
+SYN-0017,Go后端开发工程师,华为,5000人以上,通信/IT,民营,12,22,上海,上海,一线,大专,3-5年,MySQL|PostgreSQL|Linux|Gin,五险一金|年终奖|股票期权|带薪年假,2026-05-09,https://synthetic.dataset/17
+SYN-0018,数据分析师,小鹏汽车,2000-5000人,新能源汽车,上市公司,12,22,广州,广东,一线,大专,应届,Spark SQL|Python|SQL,五险一金|年终奖|弹性工作|股票期权,2026-05-14,https://synthetic.dataset/18
+SYN-0019,区块链开发工程师,OPPO,5000人以上,消费电子,民营,15,25,武汉,湖北,新一线,本科,1-3年,Solidity|Hyperledger|Rust|Node.js|智能合约|Ethereum,五险一金|年终奖|股票期权|带薪年假,2026-07-05,https://synthetic.dataset/19
+SYN-0020,算法工程师(NLP/CV),科大讯飞,2000-5000人,人工智能,上市公司,30,55,武汉,湖北,新一线,硕士,3-5年,Scikit-learn|Python|BERT,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-17,https://synthetic.dataset/20
+SYN-0021,Android开发工程师,荣耀,2000-5000人,消费电子,民营,15,25,上海,上海,一线,硕士,1-3年,Flutter|Java|Retrofit,五险一金|年终奖|股票期权|带薪年假,2026-04-19,https://synthetic.dataset/21
+SYN-0022,运维开发工程师,寒武纪,500-1000人,人工智能/芯片,上市公司,10,18,济南,山东,二线,本科,应届,Prometheus|GitOps|Terraform|Docker|Go|Nginx,五险一金|年终奖|弹性工作|股票期权,2026-06-13,https://synthetic.dataset/22
+SYN-0023,算法工程师(NLP/CV),快手,2000-5000人,互联网/短视频,民营,6,12,郑州,河南,二线,硕士,1-3年,模型部署|TensorFlow|BERT|OpenCV|深度学习|Transformer,五险一金|年终奖|补充商业保险,2026-05-12,https://synthetic.dataset/23
+SYN-0024,数据分析师,百度,5000人以上,互联网/IT,上市公司,16,28,天津,天津,新一线,硕士,3-5年,统计学|Spark SQL|Python|Excel|Tableau,五险一金|年终奖|补充商业保险,2026-04-05,https://synthetic.dataset/24
+SYN-0025,Go后端开发工程师,地平线,500-1000人,人工智能/芯片,民营,20,35,深圳,广东,一线,硕士,3-5年,PostgreSQL|MySQL|Docker|Gin|Linux,五险一金|年终奖|补充商业保险,2026-07-09,https://synthetic.dataset/25
+SYN-0026,前端开发工程师,华为,5000人以上,通信/IT,民营,6,12,合肥,安徽,二线,本科,1-3年,Vue|CSS|ECharts|HTML|React,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-18,https://synthetic.dataset/26
+SYN-0027,Go后端开发工程师,字节跳动,5000人以上,互联网/IT,民营,8,15,广州,广东,一线,本科,应届,PostgreSQL|Kafka|gRPC|MySQL|Gin,五险一金|年终奖,2026-06-12,https://synthetic.dataset/27
+SYN-0028,测试开发工程师,腾讯,5000人以上,互联网/IT,上市公司,9,16,武汉,湖北,新一线,大专,1-3年,自动化测试|Selenium|JMeter|Git|Java|Postman,五险一金|年终奖|股票期权|带薪年假,2026-04-06,https://synthetic.dataset/28
+SYN-0029,UI/UX设计师,SHEIN,5000人以上,互联网/电商,民营,12,22,南京,江苏,新一线,大专,3-5年,Figma|After Effects|Photoshop|Sketch|C4D|Adobe XD,五险一金|年终奖|补充商业保险,2026-05-08,https://synthetic.dataset/29
+SYN-0030,iOS开发工程师,阿里巴巴,5000人以上,互联网/IT,上市公司,10,18,苏州,江苏,新一线,大专,3-5年,Xcode|CocoaPods|CoreData|Combine|SwiftUI,五险一金|年终奖|带薪年假|弹性工作,2026-04-04,https://synthetic.dataset/30
+SYN-0031,Android开发工程师,地平线,500-1000人,人工智能/芯片,民营,12,22,宁波,浙江,二线,本科,1-3年,Git|Flutter|MVP/MVVM|Jetpack|SQLite|Android,五险一金|年终奖|股票期权|带薪年假,2026-05-09,https://synthetic.dataset/31
+SYN-0032,UI/UX设计师,腾讯,5000人以上,互联网/IT,上市公司,15,30,北京,北京,一线,硕士,应届,交互设计|Sketch|用户体验|Illustrator|Adobe XD,五险一金|年终奖|弹性工作,2026-06-17,https://synthetic.dataset/32
+SYN-0033,UI/UX设计师,蚂蚁集团,5000人以上,互联网金融,民营,30,55,长沙,湖南,新一线,本科,1-3年,Photoshop|交互设计|C4D|用户体验,五险一金|年终奖|股票期权,2026-06-13,https://synthetic.dataset/33
+SYN-0034,Java开发工程师,海康威视,5000人以上,安防/AI,上市公司,14,24,重庆,重庆,新一线,本科,3-5年,Spring Cloud|Git|Linux|Docker|Spring Boot,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-26,https://synthetic.dataset/34
+SYN-0035,前端开发工程师,小红书,2000-5000人,互联网/社交,民营,8,14,重庆,重庆,新一线,硕士,应届,React|CSS|ECharts,五险一金|年终奖|弹性工作|股票期权,2026-05-01,https://synthetic.dataset/35
+SYN-0036,数据分析师,腾讯,5000人以上,互联网/IT,上市公司,16,28,厦门,福建,二线,本科,1-3年,统计学|NumPy|Matplotlib|Spark SQL|Seaborn|SQL,五险一金|年终奖|股票期权,2026-04-25,https://synthetic.dataset/36
+SYN-0037,UI/UX设计师,美团,5000人以上,互联网/O2O,上市公司,16,28,南京,江苏,新一线,本科,应届,C4D|Photoshop|Sketch,五险一金|年终奖|弹性工作|餐补,2026-05-26,https://synthetic.dataset/37
+SYN-0038,嵌入式软件开发,小鹏汽车,2000-5000人,新能源汽车,上市公司,16,28,大连,辽宁,二线,硕士,1-3年,PCB|I2C/SPI|RTOS|FreeRTOS|ARM|MCU,五险一金|年终奖|补充商业保险,2026-05-27,https://synthetic.dataset/38
+SYN-0039,嵌入式软件开发,Momenta,200-500人,人工智能/自动驾驶,外商独资,16,28,厦门,福建,二线,本科,1-3年,Linux|ARM|嵌入式调试,五险一金|年终奖|带薪年假|弹性工作,2026-06-18,https://synthetic.dataset/39
+SYN-0040,C++开发工程师,京东,5000人以上,互联网/电商,上市公司,10,20,杭州,浙江,新一线,硕士,5-10年,STL|Qt|多线程|Boost,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-14,https://synthetic.dataset/40
+SYN-0041,iOS开发工程师,华为,5000人以上,通信/IT,民营,6,12,合肥,安徽,二线,本科,应届,Git|iOS|Xcode|Objective-C|UIKit|Combine,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-16,https://synthetic.dataset/41
+SYN-0042,大数据开发工程师,旷视科技,500-1000人,人工智能,民营,12,20,合肥,安徽,二线,本科,1-3年,HBase|Hive|ClickHouse|Spark|Flink,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-13,https://synthetic.dataset/42
+SYN-0043,运维开发工程师,深信服,2000-5000人,网络安全,上市公司,10,20,北京,北京,一线,本科,5-10年,Docker|Python|Ansible|Kubernetes|Prometheus|Go,五险一金|年终奖|弹性工作|餐补,2026-06-11,https://synthetic.dataset/43
+SYN-0044,大数据开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,25,45,合肥,安徽,二线,硕士,1-3年,Java|Hadoop|HDFS,五险一金|年终奖|弹性工作|股票期权,2026-04-25,https://synthetic.dataset/44
+SYN-0045,Java开发工程师,腾讯,5000人以上,互联网/IT,上市公司,40,70,南京,江苏,新一线,本科,1-3年,MySQL|MyBatis|Spring Cloud|Docker,五险一金|年终奖|弹性工作,2026-05-15,https://synthetic.dataset/45
+SYN-0046,测试开发工程师,地平线,500-1000人,人工智能/芯片,民营,12,22,成都,四川,新一线,大专,应届,Appium|Java|Python|Selenium,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-13,https://synthetic.dataset/46
+SYN-0047,前端开发工程师,科大讯飞,2000-5000人,人工智能,上市公司,20,40,宁波,浙江,二线,大专,1-3年,ECharts|JavaScript|HTML,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-22,https://synthetic.dataset/47
+SYN-0048,前端开发工程师,莉莉丝,1000-2000人,游戏/互联网,民营,14,24,青岛,山东,二线,本科,1-3年,TypeScript|Webpack|HTML|Vite|React|ECharts,五险一金|年终奖|股票期权|带薪年假,2026-05-24,https://synthetic.dataset/48
+SYN-0049,大数据开发工程师,荣耀,2000-5000人,消费电子,民营,16,28,济南,山东,二线,大专,5-10年,Scala|Flink|HDFS|HBase|Spark|Hadoop,五险一金|年终奖|补充商业保险,2026-07-08,https://synthetic.dataset/49
+SYN-0050,运维开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,6,12,济南,山东,二线,本科,1-3年,Terraform|Docker|Shell|Go|GitOps|Prometheus,五险一金|年终奖|带薪年假|弹性工作,2026-06-20,https://synthetic.dataset/50
+SYN-0051,数据仓库工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,10,18,北京,北京,一线,硕士,3-5年,ClickHouse|Hadoop|Flink|ETL,五险一金|年终奖|弹性工作|餐补,2026-07-15,https://synthetic.dataset/51
+SYN-0052,前端开发工程师,阿里巴巴,5000人以上,互联网/IT,上市公司,18,35,重庆,重庆,新一线,大专,5-10年,ECharts|HTML|Vite|CSS|Webpack,五险一金|年终奖|带薪年假|弹性工作,2026-07-24,https://synthetic.dataset/52
+SYN-0053,DevOps运维工程师,海康威视,5000人以上,安防/AI,上市公司,20,40,天津,天津,新一线,本科,3-5年,Jenkins|Docker|Grafana|Kubernetes|Linux,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-07,https://synthetic.dataset/53
+SYN-0054,区块链开发工程师,商汤科技,1000-2000人,人工智能,民营,40,70,西安,陕西,新一线,博士,应届,Go|智能合约|Rust|Web3.js|Ethereum,五险一金|年终奖|股票期权,2026-06-01,https://synthetic.dataset/54
+SYN-0055,C++开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,30,55,西安,陕西,新一线,本科,3-5年,Boost|TCP/IP|STL|Qt|C++,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-16,https://synthetic.dataset/55
+SYN-0056,网络安全工程师,小米集团,5000人以上,消费电子/互联网,上市公司,20,35,长沙,湖南,新一线,本科,1-3年,Kali Linux|密码学|Python|Burp Suite|Wireshark|防火墙,五险一金|年终奖,2026-05-05,https://synthetic.dataset/56
+SYN-0057,算法工程师(NLP/CV),大华股份,5000人以上,安防/AI,上市公司,30,55,广州,广东,一线,硕士,1-3年,模型部署|NLP|Transformer|BERT|深度学习|PyTorch,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-10,https://synthetic.dataset/57
+SYN-0058,推荐系统工程师,大华股份,5000人以上,安防/AI,上市公司,15,30,上海,上海,一线,硕士,1-3年,推荐算法|TensorFlow|PyTorch|召回,五险一金|年终奖|股票期权,2026-04-06,https://synthetic.dataset/58
+SYN-0059,UI/UX设计师,字节跳动,5000人以上,互联网/IT,民营,20,40,郑州,河南,二线,硕士,5-10年,Photoshop|Illustrator|C4D,五险一金|年终奖|弹性工作|餐补,2026-04-22,https://synthetic.dataset/59
+SYN-0060,大数据开发工程师,旷视科技,500-1000人,人工智能,民营,12,22,宁波,浙江,二线,本科,5-10年,Hive|Flink|Scala|Hadoop,五险一金|年终奖,2026-05-26,https://synthetic.dataset/60
+SYN-0061,推荐系统工程师,蚂蚁集团,5000人以上,互联网金融,民营,12,22,宁波,浙江,二线,本科,5-10年,推荐算法|协同过滤|排序|DNN|召回|Spark,五险一金|年终奖|弹性工作|餐补,2026-04-20,https://synthetic.dataset/61
+SYN-0062,UI/UX设计师,腾讯,5000人以上,互联网/IT,上市公司,6,12,长沙,湖南,新一线,硕士,1-3年,Photoshop|Figma|Illustrator,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-25,https://synthetic.dataset/62
+SYN-0063,区块链开发工程师,滴滴出行,5000人以上,互联网/出行,民营,15,25,青岛,山东,二线,本科,3-5年,共识算法|Go|Web3.js|Ethereum|智能合约|Hyperledger,五险一金|年终奖|带薪年假|弹性工作,2026-04-28,https://synthetic.dataset/63
+SYN-0064,DevOps运维工程师,小红书,2000-5000人,互联网/社交,民营,12,20,合肥,安徽,二线,本科,3-5年,Shell|Docker|Terraform,五险一金|年终奖|补充商业保险,2026-06-04,https://synthetic.dataset/64
+SYN-0065,嵌入式软件开发,大疆创新,5000人以上,硬件/无人机,民营,14,24,北京,北京,一线,硕士,5-10年,ARM|PCB|FreeRTOS,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-21,https://synthetic.dataset/65
+SYN-0066,Python开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,10,20,武汉,湖北,新一线,硕士,应届,Linux|Celery|Django|Python|Redis,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-23,https://synthetic.dataset/66
+SYN-0067,算法工程师(NLP/CV),小红书,2000-5000人,互联网/社交,民营,14,24,大连,辽宁,二线,硕士,3-5年,NLP|TensorFlow|深度学习,五险一金|年终奖|弹性工作,2026-05-16,https://synthetic.dataset/67
+SYN-0068,嵌入式软件开发,字节跳动(成都),1000-3000人,互联网/IT,民营,25,45,西安,陕西,新一线,本科,5-10年,I2C/SPI|PCB|RTOS|ARM,五险一金|年终奖|弹性工作|股票期权,2026-05-28,https://synthetic.dataset/68
+SYN-0069,大数据开发工程师,百度,5000人以上,互联网/IT,上市公司,20,35,合肥,安徽,二线,硕士,1-3年,Flink|Scala|ClickHouse,五险一金|年终奖|股票期权,2026-07-18,https://synthetic.dataset/69
+SYN-0070,测试开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,12,20,长沙,湖南,新一线,大专,应届,Postman|JMeter|Pytest|Appium|Jenkins|Java,五险一金|年终奖|股票期权|带薪年假,2026-04-11,https://synthetic.dataset/70
+SYN-0071,产品经理(技术方向),小米集团,5000人以上,消费电子/互联网,上市公司,8,15,苏州,江苏,新一线,本科,5-10年,项目管理|SQL|Axure|Jira,五险一金|年终奖|弹性工作|餐补,2026-04-17,https://synthetic.dataset/71
+SYN-0072,Java开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,10,18,杭州,浙江,新一线,大专,3-5年,Redis|Docker|Kafka|Linux|Java|MyBatis,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-11,https://synthetic.dataset/72
+SYN-0073,数据仓库工程师,OPPO,5000人以上,消费电子,民营,18,35,上海,上海,一线,硕士,1-3年,Flink|Hive|ClickHouse|SQL|ETL,五险一金|年终奖|弹性工作,2026-07-06,https://synthetic.dataset/73
+SYN-0074,Java开发工程师,蚂蚁集团,5000人以上,互联网金融,民营,20,40,上海,上海,一线,本科,1-3年,Docker|Kafka|MyBatis|Spring Boot|Redis,五险一金|年终奖|股票期权|带薪年假,2026-05-06,https://synthetic.dataset/74
+SYN-0075,前端开发工程师,滴滴出行,5000人以上,互联网/出行,民营,18,35,济南,山东,二线,本科,应届,ECharts|Vue|React|Vite|HTML|Node.js,五险一金|年终奖|弹性工作|餐补,2026-06-22,https://synthetic.dataset/75
+SYN-0076,网络安全工程师,字节跳动,5000人以上,互联网/IT,民营,10,18,重庆,重庆,新一线,硕士,3-5年,SIEM|防火墙|Python|密码学|IDS/IPS|Burp Suite,五险一金|年终奖|补充商业保险,2026-05-13,https://synthetic.dataset/76
+SYN-0077,Go后端开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,9,16,南京,江苏,新一线,大专,应届,Redis|Go|Kubernetes|gRPC|Kafka,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-20,https://synthetic.dataset/77
+SYN-0078,算法工程师(NLP/CV),OPPO,5000人以上,消费电子,民营,18,35,南京,江苏,新一线,本科,5-10年,模型部署|OpenCV|PyTorch|Scikit-learn,五险一金|年终奖|弹性工作,2026-04-10,https://synthetic.dataset/78
+SYN-0079,Python开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,10,18,宁波,浙江,二线,硕士,3-5年,Redis|Docker|Flask|Django|FastAPI,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-17,https://synthetic.dataset/79
+SYN-0080,大数据开发工程师,vivo,5000人以上,消费电子,民营,20,40,成都,四川,新一线,硕士,5-10年,Spark|ClickHouse|Scala|Java|HBase,五险一金|年终奖|股票期权|带薪年假,2026-06-03,https://synthetic.dataset/80
+SYN-0081,Java开发工程师,大疆创新,5000人以上,硬件/无人机,民营,16,28,西安,陕西,新一线,硕士,1-3年,Redis|Kafka|Docker|Java|Spring Cloud,五险一金|年终奖|弹性工作|股票期权,2026-07-01,https://synthetic.dataset/81
+SYN-0082,数据仓库工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,10,18,长沙,湖南,新一线,硕士,3-5年,数据建模|ClickHouse|Hive|Hadoop|SQL|ETL,五险一金|年终奖|补充商业保险,2026-07-04,https://synthetic.dataset/82
+SYN-0083,数据分析师,美团,5000人以上,互联网/O2O,上市公司,16,28,大连,辽宁,二线,本科,5-10年,Spark SQL|Matplotlib|Pandas|NumPy|Excel,五险一金|年终奖|弹性工作,2026-07-20,https://synthetic.dataset/83
+SYN-0084,大数据开发工程师,比亚迪,5000人以上,新能源汽车,上市公司,16,28,上海,上海,一线,硕士,3-5年,Kafka|HDFS|Spark|Java|Hive|Flink,五险一金|年终奖|带薪年假|弹性工作,2026-04-13,https://synthetic.dataset/84
+SYN-0085,iOS开发工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,15,30,深圳,广东,一线,本科,1-3年,iOS|Xcode|UIKit,五险一金|年终奖|股票期权,2026-05-03,https://synthetic.dataset/85
+SYN-0086,iOS开发工程师,海康威视,5000人以上,安防/AI,上市公司,8,14,宁波,浙江,二线,本科,3-5年,Combine|iOS|SwiftUI|CoreData,五险一金|年终奖|股票期权,2026-05-18,https://synthetic.dataset/86
+SYN-0087,Android开发工程师,地平线,500-1000人,人工智能/芯片,民营,6,12,深圳,广东,一线,本科,3-5年,Retrofit|Git|Android|Java|Kotlin,五险一金|年终奖,2026-05-24,https://synthetic.dataset/87
+SYN-0088,嵌入式软件开发,比亚迪,5000人以上,新能源汽车,上市公司,16,28,深圳,广东,一线,本科,5-10年,PCB|C++|I2C/SPI|Linux|嵌入式调试,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-24,https://synthetic.dataset/88
+SYN-0089,算法工程师(NLP/CV),荣耀,2000-5000人,消费电子,民营,25,45,郑州,河南,二线,硕士,1-3年,Transformer|TensorFlow|深度学习|Scikit-learn|NLP|Python,五险一金|年终奖|弹性工作,2026-06-20,https://synthetic.dataset/89
+SYN-0090,前端开发工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,35,60,杭州,浙江,新一线,本科,应届,Webpack|Node.js|CSS|React|Vite,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-04,https://synthetic.dataset/90
+SYN-0091,数据仓库工程师,网易,5000人以上,互联网/游戏,上市公司,18,35,武汉,湖北,新一线,大专,5-10年,ETL|Hadoop|ClickHouse|Flink|数据治理|SQL,五险一金|年终奖|带薪年假|弹性工作,2026-07-11,https://synthetic.dataset/91
+SYN-0092,测试开发工程师,地平线,500-1000人,人工智能/芯片,民营,10,18,杭州,浙江,新一线,本科,1-3年,Java|Git|自动化测试,五险一金|年终奖|带薪年假|弹性工作,2026-05-18,https://synthetic.dataset/92
+SYN-0093,运维开发工程师,华为,5000人以上,通信/IT,民营,12,22,大连,辽宁,二线,大专,1-3年,Terraform|Nginx|Python|Docker|Ansible|GitOps,五险一金|年终奖|带薪年假|弹性工作,2026-04-19,https://synthetic.dataset/93
+SYN-0094,iOS开发工程师,vivo,5000人以上,消费电子,民营,12,22,杭州,浙江,新一线,本科,3-5年,CocoaPods|Xcode|Swift|CoreData|Objective-C,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-26,https://synthetic.dataset/94
+SYN-0095,数据仓库工程师,蔚来汽车,5000人以上,新能源汽车,上市公司,6,12,济南,山东,二线,硕士,3-5年,SQL|Spark SQL|数据建模|ETL|Python,五险一金|年终奖|带薪年假|弹性工作,2026-06-01,https://synthetic.dataset/95
+SYN-0096,C++开发工程师,滴滴出行,5000人以上,互联网/出行,民营,10,20,宁波,浙江,二线,本科,3-5年,STL|多线程|Linux,五险一金|年终奖|股票期权|带薪年假,2026-07-15,https://synthetic.dataset/96
+SYN-0097,Android开发工程师,SHEIN,5000人以上,互联网/电商,民营,35,60,天津,天津,新一线,本科,1-3年,Android|Kotlin|Gradle,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-22,https://synthetic.dataset/97
+SYN-0098,大数据开发工程师,京东,5000人以上,互联网/电商,上市公司,40,70,郑州,河南,二线,本科,5-10年,HBase|Flink|Kafka|Scala|Java|Hadoop,五险一金|年终奖|带薪年假|弹性工作,2026-07-04,https://synthetic.dataset/98
+SYN-0099,运维开发工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,8,15,厦门,福建,二线,大专,1-3年,Nginx|Python|GitOps|Go,五险一金|年终奖|补充商业保险,2026-05-25,https://synthetic.dataset/99
+SYN-0100,大数据开发工程师,快手,2000-5000人,互联网/短视频,民营,6,12,重庆,重庆,新一线,硕士,1-3年,HBase|Hive|Java|Kafka|Flink|Spark,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-03,https://synthetic.dataset/100
+SYN-0101,Python开发工程师,大疆创新,5000人以上,硬件/无人机,民营,10,18,合肥,安徽,二线,本科,应届,Celery|Docker|FastAPI|Redis|Linux,五险一金|年终奖|股票期权|带薪年假,2026-06-04,https://synthetic.dataset/101
+SYN-0102,Java开发工程师,大疆创新,5000人以上,硬件/无人机,民营,16,28,长沙,湖南,新一线,本科,应届,Spring Boot|Kafka|Git|Spring Cloud|MySQL,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-17,https://synthetic.dataset/102
+SYN-0103,产品经理(技术方向),京东,5000人以上,互联网/电商,上市公司,8,14,重庆,重庆,新一线,硕士,3-5年,Axure|项目管理|用户研究|敏捷开发,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-25,https://synthetic.dataset/103
+SYN-0104,测试开发工程师,米哈游,2000-5000人,游戏/互联网,民营,10,20,杭州,浙江,新一线,大专,1-3年,JMeter|Selenium|Pytest|Git|Postman,五险一金|年终奖|弹性工作,2026-05-25,https://synthetic.dataset/104
+SYN-0105,网络安全工程师,OPPO,5000人以上,消费电子,民营,35,60,宁波,浙江,二线,硕士,5-10年,SIEM|IDS/IPS|渗透测试|Wireshark|Burp Suite,五险一金|年终奖|弹性工作|餐补,2026-06-26,https://synthetic.dataset/105
+SYN-0106,运维开发工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,10,18,上海,上海,一线,本科,应届,Shell|Prometheus|Python|GitOps|Docker,五险一金|年终奖|补充商业保险,2026-04-21,https://synthetic.dataset/106
+SYN-0107,推荐系统工程师,京东,5000人以上,互联网/电商,上市公司,16,28,济南,山东,二线,硕士,5-10年,DNN|Spark|Jaccard,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-17,https://synthetic.dataset/107
+SYN-0108,Python开发工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,10,18,郑州,河南,二线,本科,5-10年,Python|MySQL|Linux|FastAPI,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-12,https://synthetic.dataset/108
+SYN-0109,算法工程师(NLP/CV),莉莉丝,1000-2000人,游戏/互联网,民营,40,70,苏州,江苏,新一线,博士,5-10年,Scikit-learn|TensorFlow|模型部署,五险一金|年终奖|弹性工作,2026-07-10,https://synthetic.dataset/109
+SYN-0110,推荐系统工程师,地平线,500-1000人,人工智能/芯片,民营,35,60,杭州,浙江,新一线,本科,1-3年,Jaccard|推荐算法|协同过滤|TensorFlow,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-10,https://synthetic.dataset/110
+SYN-0111,产品经理(技术方向),海康威视,5000人以上,安防/AI,上市公司,10,18,长沙,湖南,新一线,本科,1-3年,项目管理|SQL|需求分析|数据驱动|Jira|Axure,五险一金|年终奖|弹性工作|股票期权,2026-06-25,https://synthetic.dataset/111
+SYN-0112,iOS开发工程师,OPPO,5000人以上,消费电子,民营,10,18,南京,江苏,新一线,本科,3-5年,Swift|CocoaPods|iOS|Xcode|Objective-C,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-20,https://synthetic.dataset/112
+SYN-0113,C++开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,15,25,成都,四川,新一线,硕士,应届,C++|Qt|CMake|TCP/IP|多线程|STL,五险一金|年终奖|弹性工作|餐补,2026-06-25,https://synthetic.dataset/113
+SYN-0114,数据分析师,理想汽车,2000-5000人,新能源汽车,上市公司,25,45,大连,辽宁,二线,本科,1-3年,Excel|Seaborn|Spark SQL|Matplotlib,五险一金|年终奖|补充商业保险,2026-07-17,https://synthetic.dataset/114
+SYN-0115,UI/UX设计师,荣耀,2000-5000人,消费电子,民营,10,20,成都,四川,新一线,本科,应届,Figma|After Effects|用户体验|Illustrator|UI设计,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-10,https://synthetic.dataset/115
+SYN-0116,Android开发工程师,京东,5000人以上,互联网/电商,上市公司,10,20,西安,陕西,新一线,本科,应届,Java|Retrofit|SQLite|Kotlin|Android|Gradle,五险一金|年终奖,2026-07-17,https://synthetic.dataset/116
+SYN-0117,数据分析师,莉莉丝,1000-2000人,游戏/互联网,民营,18,35,苏州,江苏,新一线,本科,1-3年,Excel|SQL|统计学,五险一金|年终奖|股票期权,2026-05-02,https://synthetic.dataset/117
+SYN-0118,区块链开发工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,40,70,杭州,浙江,新一线,本科,5-10年,Go|Solidity|Rust,五险一金|年终奖|弹性工作|股票期权,2026-05-18,https://synthetic.dataset/118
+SYN-0119,嵌入式软件开发,奇安信,2000-5000人,网络安全,上市公司,18,35,合肥,安徽,二线,本科,1-3年,C++|C|ARM|I2C/SPI|FreeRTOS,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-03,https://synthetic.dataset/119
+SYN-0120,区块链开发工程师,网易,5000人以上,互联网/游戏,上市公司,25,50,济南,山东,二线,博士,1-3年,Ethereum|Rust|Hyperledger|Solidity,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-08,https://synthetic.dataset/120
+SYN-0121,UI/UX设计师,大华股份,5000人以上,安防/AI,上市公司,9,16,成都,四川,新一线,本科,应届,C4D|UI设计|Figma,五险一金|年终奖|股票期权|带薪年假,2026-07-02,https://synthetic.dataset/121
+SYN-0122,测试开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,10,18,西安,陕西,新一线,本科,1-3年,JMeter|Java|Postman|Pytest|Python,五险一金|年终奖|带薪年假|弹性工作,2026-06-27,https://synthetic.dataset/122
+SYN-0123,网络安全工程师,滴滴出行,5000人以上,互联网/出行,民营,10,18,厦门,福建,二线,本科,3-5年,Wireshark|防火墙|Burp Suite|密码学|Kali Linux|Python,五险一金|年终奖|带薪年假|弹性工作,2026-06-17,https://synthetic.dataset/123
+SYN-0124,数据仓库工程师,大疆创新,5000人以上,硬件/无人机,民营,15,30,厦门,福建,二线,本科,1-3年,ETL|SQL|数据治理|Spark SQL|Python,五险一金|年终奖|带薪年假|弹性工作,2026-07-13,https://synthetic.dataset/124
+SYN-0125,产品经理(技术方向),理想汽车,2000-5000人,新能源汽车,上市公司,25,45,长沙,湖南,新一线,本科,5-10年,项目管理|敏捷开发|Axure|SQL|竞品分析,五险一金|年终奖|弹性工作,2026-07-20,https://synthetic.dataset/125
+SYN-0126,数据仓库工程师,滴滴出行,5000人以上,互联网/出行,民营,10,18,重庆,重庆,新一线,本科,1-3年,数据建模|数据治理|Hadoop|Python|ETL,五险一金|年终奖|股票期权|带薪年假,2026-05-23,https://synthetic.dataset/126
+SYN-0127,测试开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,40,70,郑州,河南,二线,本科,1-3年,Appium|Python|Java|Postman|Git|JMeter,五险一金|年终奖|带薪年假|弹性工作,2026-05-01,https://synthetic.dataset/127
+SYN-0128,推荐系统工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,10,18,郑州,河南,二线,硕士,3-5年,Jaccard|排序|协同过滤|推荐算法,五险一金|年终奖,2026-05-22,https://synthetic.dataset/128
+SYN-0129,测试开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,35,60,天津,天津,新一线,本科,1-3年,Pytest|Postman|Git|Selenium,五险一金|年终奖|补充商业保险,2026-05-04,https://synthetic.dataset/129
+SYN-0130,Android开发工程师,阿里巴巴,5000人以上,互联网/IT,上市公司,30,55,厦门,福建,二线,硕士,5-10年,Jetpack|Flutter|SQLite,五险一金|年终奖|弹性工作|股票期权,2026-06-23,https://synthetic.dataset/130
+SYN-0131,iOS开发工程师,OPPO,5000人以上,消费电子,民营,16,28,深圳,广东,一线,本科,1-3年,Git|Swift|Xcode|Combine,五险一金|年终奖|带薪年假|弹性工作,2026-04-18,https://synthetic.dataset/131
+SYN-0132,算法工程师(NLP/CV),中兴通讯,5000人以上,通信/IT,上市公司,9,16,重庆,重庆,新一线,硕士,3-5年,TensorFlow|NLP|PyTorch|模型部署,五险一金|年终奖|弹性工作|餐补,2026-04-12,https://synthetic.dataset/132
+SYN-0133,运维开发工程师,海康威视,5000人以上,安防/AI,上市公司,10,20,天津,天津,新一线,本科,应届,Go|Ansible|Nginx,五险一金|年终奖|弹性工作|餐补,2026-07-25,https://synthetic.dataset/133
+SYN-0134,运维开发工程师,比亚迪,5000人以上,新能源汽车,上市公司,10,18,广州,广东,一线,大专,1-3年,Shell|GitOps|Terraform|Go|Ansible|Prometheus,五险一金|年终奖|股票期权,2026-05-14,https://synthetic.dataset/134
+SYN-0135,Python开发工程师,vivo,5000人以上,消费电子,民营,20,40,深圳,广东,一线,博士,3-5年,Flask|Redis|MySQL|Celery,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-28,https://synthetic.dataset/135
+SYN-0136,大数据开发工程师,京东,5000人以上,互联网/电商,上市公司,10,20,武汉,湖北,新一线,大专,3-5年,Scala|Java|Spark|Flink|HDFS,五险一金|年终奖|股票期权,2026-05-06,https://synthetic.dataset/136
+SYN-0137,推荐系统工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,6,12,长沙,湖南,新一线,硕士,1-3年,Python|推荐算法|Spark,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-20,https://synthetic.dataset/137
+SYN-0138,区块链开发工程师,阿里巴巴,5000人以上,互联网/IT,上市公司,25,45,大连,辽宁,二线,本科,3-5年,Hyperledger|Rust|共识算法|Solidity,五险一金|年终奖,2026-05-15,https://synthetic.dataset/138
+SYN-0139,区块链开发工程师,比亚迪,5000人以上,新能源汽车,上市公司,40,70,郑州,河南,二线,硕士,3-5年,DeFi|Web3.js|Node.js|智能合约,五险一金|年终奖|股票期权,2026-06-17,https://synthetic.dataset/139
+SYN-0140,Go后端开发工程师,海康威视,5000人以上,安防/AI,上市公司,12,22,长沙,湖南,新一线,本科,5-10年,Linux|MySQL|gRPC|Go|Kubernetes,五险一金|年终奖|补充商业保险,2026-07-28,https://synthetic.dataset/140
+SYN-0141,UI/UX设计师,中科创达,2000-5000人,软件外包/IoT,上市公司,35,60,南京,江苏,新一线,本科,1-3年,Photoshop|Adobe XD|After Effects|Illustrator|UI设计,五险一金|年终奖|弹性工作|餐补,2026-06-16,https://synthetic.dataset/141
+SYN-0142,前端开发工程师,阿里巴巴,5000人以上,互联网/IT,上市公司,18,35,苏州,江苏,新一线,硕士,5-10年,ECharts|HTML|JavaScript|Vite,五险一金|年终奖|补充商业保险,2026-07-20,https://synthetic.dataset/142
+SYN-0143,算法工程师(NLP/CV),小米集团,5000人以上,消费电子/互联网,上市公司,14,24,大连,辽宁,二线,硕士,1-3年,OpenCV|Scikit-learn|Transformer|PyTorch,五险一金|年终奖,2026-07-02,https://synthetic.dataset/143
+SYN-0144,数据仓库工程师,大华股份,5000人以上,安防/AI,上市公司,20,40,武汉,湖北,新一线,本科,3-5年,ClickHouse|Python|Hadoop,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-27,https://synthetic.dataset/144
+SYN-0145,推荐系统工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,12,20,深圳,广东,一线,硕士,1-3年,Jaccard|召回|排序|协同过滤|TensorFlow,五险一金|年终奖|弹性工作|股票期权,2026-07-17,https://synthetic.dataset/145
+SYN-0146,Python开发工程师,腾讯,5000人以上,互联网/IT,上市公司,25,45,上海,上海,一线,本科,5-10年,Flask|FastAPI|Celery|Linux|MongoDB|Docker,五险一金|年终奖|股票期权,2026-07-20,https://synthetic.dataset/146
+SYN-0147,运维开发工程师,蚂蚁集团,5000人以上,互联网金融,民营,30,55,长沙,湖南,新一线,大专,应届,Prometheus|Ansible|Shell|Nginx|Python|Docker,五险一金|年终奖|带薪年假|弹性工作,2026-04-14,https://synthetic.dataset/147
+SYN-0148,算法工程师(NLP/CV),深信服,2000-5000人,网络安全,上市公司,20,35,北京,北京,一线,本科,应届,Python|深度学习|PyTorch|OpenCV,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-05,https://synthetic.dataset/148
+SYN-0149,Python开发工程师,寒武纪,500-1000人,人工智能/芯片,上市公司,6,12,宁波,浙江,二线,本科,3-5年,Redis|Docker|Flask|MySQL|Celery|Django,五险一金|年终奖|股票期权|带薪年假,2026-07-28,https://synthetic.dataset/149
+SYN-0150,C++开发工程师,华为,5000人以上,通信/IT,民营,8,14,青岛,山东,二线,硕士,应届,多线程|Qt|CMake|STL|Linux|Git,五险一金|年终奖|带薪年假|弹性工作,2026-06-22,https://synthetic.dataset/150
+SYN-0151,推荐系统工程师,地平线,500-1000人,人工智能/芯片,民营,20,35,厦门,福建,二线,硕士,3-5年,Spark|推荐算法|召回|Jaccard|TensorFlow,五险一金|年终奖|弹性工作|餐补,2026-06-16,https://synthetic.dataset/151
+SYN-0152,数据仓库工程师,米哈游,2000-5000人,游戏/互联网,民营,35,60,西安,陕西,新一线,本科,1-3年,ClickHouse|ETL|Spark SQL|Hadoop|SQL|数据治理,五险一金|年终奖|弹性工作,2026-06-15,https://synthetic.dataset/152
+SYN-0153,区块链开发工程师,地平线,500-1000人,人工智能/芯片,民营,20,35,武汉,湖北,新一线,硕士,应届,Ethereum|Go|智能合约|Node.js|Solidity,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-21,https://synthetic.dataset/153
+SYN-0154,Python开发工程师,旷视科技,500-1000人,人工智能,民营,25,45,深圳,广东,一线,大专,5-10年,Flask|Python|Celery,五险一金|年终奖|股票期权|带薪年假,2026-07-16,https://synthetic.dataset/154
+SYN-0155,算法工程师(NLP/CV),科大讯飞,2000-5000人,人工智能,上市公司,10,18,长沙,湖南,新一线,硕士,1-3年,BERT|Python|PyTorch|NLP,五险一金|年终奖|股票期权,2026-04-27,https://synthetic.dataset/155
+SYN-0156,区块链开发工程师,大疆创新,5000人以上,硬件/无人机,民营,6,12,成都,四川,新一线,本科,1-3年,Web3.js|Go|DeFi|Ethereum|智能合约,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-05,https://synthetic.dataset/156
+SYN-0157,网络安全工程师,vivo,5000人以上,消费电子,民营,8,14,西安,陕西,新一线,本科,1-3年,渗透测试|防火墙|IDS/IPS|Wireshark,五险一金|年终奖|带薪年假|弹性工作,2026-06-19,https://synthetic.dataset/157
+SYN-0158,Android开发工程师,科大讯飞,2000-5000人,人工智能,上市公司,25,50,济南,山东,二线,本科,5-10年,Java|MVP/MVVM|Flutter|SQLite|Gradle,五险一金|年终奖|弹性工作|餐补,2026-06-08,https://synthetic.dataset/158
+SYN-0159,大数据开发工程师,字节跳动,5000人以上,互联网/IT,民营,20,35,苏州,江苏,新一线,本科,5-10年,Flink|Hadoop|Scala|HDFS|Hive,五险一金|年终奖|弹性工作|股票期权,2026-04-22,https://synthetic.dataset/159
+SYN-0160,网络安全工程师,网易,5000人以上,互联网/游戏,上市公司,25,50,重庆,重庆,新一线,本科,5-10年,Kali Linux|防火墙|SIEM|OWASP|密码学,五险一金|年终奖|弹性工作|股票期权,2026-05-16,https://synthetic.dataset/160
+SYN-0161,网络安全工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,30,55,济南,山东,二线,大专,5-10年,OWASP|Burp Suite|密码学|SIEM|防火墙|Wireshark,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-17,https://synthetic.dataset/161
+SYN-0162,前端开发工程师,莉莉丝,1000-2000人,游戏/互联网,民营,30,55,宁波,浙江,二线,本科,1-3年,ECharts|Node.js|Vue|TypeScript,五险一金|年终奖|带薪年假|弹性工作,2026-07-04,https://synthetic.dataset/162
+SYN-0163,运维开发工程师,商汤科技,1000-2000人,人工智能,民营,16,28,厦门,福建,二线,本科,应届,Shell|Docker|Nginx,五险一金|年终奖|弹性工作|餐补,2026-04-18,https://synthetic.dataset/163
+SYN-0164,算法工程师(NLP/CV),小鹏汽车,2000-5000人,新能源汽车,上市公司,6,12,北京,北京,一线,博士,5-10年,模型部署|TensorFlow|Python|NLP,五险一金|年终奖|带薪年假|弹性工作,2026-04-18,https://synthetic.dataset/164
+SYN-0165,前端开发工程师,华为,5000人以上,通信/IT,民营,14,24,厦门,福建,二线,本科,1-3年,Vue|Webpack|HTML|React,五险一金|年终奖|弹性工作|餐补,2026-07-13,https://synthetic.dataset/165
+SYN-0166,数据仓库工程师,京东,5000人以上,互联网/电商,上市公司,15,25,杭州,浙江,新一线,本科,1-3年,Python|Spark SQL|Flink|ClickHouse|SQL|ETL,五险一金|年终奖|补充商业保险,2026-07-22,https://synthetic.dataset/166
+SYN-0167,UI/UX设计师,中兴通讯,5000人以上,通信/IT,上市公司,18,35,大连,辽宁,二线,本科,3-5年,用户体验|Adobe XD|Illustrator|Sketch|UI设计|Figma,五险一金|年终奖,2026-07-20,https://synthetic.dataset/167
+SYN-0168,数据分析师,阿里巴巴,5000人以上,互联网/IT,上市公司,40,70,武汉,湖北,新一线,本科,1-3年,Seaborn|Python|NumPy,五险一金|年终奖,2026-07-15,https://synthetic.dataset/168
+SYN-0169,数据仓库工程师,旷视科技,500-1000人,人工智能,民营,25,50,武汉,湖北,新一线,本科,3-5年,Flink|ETL|Python|Hive|Spark SQL,五险一金|年终奖|股票期权,2026-05-14,https://synthetic.dataset/169
+SYN-0170,大数据开发工程师,蚂蚁集团,5000人以上,互联网金融,民营,15,25,上海,上海,一线,大专,1-3年,Java|ClickHouse|Hadoop|Hive|HDFS|Kafka,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-23,https://synthetic.dataset/170
+SYN-0171,UI/UX设计师,比亚迪,5000人以上,新能源汽车,上市公司,15,25,杭州,浙江,新一线,大专,5-10年,Photoshop|UI设计|Illustrator|交互设计|用户体验|Sketch,五险一金|年终奖|弹性工作|餐补,2026-04-18,https://synthetic.dataset/171
+SYN-0172,UI/UX设计师,比亚迪,5000人以上,新能源汽车,上市公司,12,20,大连,辽宁,二线,硕士,3-5年,Illustrator|Photoshop|用户体验|After Effects,五险一金|年终奖|弹性工作,2026-07-28,https://synthetic.dataset/172
+SYN-0173,前端开发工程师,莉莉丝,1000-2000人,游戏/互联网,民营,20,35,大连,辽宁,二线,大专,1-3年,ECharts|JavaScript|TypeScript|Vite|CSS|HTML,五险一金|年终奖|弹性工作|股票期权,2026-07-07,https://synthetic.dataset/173
+SYN-0174,算法工程师(NLP/CV),SHEIN,5000人以上,互联网/电商,民营,12,22,北京,北京,一线,硕士,3-5年,NLP|模型部署|Transformer|TensorFlow|OpenCV|PyTorch,五险一金|年终奖|补充商业保险,2026-07-15,https://synthetic.dataset/174
+SYN-0175,测试开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,25,50,重庆,重庆,新一线,本科,1-3年,Jenkins|Java|自动化测试|Git|Selenium|Pytest,五险一金|年终奖|带薪年假|弹性工作,2026-06-14,https://synthetic.dataset/175
+SYN-0176,运维开发工程师,腾讯,5000人以上,互联网/IT,上市公司,20,35,南京,江苏,新一线,大专,1-3年,Ansible|Docker|Kubernetes|GitOps|Go|Shell,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-16,https://synthetic.dataset/176
+SYN-0177,DevOps运维工程师,海康威视,5000人以上,安防/AI,上市公司,16,28,西安,陕西,新一线,本科,5-10年,Terraform|Kubernetes|Prometheus|Grafana,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-06,https://synthetic.dataset/177
+SYN-0178,Python开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,8,15,青岛,山东,二线,本科,1-3年,Docker|Flask|MySQL,五险一金|年终奖|弹性工作,2026-05-01,https://synthetic.dataset/178
+SYN-0179,嵌入式软件开发,商汤科技,1000-2000人,人工智能,民营,40,70,郑州,河南,二线,大专,1-3年,I2C/SPI|C|PCB|Linux|MCU|ARM,五险一金|年终奖,2026-04-17,https://synthetic.dataset/179
+SYN-0180,数据仓库工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,14,24,重庆,重庆,新一线,本科,3-5年,Hive|数据治理|Spark SQL|Python,五险一金|年终奖|弹性工作|股票期权,2026-06-27,https://synthetic.dataset/180
+SYN-0181,大数据开发工程师,米哈游,2000-5000人,游戏/互联网,民营,12,20,苏州,江苏,新一线,本科,3-5年,Scala|Kafka|Java|Hive|HDFS|Hadoop,五险一金|年终奖,2026-04-13,https://synthetic.dataset/181
+SYN-0182,产品经理(技术方向),鹰角网络,500-1000人,游戏/互联网,民营,6,12,大连,辽宁,二线,本科,1-3年,Axure|PRD|Jira|SQL,五险一金|年终奖|带薪年假|弹性工作,2026-04-17,https://synthetic.dataset/182
+SYN-0183,数据分析师,腾讯,5000人以上,互联网/IT,上市公司,20,35,武汉,湖北,新一线,本科,5-10年,SQL|Tableau|Python,五险一金|年终奖|股票期权,2026-06-01,https://synthetic.dataset/183
+SYN-0184,运维开发工程师,商汤科技,1000-2000人,人工智能,民营,20,40,杭州,浙江,新一线,本科,1-3年,Prometheus|Kubernetes|Nginx|Terraform,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-13,https://synthetic.dataset/184
+SYN-0185,前端开发工程师,快手,2000-5000人,互联网/短视频,民营,12,22,青岛,山东,二线,本科,1-3年,React|TypeScript|HTML|CSS|Webpack|Vite,五险一金|年终奖|股票期权|带薪年假,2026-06-01,https://synthetic.dataset/185
+SYN-0186,网络安全工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,30,55,厦门,福建,二线,本科,1-3年,Python|IDS/IPS|密码学|Wireshark|防火墙|OWASP,五险一金|年终奖|弹性工作|股票期权,2026-04-03,https://synthetic.dataset/186
+SYN-0187,C++开发工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,8,14,苏州,江苏,新一线,硕士,5-10年,STL|Docker|C++|Boost|Linux,五险一金|年终奖|带薪年假|弹性工作,2026-06-04,https://synthetic.dataset/187
+SYN-0188,前端开发工程师,快手,2000-5000人,互联网/短视频,民营,30,55,成都,四川,新一线,本科,5-10年,TypeScript|JavaScript|ECharts|Vue|CSS|Node.js,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-28,https://synthetic.dataset/188
+SYN-0189,Java开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,10,18,重庆,重庆,新一线,大专,5-10年,Git|Linux|MyBatis|Docker,五险一金|年终奖|股票期权|带薪年假,2026-05-05,https://synthetic.dataset/189
+SYN-0190,算法工程师(NLP/CV),Momenta,200-500人,人工智能/自动驾驶,外商独资,10,18,西安,陕西,新一线,博士,3-5年,Transformer|OpenCV|模型部署|PyTorch,五险一金|年终奖|弹性工作|餐补,2026-04-12,https://synthetic.dataset/190
+SYN-0191,数据分析师,地平线,500-1000人,人工智能/芯片,民营,15,30,厦门,福建,二线,本科,应届,SQL|Pandas|Tableau|Python|NumPy|Spark SQL,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-26,https://synthetic.dataset/191
+SYN-0192,网络安全工程师,SHEIN,5000人以上,互联网/电商,民营,10,20,长沙,湖南,新一线,本科,应届,SIEM|Burp Suite|渗透测试|IDS/IPS|Kali Linux,五险一金|年终奖|股票期权|带薪年假,2026-06-10,https://synthetic.dataset/192
+SYN-0193,运维开发工程师,OPPO,5000人以上,消费电子,民营,20,35,南京,江苏,新一线,本科,5-10年,Terraform|Go|Kubernetes|Ansible|Nginx|GitOps,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-24,https://synthetic.dataset/193
+SYN-0194,iOS开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,14,24,郑州,河南,二线,大专,1-3年,Objective-C|SwiftUI|UIKit|Combine|Xcode|Swift,五险一金|年终奖|股票期权|带薪年假,2026-07-03,https://synthetic.dataset/194
+SYN-0195,推荐系统工程师,理想汽车,2000-5000人,新能源汽车,上市公司,30,55,厦门,福建,二线,硕士,5-10年,召回|Python|Jaccard|DNN|推荐算法|协同过滤,五险一金|年终奖|弹性工作,2026-04-25,https://synthetic.dataset/195
+SYN-0196,测试开发工程师,寒武纪,500-1000人,人工智能/芯片,上市公司,35,60,成都,四川,新一线,大专,1-3年,Postman|Git|Java|Python|Pytest|Selenium,五险一金|年终奖|弹性工作|股票期权,2026-05-15,https://synthetic.dataset/196
+SYN-0197,产品经理(技术方向),莉莉丝,1000-2000人,游戏/互联网,民营,10,20,郑州,河南,二线,大专,1-3年,需求分析|PRD|Axure|数据驱动|竞品分析,五险一金|年终奖|弹性工作,2026-04-27,https://synthetic.dataset/197
+SYN-0198,测试开发工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,15,30,重庆,重庆,新一线,本科,5-10年,Postman|Jenkins|Java|JMeter|自动化测试|Git,五险一金|年终奖|带薪年假|弹性工作,2026-04-10,https://synthetic.dataset/198
+SYN-0199,Go后端开发工程师,腾讯,5000人以上,互联网/IT,上市公司,15,25,北京,北京,一线,本科,1-3年,Kafka|gRPC|PostgreSQL|Linux,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-15,https://synthetic.dataset/199
+SYN-0200,产品经理(技术方向),旷视科技,500-1000人,人工智能,民营,12,20,成都,四川,新一线,本科,5-10年,用户研究|竞品分析|PRD,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-13,https://synthetic.dataset/200
+SYN-0201,iOS开发工程师,字节跳动,5000人以上,互联网/IT,民营,35,60,武汉,湖北,新一线,大专,1-3年,CocoaPods|Objective-C|Xcode,五险一金|年终奖|带薪年假|弹性工作,2026-05-15,https://synthetic.dataset/201
+SYN-0202,大数据开发工程师,网易,5000人以上,互联网/游戏,上市公司,40,70,厦门,福建,二线,大专,3-5年,Scala|HBase|Spark|Hive|Java|Kafka,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-27,https://synthetic.dataset/202
+SYN-0203,推荐系统工程师,蚂蚁集团,5000人以上,互联网金融,民营,8,14,宁波,浙江,二线,硕士,3-5年,Spark|推荐算法|TensorFlow,五险一金|年终奖|股票期权,2026-06-23,https://synthetic.dataset/203
+SYN-0204,嵌入式软件开发,哔哩哔哩,2000-5000人,互联网/视频,上市公司,10,20,苏州,江苏,新一线,本科,应届,MCU|RTOS|I2C/SPI|FreeRTOS|Linux|C++,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-16,https://synthetic.dataset/204
+SYN-0205,C++开发工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,40,70,成都,四川,新一线,本科,5-10年,CMake|C++|TCP/IP,五险一金|年终奖|股票期权,2026-05-27,https://synthetic.dataset/205
+SYN-0206,数据仓库工程师,鹰角网络,500-1000人,游戏/互联网,民营,25,45,青岛,山东,二线,大专,5-10年,Hadoop|数据治理|Spark SQL|SQL|数据建模|ClickHouse,五险一金|年终奖|弹性工作|股票期权,2026-06-02,https://synthetic.dataset/206
+SYN-0207,数据分析师,Momenta,200-500人,人工智能/自动驾驶,外商独资,16,28,大连,辽宁,二线,硕士,3-5年,Spark SQL|统计学|SQL|Tableau|Python|Pandas,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-18,https://synthetic.dataset/207
+SYN-0208,网络安全工程师,腾讯,5000人以上,互联网/IT,上市公司,12,22,大连,辽宁,二线,本科,5-10年,防火墙|Wireshark|渗透测试|IDS/IPS,五险一金|年终奖|带薪年假|弹性工作,2026-04-15,https://synthetic.dataset/208
+SYN-0209,数据分析师,网易,5000人以上,互联网/游戏,上市公司,40,70,武汉,湖北,新一线,本科,1-3年,Pandas|统计学|NumPy|Matplotlib|SQL|Python,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-18,https://synthetic.dataset/209
+SYN-0210,推荐系统工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,20,40,大连,辽宁,二线,硕士,3-5年,排序|推荐算法|TensorFlow|DNN|Spark,五险一金|年终奖,2026-06-28,https://synthetic.dataset/210
+SYN-0211,C++开发工程师,快手,2000-5000人,互联网/短视频,民营,18,35,南京,江苏,新一线,硕士,1-3年,TCP/IP|Boost|Git|CMake|Linux|Qt,五险一金|年终奖|弹性工作|餐补,2026-04-21,https://synthetic.dataset/211
+SYN-0212,产品经理(技术方向),京东,5000人以上,互联网/电商,上市公司,16,28,青岛,山东,二线,硕士,3-5年,SQL|需求分析|Axure|用户研究|竞品分析|数据驱动,五险一金|年终奖|弹性工作,2026-07-07,https://synthetic.dataset/212
+SYN-0213,iOS开发工程师,蔚来汽车,5000人以上,新能源汽车,上市公司,20,40,厦门,福建,二线,大专,3-5年,CocoaPods|Objective-C|Git|CoreData|Combine,五险一金|年终奖,2026-04-04,https://synthetic.dataset/213
+SYN-0214,Java开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,16,28,深圳,广东,一线,本科,5-10年,Kafka|MySQL|MyBatis,五险一金|年终奖|补充商业保险,2026-05-28,https://synthetic.dataset/214
+SYN-0215,前端开发工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,9,16,天津,天津,新一线,本科,1-3年,JavaScript|Webpack|CSS|HTML,五险一金|年终奖|弹性工作|股票期权,2026-07-21,https://synthetic.dataset/215
+SYN-0216,Go后端开发工程师,京东,5000人以上,互联网/电商,上市公司,10,18,北京,北京,一线,本科,5-10年,PostgreSQL|MySQL|Linux|Go,五险一金|年终奖,2026-06-27,https://synthetic.dataset/216
+SYN-0217,UI/UX设计师,网易,5000人以上,互联网/游戏,上市公司,18,35,杭州,浙江,新一线,本科,1-3年,Sketch|UI设计|C4D|Adobe XD|交互设计|用户体验,五险一金|年终奖|股票期权,2026-07-25,https://synthetic.dataset/217
+SYN-0218,C++开发工程师,快手,2000-5000人,互联网/短视频,民营,6,12,广州,广东,一线,博士,应届,TCP/IP|CMake|Linux|多线程,五险一金|年终奖|股票期权,2026-07-20,https://synthetic.dataset/218
+SYN-0219,iOS开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,12,22,广州,广东,一线,本科,3-5年,Xcode|CoreData|Combine|CocoaPods|Swift|Git,五险一金|年终奖|补充商业保险,2026-04-08,https://synthetic.dataset/219
+SYN-0220,推荐系统工程师,海康威视,5000人以上,安防/AI,上市公司,6,12,济南,山东,二线,硕士,3-5年,Spark|召回|排序|Jaccard|DNN,五险一金|年终奖|补充商业保险,2026-04-26,https://synthetic.dataset/220
+SYN-0221,区块链开发工程师,寒武纪,500-1000人,人工智能/芯片,上市公司,25,45,苏州,江苏,新一线,本科,3-5年,Node.js|Solidity|DeFi,五险一金|年终奖|带薪年假|弹性工作,2026-05-13,https://synthetic.dataset/221
+SYN-0222,UI/UX设计师,大华股份,5000人以上,安防/AI,上市公司,25,45,天津,天津,新一线,硕士,3-5年,Figma|Sketch|UI设计,五险一金|年终奖|补充商业保险,2026-05-02,https://synthetic.dataset/222
+SYN-0223,产品经理(技术方向),华为,5000人以上,通信/IT,民营,14,24,青岛,山东,二线,硕士,1-3年,Jira|Axure|数据驱动|PRD|需求分析|用户研究,五险一金|年终奖|弹性工作,2026-05-26,https://synthetic.dataset/223
+SYN-0224,数据仓库工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,10,18,长沙,湖南,新一线,大专,3-5年,ClickHouse|Flink|SQL|Hive|Hadoop,五险一金|年终奖|股票期权|带薪年假,2026-04-15,https://synthetic.dataset/224
+SYN-0225,推荐系统工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,12,22,上海,上海,一线,本科,3-5年,PyTorch|Python|排序,五险一金|年终奖|弹性工作|餐补,2026-06-17,https://synthetic.dataset/225
+SYN-0226,大数据开发工程师,荣耀,2000-5000人,消费电子,民营,20,35,成都,四川,新一线,硕士,3-5年,Hadoop|HDFS|HBase,五险一金|年终奖|补充商业保险,2026-04-09,https://synthetic.dataset/226
+SYN-0227,前端开发工程师,大华股份,5000人以上,安防/AI,上市公司,9,16,厦门,福建,二线,本科,应届,Vite|Vue|HTML,五险一金|年终奖|股票期权,2026-06-25,https://synthetic.dataset/227
+SYN-0228,运维开发工程师,美团,5000人以上,互联网/O2O,上市公司,6,12,深圳,广东,一线,大专,应届,Python|Kubernetes|Prometheus,五险一金|年终奖|弹性工作|餐补,2026-06-13,https://synthetic.dataset/228
+SYN-0229,Android开发工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,18,35,上海,上海,一线,硕士,5-10年,Retrofit|MVP/MVVM|Git|Kotlin|Android,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-04,https://synthetic.dataset/229
+SYN-0230,Python开发工程师,vivo,5000人以上,消费电子,民营,8,15,成都,四川,新一线,本科,应届,Django|Linux|MongoDB|Docker|Flask|Redis,五险一金|年终奖|弹性工作,2026-07-01,https://synthetic.dataset/230
+SYN-0231,iOS开发工程师,莉莉丝,1000-2000人,游戏/互联网,民营,40,70,重庆,重庆,新一线,硕士,3-5年,Git|Xcode|Combine|CoreData,五险一金|年终奖|弹性工作|股票期权,2026-05-05,https://synthetic.dataset/231
+SYN-0232,UI/UX设计师,字节跳动,5000人以上,互联网/IT,民营,9,16,北京,北京,一线,本科,应届,用户体验|Figma|交互设计,五险一金|年终奖|补充商业保险,2026-04-07,https://synthetic.dataset/232
+SYN-0233,数据分析师,荣耀,2000-5000人,消费电子,民营,10,20,合肥,安徽,二线,大专,1-3年,SQL|Python|NumPy|Matplotlib|Tableau,五险一金|年终奖|股票期权|带薪年假,2026-06-15,https://synthetic.dataset/233
+SYN-0234,运维开发工程师,京东,5000人以上,互联网/电商,上市公司,12,20,深圳,广东,一线,大专,3-5年,Prometheus|Python|Nginx,五险一金|年终奖|股票期权,2026-05-10,https://synthetic.dataset/234
+SYN-0235,DevOps运维工程师,地平线,500-1000人,人工智能/芯片,民营,16,28,苏州,江苏,新一线,本科,3-5年,Jenkins|Docker|Grafana|Prometheus|Ansible,五险一金|年终奖|弹性工作,2026-05-04,https://synthetic.dataset/235
+SYN-0236,网络安全工程师,小红书,2000-5000人,互联网/社交,民营,12,22,郑州,河南,二线,大专,5-10年,Burp Suite|渗透测试|防火墙|密码学|IDS/IPS,五险一金|年终奖|弹性工作,2026-04-06,https://synthetic.dataset/236
+SYN-0237,推荐系统工程师,蚂蚁集团,5000人以上,互联网金融,民营,10,20,上海,上海,一线,硕士,3-5年,Spark|Jaccard|协同过滤,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-22,https://synthetic.dataset/237
+SYN-0238,大数据开发工程师,蚂蚁集团,5000人以上,互联网金融,民营,16,28,成都,四川,新一线,本科,5-10年,Spark|ClickHouse|Scala|HBase,五险一金|年终奖|股票期权,2026-04-01,https://synthetic.dataset/238
+SYN-0239,数据分析师,华为,5000人以上,通信/IT,民营,9,16,杭州,浙江,新一线,本科,5-10年,统计学|Tableau|SQL,五险一金|年终奖,2026-04-07,https://synthetic.dataset/239
+SYN-0240,C++开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,8,15,广州,广东,一线,本科,3-5年,C++|Boost|Qt|TCP/IP|CMake|Linux,五险一金|年终奖|弹性工作|餐补,2026-04-13,https://synthetic.dataset/240
+SYN-0241,Android开发工程师,蔚来汽车,5000人以上,新能源汽车,上市公司,20,35,天津,天津,新一线,大专,3-5年,SQLite|Kotlin|Android|Jetpack|MVP/MVVM,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-21,https://synthetic.dataset/241
+SYN-0242,区块链开发工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,8,15,合肥,安徽,二线,博士,5-10年,Rust|Hyperledger|Ethereum,五险一金|年终奖|股票期权|带薪年假,2026-05-21,https://synthetic.dataset/242
+SYN-0243,数据分析师,荣耀,2000-5000人,消费电子,民营,9,16,大连,辽宁,二线,本科,5-10年,Spark SQL|Seaborn|Excel|Tableau|Matplotlib|Pandas,五险一金|年终奖|股票期权|带薪年假,2026-06-06,https://synthetic.dataset/243
+SYN-0244,DevOps运维工程师,阿里巴巴,5000人以上,互联网/IT,上市公司,20,35,济南,山东,二线,大专,1-3年,Shell|Prometheus|Terraform,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-06,https://synthetic.dataset/244
+SYN-0245,数据分析师,美团,5000人以上,互联网/O2O,上市公司,8,15,南京,江苏,新一线,硕士,应届,统计学|Matplotlib|Excel|Spark SQL,五险一金|年终奖|股票期权,2026-05-08,https://synthetic.dataset/245
+SYN-0246,DevOps运维工程师,深信服,2000-5000人,网络安全,上市公司,9,16,天津,天津,新一线,大专,1-3年,Grafana|Jenkins|Shell|Ansible,五险一金|年终奖|补充商业保险,2026-05-16,https://synthetic.dataset/246
+SYN-0247,前端开发工程师,腾讯,5000人以上,互联网/IT,上市公司,18,35,上海,上海,一线,大专,应届,Node.js|Vite|JavaScript,五险一金|年终奖|带薪年假|弹性工作,2026-05-26,https://synthetic.dataset/247
+SYN-0248,DevOps运维工程师,快手,2000-5000人,互联网/短视频,民营,6,12,成都,四川,新一线,本科,1-3年,Grafana|Kubernetes|Docker|Nginx,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-03,https://synthetic.dataset/248
+SYN-0249,产品经理(技术方向),莉莉丝,1000-2000人,游戏/互联网,民营,20,40,宁波,浙江,二线,本科,3-5年,数据驱动|用户研究|Jira|PRD|SQL,五险一金|年终奖|弹性工作|餐补,2026-06-06,https://synthetic.dataset/249
+SYN-0250,推荐系统工程师,海康威视,5000人以上,安防/AI,上市公司,15,25,天津,天津,新一线,硕士,1-3年,推荐算法|排序|PyTorch|TensorFlow|Jaccard|Python,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-28,https://synthetic.dataset/250
+SYN-0251,Python开发工程师,大华股份,5000人以上,安防/AI,上市公司,40,70,成都,四川,新一线,博士,5-10年,Celery|Django|Linux|FastAPI,五险一金|年终奖|带薪年假|弹性工作,2026-04-08,https://synthetic.dataset/251
+SYN-0252,DevOps运维工程师,米哈游,2000-5000人,游戏/互联网,民营,16,28,成都,四川,新一线,本科,3-5年,Ansible|Jenkins|Prometheus,五险一金|年终奖|弹性工作,2026-06-09,https://synthetic.dataset/252
+SYN-0253,Java开发工程师,美团,5000人以上,互联网/O2O,上市公司,14,24,上海,上海,一线,大专,5-10年,Kafka|Spring Cloud|Git|MyBatis,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-04,https://synthetic.dataset/253
+SYN-0254,运维开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,10,18,南京,江苏,新一线,大专,5-10年,Ansible|Python|Terraform,五险一金|年终奖|补充商业保险,2026-04-03,https://synthetic.dataset/254
+SYN-0255,Android开发工程师,SHEIN,5000人以上,互联网/电商,民营,30,55,苏州,江苏,新一线,大专,1-3年,Git|SQLite|Android,五险一金|年终奖|股票期权|带薪年假,2026-05-20,https://synthetic.dataset/255
+SYN-0256,Android开发工程师,蔚来汽车,5000人以上,新能源汽车,上市公司,15,30,上海,上海,一线,本科,1-3年,MVP/MVVM|Gradle|Jetpack|Git,五险一金|年终奖|补充商业保险,2026-06-08,https://synthetic.dataset/256
+SYN-0257,Python开发工程师,美团,5000人以上,互联网/O2O,上市公司,25,45,苏州,江苏,新一线,博士,应届,Python|Redis|Celery|MySQL,五险一金|年终奖|弹性工作,2026-06-27,https://synthetic.dataset/257
+SYN-0258,区块链开发工程师,奇安信,2000-5000人,网络安全,上市公司,15,30,武汉,湖北,新一线,本科,1-3年,Rust|Go|共识算法|Hyperledger,五险一金|年终奖|弹性工作,2026-06-26,https://synthetic.dataset/258
+SYN-0259,区块链开发工程师,大疆创新,5000人以上,硬件/无人机,民营,30,55,厦门,福建,二线,本科,1-3年,Ethereum|DeFi|Hyperledger|Web3.js|Go|智能合约,五险一金|年终奖,2026-06-15,https://synthetic.dataset/259
+SYN-0260,大数据开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,8,15,南京,江苏,新一线,硕士,1-3年,Spark|Scala|HDFS|HBase,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-25,https://synthetic.dataset/260
+SYN-0261,数据分析师,深信服,2000-5000人,网络安全,上市公司,25,50,大连,辽宁,二线,本科,5-10年,Spark SQL|Seaborn|NumPy|统计学|Pandas|Python,五险一金|年终奖|股票期权|带薪年假,2026-04-17,https://synthetic.dataset/261
+SYN-0262,嵌入式软件开发,大华股份,5000人以上,安防/AI,上市公司,12,22,宁波,浙江,二线,硕士,3-5年,RTOS|嵌入式调试|ARM|MCU|C++|FreeRTOS,五险一金|年终奖,2026-07-03,https://synthetic.dataset/262
+SYN-0263,iOS开发工程师,蔚来汽车,5000人以上,新能源汽车,上市公司,8,14,杭州,浙江,新一线,硕士,3-5年,Swift|CoreData|CocoaPods,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-28,https://synthetic.dataset/263
+SYN-0264,嵌入式软件开发,Momenta,200-500人,人工智能/自动驾驶,外商独资,35,60,郑州,河南,二线,本科,应届,C++|MCU|RTOS|嵌入式调试|Linux|FreeRTOS,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-04,https://synthetic.dataset/264
+SYN-0265,Go后端开发工程师,大华股份,5000人以上,安防/AI,上市公司,14,24,重庆,重庆,新一线,硕士,3-5年,Kubernetes|Linux|Kafka|Go|Gin,五险一金|年终奖|补充商业保险,2026-07-05,https://synthetic.dataset/265
+SYN-0266,推荐系统工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,8,14,苏州,江苏,新一线,硕士,5-10年,Python|DNN|推荐算法|PyTorch,五险一金|年终奖,2026-06-27,https://synthetic.dataset/266
+SYN-0267,算法工程师(NLP/CV),蚂蚁集团,5000人以上,互联网金融,民营,18,35,西安,陕西,新一线,博士,1-3年,OpenCV|深度学习|Scikit-learn|PyTorch,五险一金|年终奖|股票期权|带薪年假,2026-04-07,https://synthetic.dataset/267
+SYN-0268,iOS开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,9,16,合肥,安徽,二线,本科,应届,CocoaPods|Objective-C|Swift,五险一金|年终奖|补充商业保险,2026-07-05,https://synthetic.dataset/268
+SYN-0269,运维开发工程师,荣耀,2000-5000人,消费电子,民营,15,30,北京,北京,一线,大专,3-5年,Kubernetes|Python|Shell,五险一金|年终奖,2026-06-23,https://synthetic.dataset/269
+SYN-0270,大数据开发工程师,科大讯飞,2000-5000人,人工智能,上市公司,12,20,天津,天津,新一线,本科,1-3年,Hadoop|Kafka|HDFS,五险一金|年终奖|弹性工作|餐补,2026-07-06,https://synthetic.dataset/270
+SYN-0271,运维开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,15,25,大连,辽宁,二线,本科,1-3年,Go|Ansible|Python|Kubernetes|Shell,五险一金|年终奖|股票期权,2026-05-28,https://synthetic.dataset/271
+SYN-0272,数据分析师,旷视科技,500-1000人,人工智能,民营,25,50,武汉,湖北,新一线,硕士,5-10年,Python|Seaborn|Pandas,五险一金|年终奖|股票期权,2026-04-08,https://synthetic.dataset/272
+SYN-0273,推荐系统工程师,地平线,500-1000人,人工智能/芯片,民营,12,20,重庆,重庆,新一线,本科,5-10年,DNN|推荐算法|Spark|排序|PyTorch,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-19,https://synthetic.dataset/273
+SYN-0274,Java开发工程师,美团,5000人以上,互联网/O2O,上市公司,40,70,青岛,山东,二线,本科,应届,Redis|Spring Boot|Spring Cloud|Java|MyBatis,五险一金|年终奖|补充商业保险,2026-06-28,https://synthetic.dataset/274
+SYN-0275,大数据开发工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,25,50,重庆,重庆,新一线,本科,3-5年,Hadoop|HBase|HDFS|ClickHouse,五险一金|年终奖|股票期权,2026-04-21,https://synthetic.dataset/275
+SYN-0276,算法工程师(NLP/CV),OPPO,5000人以上,消费电子,民营,12,20,西安,陕西,新一线,博士,应届,模型部署|NLP|Scikit-learn,五险一金|年终奖|弹性工作|股票期权,2026-07-22,https://synthetic.dataset/276
+SYN-0277,嵌入式软件开发,米哈游,2000-5000人,游戏/互联网,民营,15,25,重庆,重庆,新一线,本科,应届,C++|I2C/SPI|RTOS|FreeRTOS|PCB,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-22,https://synthetic.dataset/277
+SYN-0278,前端开发工程师,SHEIN,5000人以上,互联网/电商,民营,20,40,南京,江苏,新一线,本科,3-5年,HTML|ECharts|CSS|Vite|Vue|React,五险一金|年终奖|弹性工作,2026-07-02,https://synthetic.dataset/278
+SYN-0279,运维开发工程师,深信服,2000-5000人,网络安全,上市公司,15,30,济南,山东,二线,本科,5-10年,Nginx|GitOps|Ansible,五险一金|年终奖|股票期权|带薪年假,2026-04-28,https://synthetic.dataset/279
+SYN-0280,C++开发工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,35,60,武汉,湖北,新一线,本科,5-10年,Boost|CMake|Docker|Qt|C++|Linux,五险一金|年终奖|带薪年假|弹性工作,2026-05-11,https://synthetic.dataset/280
+SYN-0281,Java开发工程师,华为,5000人以上,通信/IT,民营,15,25,郑州,河南,二线,本科,3-5年,Spring Cloud|Spring Boot|MyBatis|Redis,五险一金|年终奖|股票期权|带薪年假,2026-07-13,https://synthetic.dataset/281
+SYN-0282,区块链开发工程师,蔚来汽车,5000人以上,新能源汽车,上市公司,30,55,苏州,江苏,新一线,本科,1-3年,DeFi|Solidity|Web3.js|Hyperledger,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-01,https://synthetic.dataset/282
+SYN-0283,数据分析师,字节跳动,5000人以上,互联网/IT,民营,10,20,南京,江苏,新一线,硕士,1-3年,Matplotlib|Spark SQL|Tableau,五险一金|年终奖|股票期权,2026-04-27,https://synthetic.dataset/283
+SYN-0284,算法工程师(NLP/CV),腾讯,5000人以上,互联网/IT,上市公司,40,70,重庆,重庆,新一线,博士,3-5年,Transformer|PyTorch|Scikit-learn|NLP|BERT,五险一金|年终奖|弹性工作|股票期权,2026-05-26,https://synthetic.dataset/284
+SYN-0285,Java开发工程师,大疆创新,5000人以上,硬件/无人机,民营,15,30,南京,江苏,新一线,本科,3-5年,Git|Linux|MyBatis,五险一金|年终奖|弹性工作,2026-06-23,https://synthetic.dataset/285
+SYN-0286,产品经理(技术方向),腾讯,5000人以上,互联网/IT,上市公司,8,15,西安,陕西,新一线,大专,1-3年,Axure|需求分析|项目管理,五险一金|年终奖|弹性工作,2026-07-15,https://synthetic.dataset/286
+SYN-0287,Go后端开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,10,20,大连,辽宁,二线,本科,5-10年,Go|Redis|Kubernetes|Docker,五险一金|年终奖|弹性工作,2026-06-20,https://synthetic.dataset/287
+SYN-0288,C++开发工程师,奇安信,2000-5000人,网络安全,上市公司,40,70,合肥,安徽,二线,本科,应届,Git|STL|多线程,五险一金|年终奖|弹性工作|餐补,2026-05-20,https://synthetic.dataset/288
+SYN-0289,大数据开发工程师,科大讯飞,2000-5000人,人工智能,上市公司,14,24,青岛,山东,二线,本科,3-5年,Hive|Hadoop|ClickHouse|Spark|HDFS,五险一金|年终奖|弹性工作|餐补,2026-06-08,https://synthetic.dataset/289
+SYN-0290,Java开发工程师,字节跳动,5000人以上,互联网/IT,民营,25,45,广州,广东,一线,本科,应届,Spring Boot|Linux|Git|Docker,五险一金|年终奖|弹性工作,2026-06-21,https://synthetic.dataset/290
+SYN-0291,网络安全工程师,旷视科技,500-1000人,人工智能,民营,8,15,重庆,重庆,新一线,大专,5-10年,IDS/IPS|Wireshark|防火墙,五险一金|年终奖|带薪年假|弹性工作,2026-06-14,https://synthetic.dataset/291
+SYN-0292,Go后端开发工程师,网易,5000人以上,互联网/游戏,上市公司,15,25,上海,上海,一线,本科,3-5年,Docker|Linux|Redis|PostgreSQL|Go,五险一金|年终奖|带薪年假|弹性工作,2026-06-06,https://synthetic.dataset/292
+SYN-0293,产品经理(技术方向),网易,5000人以上,互联网/游戏,上市公司,12,20,苏州,江苏,新一线,本科,3-5年,Jira|数据驱动|Axure|PRD|SQL|需求分析,五险一金|年终奖|股票期权,2026-04-14,https://synthetic.dataset/293
+SYN-0294,区块链开发工程师,深信服,2000-5000人,网络安全,上市公司,40,70,宁波,浙江,二线,本科,3-5年,DeFi|Solidity|Ethereum|智能合约|Hyperledger|Node.js,五险一金|年终奖|股票期权|带薪年假,2026-07-02,https://synthetic.dataset/294
+SYN-0295,大数据开发工程师,百度,5000人以上,互联网/IT,上市公司,35,60,长沙,湖南,新一线,本科,1-3年,HDFS|Java|Spark|Kafka,五险一金|年终奖|弹性工作|股票期权,2026-07-12,https://synthetic.dataset/295
+SYN-0296,C++开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,6,12,大连,辽宁,二线,博士,3-5年,多线程|TCP/IP|Docker|Qt,五险一金|年终奖|股票期权,2026-04-25,https://synthetic.dataset/296
+SYN-0297,DevOps运维工程师,OPPO,5000人以上,消费电子,民营,8,15,南京,江苏,新一线,本科,3-5年,Prometheus|Nginx|Grafana|Shell,五险一金|年终奖|弹性工作|股票期权,2026-04-15,https://synthetic.dataset/297
+SYN-0298,运维开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,16,28,郑州,河南,二线,本科,5-10年,Go|Shell|Python|GitOps|Kubernetes,五险一金|年终奖|股票期权|带薪年假,2026-04-18,https://synthetic.dataset/298
+SYN-0299,Java开发工程师,海康威视,5000人以上,安防/AI,上市公司,20,40,广州,广东,一线,硕士,应届,Spring Cloud|Docker|Linux|Kafka,五险一金|年终奖,2026-05-28,https://synthetic.dataset/299
+SYN-0300,DevOps运维工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,25,45,大连,辽宁,二线,大专,1-3年,Shell|Docker|Prometheus|Nginx|Terraform,五险一金|年终奖|弹性工作|股票期权,2026-04-11,https://synthetic.dataset/300
+SYN-0301,算法工程师(NLP/CV),米哈游,2000-5000人,游戏/互联网,民营,12,22,大连,辽宁,二线,本科,5-10年,PyTorch|深度学习|模型部署,五险一金|年终奖|股票期权|带薪年假,2026-04-09,https://synthetic.dataset/301
+SYN-0302,iOS开发工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,15,30,武汉,湖北,新一线,本科,5-10年,UIKit|Xcode|Swift|CoreData|Combine|iOS,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-25,https://synthetic.dataset/302
+SYN-0303,网络安全工程师,理想汽车,2000-5000人,新能源汽车,上市公司,25,45,宁波,浙江,二线,硕士,3-5年,OWASP|Wireshark|Python,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-17,https://synthetic.dataset/303
+SYN-0304,运维开发工程师,滴滴出行,5000人以上,互联网/出行,民营,12,20,成都,四川,新一线,大专,1-3年,GitOps|Nginx|Prometheus|Ansible|Terraform,五险一金|年终奖|弹性工作|股票期权,2026-06-13,https://synthetic.dataset/304
+SYN-0305,算法工程师(NLP/CV),SHEIN,5000人以上,互联网/电商,民营,14,24,郑州,河南,二线,硕士,3-5年,BERT|Scikit-learn|NLP|TensorFlow|Transformer,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-22,https://synthetic.dataset/305
+SYN-0306,C++开发工程师,米哈游,2000-5000人,游戏/互联网,民营,8,14,成都,四川,新一线,博士,应届,CMake|多线程|TCP/IP,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-22,https://synthetic.dataset/306
+SYN-0307,算法工程师(NLP/CV),中兴通讯,5000人以上,通信/IT,上市公司,12,22,合肥,安徽,二线,硕士,3-5年,Transformer|PyTorch|Python,五险一金|年终奖,2026-05-09,https://synthetic.dataset/307
+SYN-0308,算法工程师(NLP/CV),小红书,2000-5000人,互联网/社交,民营,20,40,西安,陕西,新一线,硕士,1-3年,BERT|Python|Scikit-learn|Transformer,五险一金|年终奖|弹性工作|餐补,2026-04-20,https://synthetic.dataset/308
+SYN-0309,数据分析师,海康威视,5000人以上,安防/AI,上市公司,25,50,大连,辽宁,二线,大专,3-5年,Python|Matplotlib|Spark SQL|NumPy|Excel,五险一金|年终奖|带薪年假|弹性工作,2026-04-01,https://synthetic.dataset/309
+SYN-0310,iOS开发工程师,地平线,500-1000人,人工智能/芯片,民营,9,16,济南,山东,二线,本科,3-5年,UIKit|SwiftUI|Git|Swift,五险一金|年终奖|弹性工作,2026-05-06,https://synthetic.dataset/310
+SYN-0311,Go后端开发工程师,vivo,5000人以上,消费电子,民营,20,35,苏州,江苏,新一线,本科,5-10年,gRPC|PostgreSQL|Redis|Go|Kafka,五险一金|年终奖|弹性工作|餐补,2026-05-02,https://synthetic.dataset/311
+SYN-0312,DevOps运维工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,20,40,济南,山东,二线,本科,1-3年,Grafana|Prometheus|Terraform|Linux|Shell|Kubernetes,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-06,https://synthetic.dataset/312
+SYN-0313,前端开发工程师,荣耀,2000-5000人,消费电子,民营,30,55,青岛,山东,二线,大专,5-10年,TypeScript|HTML|React|ECharts|Node.js|Vue,五险一金|年终奖|带薪年假|弹性工作,2026-06-10,https://synthetic.dataset/313
+SYN-0314,推荐系统工程师,商汤科技,1000-2000人,人工智能,民营,6,12,青岛,山东,二线,博士,1-3年,Jaccard|DNN|Spark,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-02,https://synthetic.dataset/314
+SYN-0315,产品经理(技术方向),拼多多,5000人以上,互联网/电商,上市公司,30,55,深圳,广东,一线,本科,3-5年,需求分析|项目管理|SQL|敏捷开发|Jira,五险一金|年终奖|弹性工作|餐补,2026-07-02,https://synthetic.dataset/315
+SYN-0316,iOS开发工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,12,22,长沙,湖南,新一线,硕士,1-3年,CocoaPods|Combine|iOS|Xcode,五险一金|年终奖|弹性工作,2026-05-22,https://synthetic.dataset/316
+SYN-0317,UI/UX设计师,商汤科技,1000-2000人,人工智能,民营,14,24,深圳,广东,一线,本科,应届,Adobe XD|Figma|After Effects,五险一金|年终奖|带薪年假|弹性工作,2026-04-03,https://synthetic.dataset/317
+SYN-0318,Python开发工程师,百度,5000人以上,互联网/IT,上市公司,10,18,成都,四川,新一线,硕士,应届,MongoDB|Docker|FastAPI|MySQL,五险一金|年终奖|股票期权|带薪年假,2026-07-11,https://synthetic.dataset/318
+SYN-0319,产品经理(技术方向),阿里巴巴,5000人以上,互联网/IT,上市公司,40,70,深圳,广东,一线,大专,1-3年,用户研究|需求分析|Axure,五险一金|年终奖|带薪年假|弹性工作,2026-04-10,https://synthetic.dataset/319
+SYN-0320,推荐系统工程师,蚂蚁集团,5000人以上,互联网金融,民营,12,20,广州,广东,一线,本科,5-10年,Python|DNN|PyTorch|推荐算法|TensorFlow|Jaccard,五险一金|年终奖|股票期权|带薪年假,2026-06-21,https://synthetic.dataset/320
+SYN-0321,算法工程师(NLP/CV),哔哩哔哩,2000-5000人,互联网/视频,上市公司,30,55,天津,天津,新一线,硕士,3-5年,TensorFlow|Python|BERT|OpenCV,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-18,https://synthetic.dataset/321
+SYN-0322,前端开发工程师,海康威视,5000人以上,安防/AI,上市公司,15,30,重庆,重庆,新一线,大专,1-3年,Node.js|Vue|ECharts|TypeScript|Webpack|CSS,五险一金|年终奖|补充商业保险,2026-05-04,https://synthetic.dataset/322
+SYN-0323,运维开发工程师,滴滴出行,5000人以上,互联网/出行,民营,30,55,上海,上海,一线,大专,5-10年,Ansible|Go|Prometheus,五险一金|年终奖|弹性工作,2026-05-24,https://synthetic.dataset/323
+SYN-0324,区块链开发工程师,深信服,2000-5000人,网络安全,上市公司,18,35,长沙,湖南,新一线,本科,3-5年,Rust|Go|智能合约,五险一金|年终奖|带薪年假|弹性工作,2026-07-15,https://synthetic.dataset/324
+SYN-0325,推荐系统工程师,SHEIN,5000人以上,互联网/电商,民营,35,60,重庆,重庆,新一线,硕士,3-5年,Jaccard|协同过滤|PyTorch|Python|DNN,五险一金|年终奖|弹性工作|股票期权,2026-05-23,https://synthetic.dataset/325
+SYN-0326,大数据开发工程师,蔚来汽车,5000人以上,新能源汽车,上市公司,25,45,天津,天津,新一线,本科,3-5年,ClickHouse|HDFS|Flink|Kafka|Scala|Hadoop,五险一金|年终奖|股票期权,2026-04-27,https://synthetic.dataset/326
+SYN-0327,C++开发工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,10,18,大连,辽宁,二线,硕士,1-3年,C++|多线程|Docker,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-25,https://synthetic.dataset/327
+SYN-0328,iOS开发工程师,深信服,2000-5000人,网络安全,上市公司,30,55,上海,上海,一线,硕士,3-5年,Objective-C|Xcode|CoreData|Swift|SwiftUI|Combine,五险一金|年终奖|股票期权,2026-07-17,https://synthetic.dataset/328
+SYN-0329,前端开发工程师,vivo,5000人以上,消费电子,民营,6,12,苏州,江苏,新一线,本科,应届,ECharts|Vue|Node.js|React,五险一金|年终奖|股票期权,2026-05-19,https://synthetic.dataset/329
+SYN-0330,C++开发工程师,大华股份,5000人以上,安防/AI,上市公司,18,35,厦门,福建,二线,本科,3-5年,Linux|STL|Git|Boost|多线程|C++,五险一金|年终奖|弹性工作|股票期权,2026-06-13,https://synthetic.dataset/330
+SYN-0331,网络安全工程师,小米集团,5000人以上,消费电子/互联网,上市公司,12,22,上海,上海,一线,本科,1-3年,防火墙|OWASP|IDS/IPS|Burp Suite|SIEM,五险一金|年终奖|股票期权|带薪年假,2026-06-19,https://synthetic.dataset/331
+SYN-0332,嵌入式软件开发,百度,5000人以上,互联网/IT,上市公司,25,50,西安,陕西,新一线,本科,3-5年,FreeRTOS|嵌入式调试|I2C/SPI|MCU|ARM|Linux,五险一金|年终奖,2026-05-15,https://synthetic.dataset/332
+SYN-0333,数据分析师,小红书,2000-5000人,互联网/社交,民营,15,30,广州,广东,一线,本科,1-3年,Pandas|统计学|Excel|Tableau,五险一金|年终奖|弹性工作,2026-05-14,https://synthetic.dataset/333
+SYN-0334,Go后端开发工程师,SHEIN,5000人以上,互联网/电商,民营,15,30,厦门,福建,二线,大专,5-10年,Kubernetes|Go|MySQL|Kafka,五险一金|年终奖|股票期权,2026-05-05,https://synthetic.dataset/334
+SYN-0335,Python开发工程师,vivo,5000人以上,消费电子,民营,15,25,宁波,浙江,二线,本科,1-3年,Flask|FastAPI|Docker|MongoDB|Linux,五险一金|年终奖,2026-06-03,https://synthetic.dataset/335
+SYN-0336,网络安全工程师,商汤科技,1000-2000人,人工智能,民营,15,25,济南,山东,二线,本科,5-10年,Python|IDS/IPS|OWASP|防火墙,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-06,https://synthetic.dataset/336
+SYN-0337,网络安全工程师,SHEIN,5000人以上,互联网/电商,民营,18,35,济南,山东,二线,硕士,1-3年,Python|IDS/IPS|Kali Linux|Wireshark|渗透测试|防火墙,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-27,https://synthetic.dataset/337
+SYN-0338,推荐系统工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,40,70,深圳,广东,一线,硕士,5-10年,召回|排序|TensorFlow,五险一金|年终奖|弹性工作,2026-07-22,https://synthetic.dataset/338
+SYN-0339,推荐系统工程师,快手,2000-5000人,互联网/短视频,民营,25,50,大连,辽宁,二线,硕士,5-10年,Jaccard|Python|协同过滤|TensorFlow|Spark|排序,五险一金|年终奖|带薪年假|弹性工作,2026-04-14,https://synthetic.dataset/339
+SYN-0340,大数据开发工程师,快手,2000-5000人,互联网/短视频,民营,20,40,厦门,福建,二线,本科,1-3年,Flink|Kafka|Hadoop|HDFS|HBase|ClickHouse,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-17,https://synthetic.dataset/340
+SYN-0341,产品经理(技术方向),字节跳动,5000人以上,互联网/IT,民营,9,16,武汉,湖北,新一线,硕士,5-10年,数据驱动|Jira|敏捷开发,五险一金|年终奖|补充商业保险,2026-07-19,https://synthetic.dataset/341
+SYN-0342,推荐系统工程师,莉莉丝,1000-2000人,游戏/互联网,民营,14,24,西安,陕西,新一线,博士,3-5年,PyTorch|Jaccard|DNN|排序|协同过滤|推荐算法,五险一金|年终奖|带薪年假|弹性工作,2026-07-24,https://synthetic.dataset/342
+SYN-0343,Go后端开发工程师,快手,2000-5000人,互联网/短视频,民营,12,22,南京,江苏,新一线,大专,3-5年,Kafka|Kubernetes|Docker|PostgreSQL,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-06,https://synthetic.dataset/343
+SYN-0344,Java开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,40,70,广州,广东,一线,本科,5-10年,Spring Boot|Git|Redis|Linux|MyBatis|Java,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-24,https://synthetic.dataset/344
+SYN-0345,产品经理(技术方向),鹰角网络,500-1000人,游戏/互联网,民营,40,70,济南,山东,二线,大专,3-5年,数据驱动|PRD|项目管理,五险一金|年终奖,2026-05-28,https://synthetic.dataset/345
+SYN-0346,算法工程师(NLP/CV),荣耀,2000-5000人,消费电子,民营,25,50,武汉,湖北,新一线,硕士,3-5年,模型部署|PyTorch|Python|BERT,五险一金|年终奖|弹性工作|股票期权,2026-04-06,https://synthetic.dataset/346
+SYN-0347,大数据开发工程师,京东,5000人以上,互联网/电商,上市公司,12,20,苏州,江苏,新一线,硕士,5-10年,Java|Hadoop|Spark|Scala,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-24,https://synthetic.dataset/347
+SYN-0348,运维开发工程师,海康威视,5000人以上,安防/AI,上市公司,18,35,天津,天津,新一线,本科,1-3年,Shell|Nginx|Python|Docker,五险一金|年终奖|股票期权,2026-07-17,https://synthetic.dataset/348
+SYN-0349,数据仓库工程师,美团,5000人以上,互联网/O2O,上市公司,8,14,广州,广东,一线,硕士,1-3年,Python|数据建模|数据治理,五险一金|年终奖|弹性工作|餐补,2026-07-19,https://synthetic.dataset/349
+SYN-0350,数据分析师,小米集团,5000人以上,消费电子/互联网,上市公司,35,60,长沙,湖南,新一线,大专,5-10年,Seaborn|SQL|Tableau,五险一金|年终奖|弹性工作,2026-07-21,https://synthetic.dataset/350
+SYN-0351,数据分析师,旷视科技,500-1000人,人工智能,民营,25,50,长沙,湖南,新一线,大专,1-3年,Tableau|NumPy|统计学,五险一金|年终奖|弹性工作,2026-07-22,https://synthetic.dataset/351
+SYN-0352,前端开发工程师,SHEIN,5000人以上,互联网/电商,民营,8,14,大连,辽宁,二线,大专,5-10年,React|CSS|Vue|HTML|Webpack,五险一金|年终奖|弹性工作|股票期权,2026-07-24,https://synthetic.dataset/352
+SYN-0353,数据分析师,科大讯飞,2000-5000人,人工智能,上市公司,18,35,南京,江苏,新一线,硕士,3-5年,NumPy|Excel|Pandas|Matplotlib,五险一金|年终奖|弹性工作,2026-04-03,https://synthetic.dataset/353
+SYN-0354,推荐系统工程师,OPPO,5000人以上,消费电子,民营,25,45,北京,北京,一线,硕士,1-3年,排序|Jaccard|DNN|推荐算法|PyTorch,五险一金|年终奖|弹性工作|餐补,2026-05-25,https://synthetic.dataset/354
+SYN-0355,大数据开发工程师,vivo,5000人以上,消费电子,民营,10,20,苏州,江苏,新一线,本科,1-3年,Java|HBase|ClickHouse,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-17,https://synthetic.dataset/355
+SYN-0356,产品经理(技术方向),米哈游,2000-5000人,游戏/互联网,民营,25,50,成都,四川,新一线,本科,1-3年,SQL|需求分析|项目管理|用户研究|Axure|竞品分析,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-11,https://synthetic.dataset/356
+SYN-0357,推荐系统工程师,莉莉丝,1000-2000人,游戏/互联网,民营,20,35,西安,陕西,新一线,硕士,1-3年,推荐算法|DNN|Jaccard|PyTorch,五险一金|年终奖|股票期权,2026-07-14,https://synthetic.dataset/357
+SYN-0358,UI/UX设计师,商汤科技,1000-2000人,人工智能,民营,20,35,天津,天津,新一线,大专,5-10年,Adobe XD|UI设计|Photoshop|交互设计|Figma|C4D,五险一金|年终奖|弹性工作|股票期权,2026-07-28,https://synthetic.dataset/358
+SYN-0359,iOS开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,6,12,杭州,浙江,新一线,本科,5-10年,CoreData|Git|Objective-C|Combine,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-26,https://synthetic.dataset/359
+SYN-0360,算法工程师(NLP/CV),OPPO,5000人以上,消费电子,民营,8,15,西安,陕西,新一线,本科,3-5年,TensorFlow|PyTorch|Python|模型部署|BERT|NLP,五险一金|年终奖|弹性工作,2026-07-24,https://synthetic.dataset/360
+SYN-0361,大数据开发工程师,SHEIN,5000人以上,互联网/电商,民营,30,55,天津,天津,新一线,硕士,1-3年,HDFS|Hadoop|HBase|Java|Hive,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-19,https://synthetic.dataset/361
+SYN-0362,数据仓库工程师,大华股份,5000人以上,安防/AI,上市公司,8,14,成都,四川,新一线,本科,1-3年,Hadoop|Hive|ClickHouse|数据建模|Spark SQL|Flink,五险一金|年终奖|股票期权,2026-05-21,https://synthetic.dataset/362
+SYN-0363,UI/UX设计师,SHEIN,5000人以上,互联网/电商,民营,10,18,济南,山东,二线,硕士,5-10年,Adobe XD|用户体验|Photoshop,五险一金|年终奖|带薪年假|弹性工作,2026-06-21,https://synthetic.dataset/363
+SYN-0364,大数据开发工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,16,28,济南,山东,二线,本科,3-5年,Scala|Java|ClickHouse|Kafka|Spark,五险一金|年终奖|股票期权,2026-04-05,https://synthetic.dataset/364
+SYN-0365,大数据开发工程师,寒武纪,500-1000人,人工智能/芯片,上市公司,12,20,广州,广东,一线,本科,3-5年,Spark|Scala|ClickHouse,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-01,https://synthetic.dataset/365
+SYN-0366,嵌入式软件开发,大疆创新,5000人以上,硬件/无人机,民营,40,70,广州,广东,一线,本科,1-3年,C++|MCU|Linux|嵌入式调试,五险一金|年终奖|弹性工作|股票期权,2026-06-15,https://synthetic.dataset/366
+SYN-0367,C++开发工程师,快手,2000-5000人,互联网/短视频,民营,8,15,青岛,山东,二线,硕士,3-5年,CMake|TCP/IP|多线程|Qt|Git,五险一金|年终奖|补充商业保险,2026-07-05,https://synthetic.dataset/367
+SYN-0368,Android开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,35,60,宁波,浙江,二线,硕士,5-10年,Gradle|Flutter|Jetpack|Kotlin|Retrofit|SQLite,五险一金|年终奖|弹性工作|股票期权,2026-04-15,https://synthetic.dataset/368
+SYN-0369,测试开发工程师,蚂蚁集团,5000人以上,互联网金融,民营,20,40,合肥,安徽,二线,本科,3-5年,Python|Pytest|Selenium,五险一金|年终奖|带薪年假|弹性工作,2026-06-16,https://synthetic.dataset/369
+SYN-0370,Java开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,6,12,厦门,福建,二线,大专,3-5年,Redis|MySQL|Java|Git|MyBatis|Spring Boot,五险一金|年终奖|股票期权|带薪年假,2026-07-13,https://synthetic.dataset/370
+SYN-0371,Android开发工程师,寒武纪,500-1000人,人工智能/芯片,上市公司,20,35,苏州,江苏,新一线,本科,3-5年,MVP/MVVM|Retrofit|Jetpack,五险一金|年终奖|补充商业保险,2026-06-14,https://synthetic.dataset/371
+SYN-0372,前端开发工程师,科大讯飞,2000-5000人,人工智能,上市公司,12,22,成都,四川,新一线,大专,1-3年,ECharts|Vite|CSS|HTML|Node.js|React,五险一金|年终奖|弹性工作|股票期权,2026-06-01,https://synthetic.dataset/372
+SYN-0373,Python开发工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,12,22,大连,辽宁,二线,本科,3-5年,MongoDB|Flask|Linux|Redis|Python,五险一金|年终奖|弹性工作|股票期权,2026-04-05,https://synthetic.dataset/373
+SYN-0374,区块链开发工程师,字节跳动,5000人以上,互联网/IT,民营,20,40,武汉,湖北,新一线,本科,5-10年,DeFi|共识算法|Solidity|Ethereum|Node.js|Go,五险一金|年终奖,2026-06-25,https://synthetic.dataset/374
+SYN-0375,前端开发工程师,大疆创新,5000人以上,硬件/无人机,民营,15,30,大连,辽宁,二线,本科,3-5年,Webpack|JavaScript|TypeScript|ECharts|HTML,五险一金|年终奖|弹性工作|股票期权,2026-07-25,https://synthetic.dataset/375
+SYN-0376,数据分析师,理想汽车,2000-5000人,新能源汽车,上市公司,12,22,上海,上海,一线,本科,5-10年,Seaborn|Matplotlib|Tableau|Pandas,五险一金|年终奖|股票期权,2026-04-24,https://synthetic.dataset/376
+SYN-0377,嵌入式软件开发,海康威视,5000人以上,安防/AI,上市公司,20,40,深圳,广东,一线,大专,5-10年,FreeRTOS|C|ARM|PCB,五险一金|年终奖|弹性工作|股票期权,2026-07-11,https://synthetic.dataset/377
+SYN-0378,Android开发工程师,字节跳动,5000人以上,互联网/IT,民营,12,20,西安,陕西,新一线,硕士,1-3年,Android|Flutter|SQLite|Git,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-12,https://synthetic.dataset/378
+SYN-0379,数据分析师,京东,5000人以上,互联网/电商,上市公司,40,70,成都,四川,新一线,大专,1-3年,Python|统计学|Excel|Seaborn|SQL,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-05,https://synthetic.dataset/379
+SYN-0380,数据分析师,OPPO,5000人以上,消费电子,民营,16,28,长沙,湖南,新一线,本科,1-3年,Python|Matplotlib|Excel|Seaborn,五险一金|年终奖|股票期权,2026-06-02,https://synthetic.dataset/380
+SYN-0381,网络安全工程师,OPPO,5000人以上,消费电子,民营,25,45,大连,辽宁,二线,大专,应届,密码学|IDS/IPS|SIEM|OWASP,五险一金|年终奖|弹性工作|餐补,2026-06-28,https://synthetic.dataset/381
+SYN-0382,数据仓库工程师,奇安信,2000-5000人,网络安全,上市公司,10,20,成都,四川,新一线,本科,3-5年,数据建模|数据治理|ETL|Flink|SQL|Python,五险一金|年终奖|股票期权|带薪年假,2026-05-01,https://synthetic.dataset/382
+SYN-0383,测试开发工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,10,18,济南,山东,二线,大专,1-3年,JMeter|Pytest|Jenkins|Git|Appium|Java,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-11,https://synthetic.dataset/383
+SYN-0384,DevOps运维工程师,比亚迪,5000人以上,新能源汽车,上市公司,10,18,深圳,广东,一线,本科,1-3年,Kubernetes|Grafana|Linux,五险一金|年终奖|弹性工作|股票期权,2026-04-16,https://synthetic.dataset/384
+SYN-0385,Go后端开发工程师,科大讯飞,2000-5000人,人工智能,上市公司,25,45,上海,上海,一线,硕士,5-10年,Go|Docker|MySQL|Redis|Kafka,五险一金|年终奖|弹性工作,2026-04-07,https://synthetic.dataset/385
+SYN-0386,前端开发工程师,OPPO,5000人以上,消费电子,民营,30,55,郑州,河南,二线,本科,1-3年,HTML|JavaScript|CSS|Vite|Node.js|ECharts,五险一金|年终奖|补充商业保险,2026-04-07,https://synthetic.dataset/386
+SYN-0387,Go后端开发工程师,荣耀,2000-5000人,消费电子,民营,12,20,深圳,广东,一线,本科,应届,MySQL|Kafka|PostgreSQL|Redis,五险一金|年终奖|股票期权,2026-07-24,https://synthetic.dataset/387
+SYN-0388,运维开发工程师,美团,5000人以上,互联网/O2O,上市公司,12,22,天津,天津,新一线,本科,5-10年,Docker|GitOps|Nginx|Ansible,五险一金|年终奖|带薪年假|弹性工作,2026-05-18,https://synthetic.dataset/388
+SYN-0389,网络安全工程师,奇安信,2000-5000人,网络安全,上市公司,8,14,天津,天津,新一线,大专,应届,Python|密码学|SIEM|防火墙|Kali Linux,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-13,https://synthetic.dataset/389
+SYN-0390,大数据开发工程师,海康威视,5000人以上,安防/AI,上市公司,12,20,天津,天津,新一线,本科,5-10年,Hadoop|Flink|Scala,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-10,https://synthetic.dataset/390
+SYN-0391,算法工程师(NLP/CV),字节跳动,5000人以上,互联网/IT,民营,6,12,南京,江苏,新一线,硕士,5-10年,BERT|模型部署|PyTorch|Python|Transformer,五险一金|年终奖|弹性工作|餐补,2026-06-05,https://synthetic.dataset/391
+SYN-0392,大数据开发工程师,快手,2000-5000人,互联网/短视频,民营,18,35,天津,天津,新一线,大专,3-5年,Flink|Spark|HBase|Scala|Java,五险一金|年终奖|弹性工作,2026-06-26,https://synthetic.dataset/392
+SYN-0393,Android开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,40,70,厦门,福建,二线,硕士,1-3年,Android|MVP/MVVM|Java|Gradle|Flutter,五险一金|年终奖|带薪年假|弹性工作,2026-06-27,https://synthetic.dataset/393
+SYN-0394,UI/UX设计师,蔚来汽车,5000人以上,新能源汽车,上市公司,6,12,深圳,广东,一线,本科,应届,Figma|Illustrator|UI设计|Adobe XD|C4D|用户体验,五险一金|年终奖|股票期权,2026-06-17,https://synthetic.dataset/394
+SYN-0395,C++开发工程师,旷视科技,500-1000人,人工智能,民营,40,70,上海,上海,一线,本科,5-10年,Linux|Qt|Git,五险一金|年终奖|股票期权|带薪年假,2026-05-05,https://synthetic.dataset/395
+SYN-0396,前端开发工程师,SHEIN,5000人以上,互联网/电商,民营,30,55,厦门,福建,二线,硕士,1-3年,CSS|TypeScript|Webpack|ECharts|React|Node.js,五险一金|年终奖|股票期权,2026-07-18,https://synthetic.dataset/396
+SYN-0397,区块链开发工程师,科大讯飞,2000-5000人,人工智能,上市公司,30,55,苏州,江苏,新一线,博士,3-5年,智能合约|Go|Rust|Hyperledger,五险一金|年终奖|股票期权|带薪年假,2026-06-22,https://synthetic.dataset/397
+SYN-0398,前端开发工程师,大华股份,5000人以上,安防/AI,上市公司,9,16,深圳,广东,一线,本科,5-10年,React|HTML|Node.js|CSS|Vite,五险一金|年终奖,2026-06-06,https://synthetic.dataset/398
+SYN-0399,推荐系统工程师,米哈游,2000-5000人,游戏/互联网,民营,16,28,郑州,河南,二线,硕士,3-5年,Spark|排序|Jaccard,五险一金|年终奖|股票期权,2026-04-04,https://synthetic.dataset/399
+SYN-0400,数据分析师,华为,5000人以上,通信/IT,民营,6,12,济南,山东,二线,本科,1-3年,SQL|Tableau|Seaborn|NumPy|Python,五险一金|年终奖|带薪年假|弹性工作,2026-05-24,https://synthetic.dataset/400
+SYN-0401,iOS开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,20,35,武汉,湖北,新一线,硕士,应届,Combine|Objective-C|iOS|UIKit|SwiftUI|Xcode,五险一金|年终奖,2026-06-06,https://synthetic.dataset/401
+SYN-0402,算法工程师(NLP/CV),华为,5000人以上,通信/IT,民营,8,15,武汉,湖北,新一线,本科,5-10年,Python|TensorFlow|Transformer|Scikit-learn|PyTorch|深度学习,五险一金|年终奖|弹性工作,2026-04-10,https://synthetic.dataset/402
+SYN-0403,数据分析师,鹰角网络,500-1000人,游戏/互联网,民营,8,14,苏州,江苏,新一线,本科,1-3年,统计学|Spark SQL|SQL|Seaborn|Matplotlib|Tableau,五险一金|年终奖|弹性工作|餐补,2026-04-02,https://synthetic.dataset/403
+SYN-0404,嵌入式软件开发,寒武纪,500-1000人,人工智能/芯片,上市公司,12,20,重庆,重庆,新一线,大专,5-10年,C|FreeRTOS|PCB|RTOS,五险一金|年终奖|补充商业保险,2026-05-17,https://synthetic.dataset/404
+SYN-0405,Python开发工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,30,55,西安,陕西,新一线,大专,1-3年,MySQL|Flask|Redis|Celery|Linux,五险一金|年终奖|股票期权,2026-04-24,https://synthetic.dataset/405
+SYN-0406,嵌入式软件开发,鹰角网络,500-1000人,游戏/互联网,民营,18,35,济南,山东,二线,本科,5-10年,MCU|Linux|FreeRTOS|ARM,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-07,https://synthetic.dataset/406
+SYN-0407,运维开发工程师,快手,2000-5000人,互联网/短视频,民营,20,40,大连,辽宁,二线,大专,3-5年,Nginx|Docker|GitOps|Shell,五险一金|年终奖|弹性工作,2026-04-06,https://synthetic.dataset/407
+SYN-0408,C++开发工程师,拼多多,5000人以上,互联网/电商,上市公司,14,24,北京,北京,一线,本科,5-10年,TCP/IP|Git|Boost|Qt|STL,五险一金|年终奖|弹性工作,2026-05-06,https://synthetic.dataset/408
+SYN-0409,推荐系统工程师,阿里巴巴,5000人以上,互联网/IT,上市公司,35,60,济南,山东,二线,本科,1-3年,排序|Spark|召回|Jaccard,五险一金|年终奖,2026-06-03,https://synthetic.dataset/409
+SYN-0410,C++开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,9,16,青岛,山东,二线,博士,5-10年,Qt|TCP/IP|多线程|STL,五险一金|年终奖|股票期权,2026-05-08,https://synthetic.dataset/410
+SYN-0411,UI/UX设计师,腾讯,5000人以上,互联网/IT,上市公司,18,35,北京,北京,一线,大专,5-10年,Photoshop|Sketch|Adobe XD|UI设计,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-23,https://synthetic.dataset/411
+SYN-0412,网络安全工程师,拼多多,5000人以上,互联网/电商,上市公司,8,15,南京,江苏,新一线,本科,5-10年,SIEM|Python|Wireshark|防火墙|渗透测试|Burp Suite,五险一金|年终奖|弹性工作|餐补,2026-04-08,https://synthetic.dataset/412
+SYN-0413,数据仓库工程师,荣耀,2000-5000人,消费电子,民营,12,20,苏州,江苏,新一线,本科,3-5年,Flink|数据建模|Hadoop,五险一金|年终奖|股票期权|带薪年假,2026-06-25,https://synthetic.dataset/413
+SYN-0414,网络安全工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,40,70,成都,四川,新一线,本科,1-3年,OWASP|IDS/IPS|渗透测试,五险一金|年终奖|弹性工作|餐补,2026-04-24,https://synthetic.dataset/414
+SYN-0415,Go后端开发工程师,vivo,5000人以上,消费电子,民营,10,20,成都,四川,新一线,硕士,应届,Kubernetes|Docker|Linux|Go|Gin|MySQL,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-15,https://synthetic.dataset/415
+SYN-0416,大数据开发工程师,京东,5000人以上,互联网/电商,上市公司,10,18,长沙,湖南,新一线,本科,1-3年,ClickHouse|HDFS|Spark,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-24,https://synthetic.dataset/416
+SYN-0417,推荐系统工程师,vivo,5000人以上,消费电子,民营,12,20,成都,四川,新一线,博士,1-3年,PyTorch|Jaccard|排序,五险一金|年终奖|股票期权,2026-05-06,https://synthetic.dataset/417
+SYN-0418,UI/UX设计师,华为,5000人以上,通信/IT,民营,20,40,重庆,重庆,新一线,大专,5-10年,Sketch|Adobe XD|Photoshop|Figma,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-01,https://synthetic.dataset/418
+SYN-0419,区块链开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,40,70,厦门,福建,二线,博士,1-3年,智能合约|Web3.js|共识算法|Node.js|Hyperledger|DeFi,五险一金|年终奖|弹性工作,2026-04-08,https://synthetic.dataset/419
+SYN-0420,大数据开发工程师,海康威视,5000人以上,安防/AI,上市公司,8,15,济南,山东,二线,大专,3-5年,Hive|Hadoop|HDFS|Java,五险一金|年终奖|股票期权,2026-04-22,https://synthetic.dataset/420
+SYN-0421,推荐系统工程师,大华股份,5000人以上,安防/AI,上市公司,8,15,重庆,重庆,新一线,本科,1-3年,协同过滤|PyTorch|召回,五险一金|年终奖|补充商业保险,2026-05-15,https://synthetic.dataset/421
+SYN-0422,测试开发工程师,深信服,2000-5000人,网络安全,上市公司,8,14,上海,上海,一线,本科,1-3年,Git|Java|自动化测试|Jenkins|Appium,五险一金|年终奖|弹性工作,2026-06-16,https://synthetic.dataset/422
+SYN-0423,Go后端开发工程师,快手,2000-5000人,互联网/短视频,民营,14,24,西安,陕西,新一线,本科,应届,MySQL|Go|Gin|Redis,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-16,https://synthetic.dataset/423
+SYN-0424,算法工程师(NLP/CV),奇安信,2000-5000人,网络安全,上市公司,20,35,合肥,安徽,二线,本科,5-10年,PyTorch|深度学习|BERT|NLP|TensorFlow,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-23,https://synthetic.dataset/424
+SYN-0425,iOS开发工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,16,28,北京,北京,一线,本科,1-3年,UIKit|CoreData|CocoaPods,五险一金|年终奖,2026-06-12,https://synthetic.dataset/425
+SYN-0426,iOS开发工程师,海康威视,5000人以上,安防/AI,上市公司,20,35,北京,北京,一线,本科,3-5年,SwiftUI|Combine|Xcode,五险一金|年终奖,2026-04-22,https://synthetic.dataset/426
+SYN-0427,DevOps运维工程师,SHEIN,5000人以上,互联网/电商,民营,6,12,苏州,江苏,新一线,大专,1-3年,Jenkins|Terraform|Prometheus|Shell,五险一金|年终奖|弹性工作|餐补,2026-07-26,https://synthetic.dataset/427
+SYN-0428,C++开发工程师,腾讯,5000人以上,互联网/IT,上市公司,30,55,厦门,福建,二线,硕士,5-10年,TCP/IP|Qt|C++|多线程|Git,五险一金|年终奖|补充商业保险,2026-06-18,https://synthetic.dataset/428
+SYN-0429,Java开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,9,16,武汉,湖北,新一线,硕士,3-5年,MyBatis|Redis|Java,五险一金|年终奖|带薪年假|弹性工作,2026-07-21,https://synthetic.dataset/429
+SYN-0430,Android开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,15,25,宁波,浙江,二线,硕士,5-10年,Jetpack|Git|Android,五险一金|年终奖|补充商业保险,2026-07-03,https://synthetic.dataset/430
+SYN-0431,数据分析师,OPPO,5000人以上,消费电子,民营,15,30,天津,天津,新一线,大专,1-3年,Pandas|SQL|Excel|Matplotlib|Python,五险一金|年终奖|弹性工作|股票期权,2026-04-15,https://synthetic.dataset/431
+SYN-0432,Java开发工程师,vivo,5000人以上,消费电子,民营,15,30,厦门,福建,二线,硕士,3-5年,Spring Cloud|Linux|Redis|Kafka|MyBatis,五险一金|年终奖|股票期权,2026-04-27,https://synthetic.dataset/432
+SYN-0433,C++开发工程师,荣耀,2000-5000人,消费电子,民营,12,20,武汉,湖北,新一线,本科,5-10年,C++|Git|Docker,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-04-11,https://synthetic.dataset/433
+SYN-0434,Python开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,6,12,深圳,广东,一线,博士,5-10年,MySQL|Redis|Celery|Django|Flask,五险一金|年终奖|补充商业保险,2026-06-25,https://synthetic.dataset/434
+SYN-0435,Go后端开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,20,35,西安,陕西,新一线,本科,3-5年,Go|Kafka|Gin,五险一金|年终奖|弹性工作|股票期权,2026-06-18,https://synthetic.dataset/435
+SYN-0436,大数据开发工程师,拼多多,5000人以上,互联网/电商,上市公司,18,35,杭州,浙江,新一线,硕士,1-3年,Spark|Flink|HDFS|Java,五险一金|年终奖|弹性工作|餐补,2026-04-05,https://synthetic.dataset/436
+SYN-0437,区块链开发工程师,阿里巴巴,5000人以上,互联网/IT,上市公司,8,15,上海,上海,一线,本科,5-10年,Hyperledger|Web3.js|Ethereum,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-20,https://synthetic.dataset/437
+SYN-0438,算法工程师(NLP/CV),米哈游,2000-5000人,游戏/互联网,民营,10,18,长沙,湖南,新一线,硕士,3-5年,模型部署|PyTorch|TensorFlow|Transformer|Scikit-learn|NLP,五险一金|年终奖|弹性工作,2026-07-10,https://synthetic.dataset/438
+SYN-0439,区块链开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,40,70,南京,江苏,新一线,硕士,3-5年,DeFi|Hyperledger|Ethereum|Web3.js|Node.js,五险一金|年终奖|带薪年假|弹性工作,2026-06-15,https://synthetic.dataset/439
+SYN-0440,Java开发工程师,OPPO,5000人以上,消费电子,民营,9,16,广州,广东,一线,大专,1-3年,Spring Cloud|MyBatis|Redis|Kafka|Linux|Git,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-17,https://synthetic.dataset/440
+SYN-0441,产品经理(技术方向),美团,5000人以上,互联网/O2O,上市公司,10,18,深圳,广东,一线,硕士,1-3年,项目管理|PRD|Jira|敏捷开发|竞品分析,五险一金|年终奖|弹性工作|股票期权,2026-05-18,https://synthetic.dataset/441
+SYN-0442,区块链开发工程师,小红书,2000-5000人,互联网/社交,民营,15,30,苏州,江苏,新一线,本科,3-5年,Hyperledger|DeFi|智能合约|Go|Node.js|Solidity,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-04,https://synthetic.dataset/442
+SYN-0443,推荐系统工程师,深信服,2000-5000人,网络安全,上市公司,12,22,郑州,河南,二线,本科,1-3年,PyTorch|推荐算法|协同过滤|Python|召回|DNN,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-07-11,https://synthetic.dataset/443
+SYN-0444,Python开发工程师,OPPO,5000人以上,消费电子,民营,35,60,广州,广东,一线,本科,3-5年,Flask|Celery|Linux,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-13,https://synthetic.dataset/444
+SYN-0445,运维开发工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,8,14,郑州,河南,二线,大专,3-5年,Prometheus|Ansible|Nginx|Terraform|Docker,五险一金|年终奖|弹性工作,2026-04-20,https://synthetic.dataset/445
+SYN-0446,产品经理(技术方向),vivo,5000人以上,消费电子,民营,9,16,杭州,浙江,新一线,硕士,1-3年,需求分析|项目管理|SQL,五险一金|年终奖|弹性工作,2026-06-28,https://synthetic.dataset/446
+SYN-0447,数据分析师,阿里巴巴,5000人以上,互联网/IT,上市公司,8,14,合肥,安徽,二线,本科,5-10年,Matplotlib|统计学|Spark SQL|Tableau|SQL|Excel,五险一金|年终奖|弹性工作|餐补,2026-05-07,https://synthetic.dataset/447
+SYN-0448,产品经理(技术方向),海康威视,5000人以上,安防/AI,上市公司,20,40,天津,天津,新一线,本科,3-5年,数据驱动|需求分析|Axure|SQL,五险一金|年终奖,2026-05-24,https://synthetic.dataset/448
+SYN-0449,UI/UX设计师,OPPO,5000人以上,消费电子,民营,14,24,杭州,浙江,新一线,本科,3-5年,UI设计|交互设计|Adobe XD|Photoshop|Illustrator|C4D,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-13,https://synthetic.dataset/449
+SYN-0450,数据分析师,米哈游,2000-5000人,游戏/互联网,民营,6,12,成都,四川,新一线,大专,应届,NumPy|Spark SQL|Tableau|统计学|Seaborn|Excel,五险一金|年终奖|带薪年假|弹性工作,2026-04-02,https://synthetic.dataset/450
+SYN-0451,区块链开发工程师,大华股份,5000人以上,安防/AI,上市公司,25,45,天津,天津,新一线,本科,应届,Ethereum|Node.js|Rust,五险一金|年终奖|弹性工作|餐补,2026-04-17,https://synthetic.dataset/451
+SYN-0452,前端开发工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,30,55,南京,江苏,新一线,本科,1-3年,ECharts|JavaScript|HTML|CSS|Node.js,五险一金|年终奖|弹性工作|餐补,2026-07-17,https://synthetic.dataset/452
+SYN-0453,运维开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,20,40,长沙,湖南,新一线,本科,1-3年,Docker|Python|Ansible|Terraform|Shell,五险一金|年终奖|补充商业保险,2026-04-21,https://synthetic.dataset/453
+SYN-0454,运维开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,20,40,成都,四川,新一线,大专,1-3年,Ansible|Shell|Go,五险一金|年终奖|股票期权,2026-04-28,https://synthetic.dataset/454
+SYN-0455,大数据开发工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,20,35,杭州,浙江,新一线,大专,3-5年,Hadoop|Spark|Hive|Flink|HDFS,五险一金|年终奖|股票期权,2026-07-12,https://synthetic.dataset/455
+SYN-0456,大数据开发工程师,滴滴出行,5000人以上,互联网/出行,民营,25,50,南京,江苏,新一线,本科,3-5年,HDFS|Spark|Hive,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-27,https://synthetic.dataset/456
+SYN-0457,UI/UX设计师,OPPO,5000人以上,消费电子,民营,15,25,苏州,江苏,新一线,本科,5-10年,UI设计|用户体验|Figma|C4D,五险一金|年终奖|补充商业保险,2026-04-02,https://synthetic.dataset/457
+SYN-0458,网络安全工程师,小红书,2000-5000人,互联网/社交,民营,25,45,苏州,江苏,新一线,本科,1-3年,Python|密码学|渗透测试|IDS/IPS,五险一金|年终奖|股票期权,2026-07-01,https://synthetic.dataset/458
+SYN-0459,网络安全工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,8,15,苏州,江苏,新一线,大专,应届,OWASP|SIEM|Python,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-06-11,https://synthetic.dataset/459
+SYN-0460,大数据开发工程师,Momenta,200-500人,人工智能/自动驾驶,外商独资,12,20,深圳,广东,一线,硕士,1-3年,Kafka|Scala|HDFS|ClickHouse|HBase|Spark,五险一金|年终奖|带薪年假|弹性工作,2026-04-22,https://synthetic.dataset/460
+SYN-0461,前端开发工程师,字节跳动,5000人以上,互联网/IT,民营,25,50,北京,北京,一线,本科,1-3年,Vite|HTML|React,五险一金|年终奖|补充商业保险,2026-06-07,https://synthetic.dataset/461
+SYN-0462,Java开发工程师,腾讯,5000人以上,互联网/IT,上市公司,40,70,济南,山东,二线,本科,1-3年,Git|Spring Boot|Linux|Java,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-13,https://synthetic.dataset/462
+SYN-0463,Android开发工程师,大华股份,5000人以上,安防/AI,上市公司,20,40,深圳,广东,一线,大专,1-3年,Java|SQLite|Jetpack|MVP/MVVM|Retrofit|Kotlin,五险一金|年终奖|补充商业保险,2026-05-25,https://synthetic.dataset/463
+SYN-0464,大数据开发工程师,百度,5000人以上,互联网/IT,上市公司,8,14,上海,上海,一线,本科,5-10年,Flink|Scala|Hive,五险一金|年终奖|弹性工作|餐补,2026-04-16,https://synthetic.dataset/464
+SYN-0465,推荐系统工程师,科大讯飞,2000-5000人,人工智能,上市公司,12,22,苏州,江苏,新一线,硕士,5-10年,召回|协同过滤|Spark|推荐算法,五险一金|年终奖|弹性工作,2026-07-23,https://synthetic.dataset/465
+SYN-0466,Go后端开发工程师,地平线,500-1000人,人工智能/芯片,民营,35,60,上海,上海,一线,本科,1-3年,Linux|Go|PostgreSQL|Gin|Docker,五险一金|年终奖,2026-04-22,https://synthetic.dataset/466
+SYN-0467,大数据开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,35,60,杭州,浙江,新一线,硕士,5-10年,Java|ClickHouse|Scala,五险一金|年终奖|股票期权|带薪年假,2026-07-28,https://synthetic.dataset/467
+SYN-0468,数据仓库工程师,百度,5000人以上,互联网/IT,上市公司,25,45,南京,江苏,新一线,本科,5-10年,数据治理|Python|ETL,五险一金|年终奖|带薪年假|弹性工作,2026-06-13,https://synthetic.dataset/468
+SYN-0469,前端开发工程师,华为,5000人以上,通信/IT,民营,10,18,天津,天津,新一线,硕士,1-3年,CSS|React|Vue|ECharts|JavaScript|Node.js,五险一金|年终奖|弹性工作|股票期权,2026-06-23,https://synthetic.dataset/469
+SYN-0470,Go后端开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,16,28,天津,天津,新一线,大专,1-3年,gRPC|Go|MySQL|Kafka,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-16,https://synthetic.dataset/470
+SYN-0471,前端开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,30,55,大连,辽宁,二线,本科,5-10年,JavaScript|ECharts|HTML|Node.js|Vue|Webpack,五险一金|年终奖|股票期权|带薪年假,2026-04-07,https://synthetic.dataset/471
+SYN-0472,网络安全工程师,荣耀,2000-5000人,消费电子,民营,18,35,大连,辽宁,二线,本科,应届,Wireshark|IDS/IPS|渗透测试,五险一金|年终奖,2026-07-20,https://synthetic.dataset/472
+SYN-0473,数据分析师,腾讯,5000人以上,互联网/IT,上市公司,8,15,杭州,浙江,新一线,本科,3-5年,SQL|Seaborn|Pandas|Matplotlib|Tableau,五险一金|年终奖|弹性工作,2026-04-04,https://synthetic.dataset/473
+SYN-0474,推荐系统工程师,OPPO,5000人以上,消费电子,民营,15,30,济南,山东,二线,硕士,1-3年,Jaccard|协同过滤|排序|Python|DNN|推荐算法,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-11,https://synthetic.dataset/474
+SYN-0475,Python开发工程师,商汤科技,1000-2000人,人工智能,民营,10,18,宁波,浙江,二线,本科,5-10年,MongoDB|Flask|Docker,五险一金|年终奖|股票期权,2026-06-18,https://synthetic.dataset/475
+SYN-0476,网络安全工程师,小红书,2000-5000人,互联网/社交,民营,10,20,南京,江苏,新一线,硕士,1-3年,密码学|Python|IDS/IPS,五险一金|年终奖,2026-07-03,https://synthetic.dataset/476
+SYN-0477,Java开发工程师,字节跳动,5000人以上,互联网/IT,民营,20,40,成都,四川,新一线,本科,应届,Spring Cloud|MyBatis|MySQL|Spring Boot|Docker|Linux,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-14,https://synthetic.dataset/477
+SYN-0478,Android开发工程师,寒武纪,500-1000人,人工智能/芯片,上市公司,15,25,济南,山东,二线,本科,应届,Flutter|Java|Jetpack|Kotlin|Retrofit|Android,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-05-07,https://synthetic.dataset/478
+SYN-0479,嵌入式软件开发,网易,5000人以上,互联网/游戏,上市公司,30,55,深圳,广东,一线,硕士,1-3年,I2C/SPI|ARM|Linux|C,五险一金|年终奖|弹性工作|股票期权,2026-04-26,https://synthetic.dataset/479
+SYN-0480,区块链开发工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,8,15,厦门,福建,二线,硕士,3-5年,DeFi|Rust|智能合约,五险一金|年终奖|股票期权|带薪年假,2026-06-11,https://synthetic.dataset/480
+SYN-0481,网络安全工程师,中科创达,2000-5000人,软件外包/IoT,上市公司,30,55,上海,上海,一线,本科,1-3年,IDS/IPS|Wireshark|渗透测试|防火墙,五险一金|年终奖|弹性工作,2026-04-08,https://synthetic.dataset/481
+SYN-0482,运维开发工程师,理想汽车,2000-5000人,新能源汽车,上市公司,15,30,宁波,浙江,二线,本科,5-10年,Kubernetes|Go|Terraform|GitOps|Python,五险一金|年终奖|弹性工作|股票期权,2026-07-28,https://synthetic.dataset/482
+SYN-0483,产品经理(技术方向),科大讯飞,2000-5000人,人工智能,上市公司,35,60,南京,江苏,新一线,本科,5-10年,需求分析|Jira|数据驱动|Axure|敏捷开发|竞品分析,五险一金|年终奖|股票期权,2026-07-12,https://synthetic.dataset/483
+SYN-0484,网络安全工程师,快手,2000-5000人,互联网/短视频,民营,15,30,武汉,湖北,新一线,大专,1-3年,IDS/IPS|Wireshark|OWASP|密码学|Kali Linux,五险一金|年终奖|弹性工作,2026-07-15,https://synthetic.dataset/484
+SYN-0485,Android开发工程师,比亚迪,5000人以上,新能源汽车,上市公司,40,70,长沙,湖南,新一线,大专,1-3年,Flutter|Kotlin|Retrofit|Android,五险一金|年终奖|股票期权|带薪年假,2026-07-28,https://synthetic.dataset/485
+SYN-0486,运维开发工程师,商汤科技,1000-2000人,人工智能,民营,6,12,厦门,福建,二线,本科,1-3年,Kubernetes|Prometheus|Terraform|GitOps|Ansible|Go,五险一金|年终奖|带薪年假|股票期权|补充商业保险,2026-05-19,https://synthetic.dataset/486
+SYN-0487,UI/UX设计师,字节跳动,5000人以上,互联网/IT,民营,25,50,上海,上海,一线,本科,5-10年,交互设计|C4D|UI设计,五险一金|年终奖|弹性工作|餐补,2026-04-15,https://synthetic.dataset/487
+SYN-0488,数据分析师,OPPO,5000人以上,消费电子,民营,14,24,广州,广东,一线,本科,1-3年,Pandas|Excel|Tableau|SQL,五险一金|年终奖|弹性工作,2026-04-16,https://synthetic.dataset/488
+SYN-0489,Android开发工程师,蚂蚁集团,5000人以上,互联网金融,民营,6,12,郑州,河南,二线,硕士,应届,SQLite|Kotlin|MVP/MVVM|Java|Gradle|Retrofit,五险一金|年终奖,2026-04-13,https://synthetic.dataset/489
+SYN-0490,嵌入式软件开发,SHEIN,5000人以上,互联网/电商,民营,20,35,上海,上海,一线,大专,5-10年,C++|FreeRTOS|C|Linux,五险一金|年终奖|带薪年假|弹性工作,2026-04-04,https://synthetic.dataset/490
+SYN-0491,测试开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,9,16,郑州,河南,二线,大专,1-3年,Selenium|Pytest|Java|Appium|Postman,五险一金|年终奖|弹性工作|股票期权,2026-05-11,https://synthetic.dataset/491
+SYN-0492,数据仓库工程师,寒武纪,500-1000人,人工智能/芯片,上市公司,15,30,深圳,广东,一线,大专,3-5年,ETL|数据治理|数据建模|Hadoop,五险一金|年终奖|股票期权|带薪年假,2026-06-02,https://synthetic.dataset/492
+SYN-0493,测试开发工程师,百度,5000人以上,互联网/IT,上市公司,25,50,天津,天津,新一线,本科,5-10年,Jenkins|Pytest|Appium,五险一金|年终奖|弹性工作|餐补,2026-06-26,https://synthetic.dataset/493
+SYN-0494,iOS开发工程师,百度,5000人以上,互联网/IT,上市公司,12,20,郑州,河南,二线,本科,1-3年,SwiftUI|Swift|CocoaPods|Git,五险一金|年终奖|补充商业保险,2026-04-23,https://synthetic.dataset/494
+SYN-0495,区块链开发工程师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,6,12,杭州,浙江,新一线,硕士,应届,Hyperledger|Node.js|Ethereum|智能合约|共识算法,五险一金|年终奖|股票期权|带薪年假,2026-07-24,https://synthetic.dataset/495
+SYN-0496,算法工程师(NLP/CV),阿里巴巴,5000人以上,互联网/IT,上市公司,18,35,武汉,湖北,新一线,硕士,1-3年,Transformer|Scikit-learn|BERT|NLP|OpenCV,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-07-15,https://synthetic.dataset/496
+SYN-0497,运维开发工程师,蚂蚁集团,5000人以上,互联网金融,民营,20,35,杭州,浙江,新一线,本科,3-5年,Shell|Terraform|Ansible|Nginx,五险一金|年终奖,2026-05-12,https://synthetic.dataset/497
+SYN-0498,网络安全工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,30,55,成都,四川,新一线,硕士,3-5年,IDS/IPS|密码学|OWASP|Kali Linux|Python,五险一金|年终奖|弹性工作,2026-04-11,https://synthetic.dataset/498
+SYN-0499,C++开发工程师,大华股份,5000人以上,安防/AI,上市公司,15,25,郑州,河南,二线,本科,1-3年,多线程|C++|CMake|Boost,五险一金|年终奖|股票期权,2026-06-15,https://synthetic.dataset/499
+SYN-0500,Android开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,6,12,大连,辽宁,二线,本科,1-3年,SQLite|Kotlin|Flutter|Gradle|Java|Android,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-06-21,https://synthetic.dataset/500
+SYN-0501,区块链开发工程师,字节跳动(成都),1000-3000人,互联网/IT,民营,35,60,重庆,重庆,新一线,博士,3-5年,DeFi|Go|共识算法|Solidity|Node.js|Rust,五险一金|年终奖|弹性工作,2026-06-01,https://synthetic.dataset/501
+SYN-0502,推荐系统工程师,大疆创新,5000人以上,硬件/无人机,民营,10,18,南京,江苏,新一线,博士,3-5年,Python|Spark|召回|协同过滤|PyTorch,五险一金|年终奖|弹性工作|股票期权,2026-04-03,https://synthetic.dataset/502
+SYN-0503,网络安全工程师,中兴通讯,5000人以上,通信/IT,上市公司,15,30,广州,广东,一线,硕士,5-10年,SIEM|OWASP|Wireshark|密码学|IDS/IPS|Burp Suite,五险一金|年终奖|股票期权,2026-07-12,https://synthetic.dataset/503
+SYN-0504,测试开发工程师,鹰角网络,500-1000人,游戏/互联网,民营,9,16,北京,北京,一线,本科,1-3年,Jenkins|Pytest|Java|自动化测试|Postman,五险一金|年终奖|弹性工作|餐补,2026-07-26,https://synthetic.dataset/504
+SYN-0505,算法工程师(NLP/CV),理想汽车,2000-5000人,新能源汽车,上市公司,10,20,成都,四川,新一线,博士,应届,PyTorch|NLP|OpenCV,五险一金|年终奖|弹性工作|餐补,2026-06-03,https://synthetic.dataset/505
+SYN-0506,产品经理(技术方向),深信服,2000-5000人,网络安全,上市公司,20,35,广州,广东,一线,本科,5-10年,数据驱动|项目管理|PRD|SQL|敏捷开发|Axure,五险一金|年终奖|弹性工作|股票期权,2026-05-27,https://synthetic.dataset/506
+SYN-0507,算法工程师(NLP/CV),鹰角网络,500-1000人,游戏/互联网,民营,20,40,大连,辽宁,二线,博士,1-3年,深度学习|BERT|模型部署|TensorFlow|Python,五险一金|年终奖,2026-05-09,https://synthetic.dataset/507
+SYN-0508,区块链开发工程师,蚂蚁集团,5000人以上,互联网金融,民营,15,25,深圳,广东,一线,本科,5-10年,智能合约|Solidity|Go|Hyperledger|Ethereum|Web3.js,五险一金|年终奖|弹性工作,2026-06-19,https://synthetic.dataset/508
+SYN-0509,运维开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,12,22,合肥,安徽,二线,本科,5-10年,GitOps|Python|Ansible|Go|Shell,五险一金|年终奖,2026-05-11,https://synthetic.dataset/509
+SYN-0510,C++开发工程师,小鹏汽车,2000-5000人,新能源汽车,上市公司,20,35,天津,天津,新一线,硕士,3-5年,Qt|CMake|C++|Boost|Docker,五险一金|年终奖|股票期权|弹性工作|餐补|交通补贴,2026-04-17,https://synthetic.dataset/510
+SYN-0511,Android开发工程师,科大讯飞,2000-5000人,人工智能,上市公司,30,55,深圳,广东,一线,硕士,3-5年,Git|Jetpack|Gradle|Flutter|MVP/MVVM,五险一金|年终奖|带薪年假|弹性工作,2026-04-18,https://synthetic.dataset/511
+SYN-0512,测试开发工程师,深信服,2000-5000人,网络安全,上市公司,25,50,杭州,浙江,新一线,本科,3-5年,Postman|Jenkins|Git|Selenium|Java,五险一金|年终奖|弹性工作,2026-05-05,https://synthetic.dataset/512
+SYN-0513,数据分析师,vivo,5000人以上,消费电子,民营,25,50,武汉,湖北,新一线,本科,应届,Matplotlib|Seaborn|SQL,五险一金|年终奖|弹性工作,2026-05-01,https://synthetic.dataset/513
+SYN-0514,测试开发工程师,小米集团,5000人以上,消费电子/互联网,上市公司,16,28,重庆,重庆,新一线,本科,3-5年,Selenium|Appium|Python|Postman|Jenkins,五险一金|年终奖|弹性工作|股票期权,2026-05-28,https://synthetic.dataset/514
+SYN-0515,数据分析师,哔哩哔哩,2000-5000人,互联网/视频,上市公司,10,20,重庆,重庆,新一线,本科,3-5年,Matplotlib|SQL|Spark SQL,五险一金|年终奖,2026-07-25,https://synthetic.dataset/515
+SYN-0516,Python开发工程师,蔚来汽车,5000人以上,新能源汽车,上市公司,25,50,武汉,湖北,新一线,本科,1-3年,Linux|Django|MongoDB,五险一金|年终奖,2026-04-10,https://synthetic.dataset/516
+SYN-0517,Go后端开发工程师,字节跳动,5000人以上,互联网/IT,民营,35,60,深圳,广东,一线,硕士,3-5年,gRPC|Docker|Go|Linux,五险一金|年终奖|股票期权,2026-06-19,https://synthetic.dataset/517
+SYN-0518,测试开发工程师,米哈游,2000-5000人,游戏/互联网,民营,18,35,成都,四川,新一线,大专,应届,Java|Python|JMeter,五险一金|年终奖|弹性工作|股票期权,2026-06-06,https://synthetic.dataset/518
+SYN-0519,Java开发工程师,中兴通讯,5000人以上,通信/IT,上市公司,25,45,深圳,广东,一线,本科,应届,Git|MyBatis|Spring Cloud|Docker|Java,五险一金|年终奖|股票期权,2026-06-13,https://synthetic.dataset/519
+SYN-0520,iOS开发工程师,蔚来汽车,5000人以上,新能源汽车,上市公司,12,22,青岛,山东,二线,本科,5-10年,Swift|Git|Combine|SwiftUI|CocoaPods,五险一金|年终奖|弹性工作|餐补,2026-06-23,https://synthetic.dataset/520

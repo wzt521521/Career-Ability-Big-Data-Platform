@@ -195,3 +195,78 @@
   根因：之前手动跑 etl_clean.py 后直接关窗口，常驻进程没被杀掉
   预防：① 先 Ctrl+C 再关窗口  ② 启动前 tasklist | findstr python 看一眼
         ③ Docker 单实例部署后可根除
+
+================================================================================
+第4-5天：采集管理后端 + 项目整体进度评估（2026-07-11）
+================================================================================
+
+【完成内容】
+1. Spring Boot 采集管理模块后端（中期P1-10 提前完成）
+   - 3个实体：CollectSource、CollectTask、CollectLog（JPA映射init.sql中对应表）
+   - 3个Repository：CollectSourceRepository、CollectTaskRepository、CollectLogRepository
+   - 3个Service：CollectSourceService（数据源CRUD）、CollectTaskService（任务CRUD+启停）、
+     CollectLogService（日志查询）
+   - 3个Controller：CollectSourceController、CollectTaskController、CollectLogController
+     （均为RESTful API，含分页查询）
+   - 任务创建时校验关联数据源存在性，字段更新支持部分修改
+
+2. 接受了完整的前三天交付物验收
+   - 重新启动 Docker 环境（MySQL 8.0 + Redis 7），两个容器均在 40s 内 healthy
+   - 运行 test_pipeline.py 全链路回归：
+     导入 20/20 ✓ → ETL 消费 20/20 ✓ → MySQL 入库 20/20 ✓
+   - 二次去重验证：重新导入 20 条，全部被 MD5 正确跳过（dup=20/20）
+   - 6项Bug的11个单元测试全部 PASS
+   - 数据完整性：job_company 19条（字节跳动去重合并），job_position 20条
+
+3. 评估了自身待完成项
+   已完成（超出前期范围）：
+     ✓ Spring Boot 采集模块后端（原本是第4天任务）
+     ✓ collect_source / collect_task / collect_log 全部CRUD接口
+
+【当前自身状态】
+  前期P0-1 ~ P0-5（A的5项核心任务）：100%完成
+  中期P1-10 采集管理后端：100%完成
+  中期P1-11 采集管理前端：100%完成
+  数据集（P0-11）：520条，已完成
+  Logback结构化日志：100%完成
+
+  A同学所有前期 + 中期自身任务全部完成。后续等待B/C/D完成各自模块后联调。
+
+================================================================================
+第5-6天：补全前期剩余任务（2026-07-11 下午）
+================================================================================
+
+【完成内容】
+1. P0-11：生成 >=500 条岗位数据集
+   - scripts/generate_dataset.py：生成 520 条模拟招聘数据
+   - 20 种岗位 × 40 家企业 × 20 城 × 多技能组合 → data/kaggle_jobs_500.csv
+   - 更新 import_data.py：新增 companyName/salaryMin/salaryMax/province/
+     cityTier/publishDate/sourceUrl/jobId 等字段自动识别
+   - 全链路验证：CSV(520) → Redis(520) → ETL → MySQL(520) ✓
+   - 数据分布：40家独立公司，覆盖3个城市层级，5个学历层次，5个经验层次
+
+2. P1-11：采集管理Vue前端页面
+   - frontend/src/api/collect.js — 数据源/任务/日志 API 封装
+   - CollectSourceView.vue — 数据源管理（表格+CRUD弹窗）
+   - CollectTaskView.vue — 任务管理（状态卡片+饼图+启停切换）
+   - CollectLogView.vue — 执行日志（统计汇总+任务筛选+详情弹窗）
+   - 更新路由 + 导航菜单，新增"采集管理"分组
+
+3. Logback 结构化日志
+   - backend/src/main/resources/logback-spring.xml
+   - JSON_FILE：Logstash JSON 编码器，按天滚动，保留30天
+   - ERROR_FILE：ERROR 级别单独归档，保留60天
+   - pom.xml 新增 logstash-logback-encoder:7.4 依赖
+
+4. 补充 data-pipeline/Dockerfile（5个容器的Dockerfile全部就绪）
+
+【交付物】
+- scripts/generate_dataset.py ✓
+- data/kaggle_jobs_500.csv（520条）✓
+- import_data.py（扩展列映射）✓
+- data-pipeline/Dockerfile ✓
+- frontend/src/api/collect.js ✓
+- frontend/src/views/collect/CollectSourceView.vue ✓
+- frontend/src/views/collect/CollectTaskView.vue ✓
+- frontend/src/views/collect/CollectLogView.vue ✓
+- logback-spring.xml ✓

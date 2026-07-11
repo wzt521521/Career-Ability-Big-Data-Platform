@@ -86,7 +86,7 @@ def parse_salary(raw):
 def make_job_id(row, idx):
     """生成唯一 jobId"""
     # 优先用原始 ID
-    for col in ["Job ID", "job_id", "id", "ID", "index"]:
+    for col in ["Job ID", "job_id", "jobId", "id", "ID", "index"]:
         if col in row and not pd.isna(row[col]):
             return str(row[col])
     # fallback：用行号 + 来源标识
@@ -95,41 +95,52 @@ def make_job_id(row, idx):
 
 def row_to_json(row, idx, city_map):
     """单行 CSV → 标准 JSON"""
-    # 列映射：优先匹配常见列名
+    # 列映射：优先匹配常见列名（支持 Kaggle / synthetic 等多来源）
     title = row.get("Job Title") or row.get("job_title") or row.get("Title") or row.get("title") or row.get("position") or ""
-    company_name = row.get("Company") or row.get("Company Name") or row.get("company") or row.get("company_name") or row.get("Employer") or ""
+    company_name = row.get("Company") or row.get("Company Name") or row.get("company") or row.get("company_name") or row.get("Employer") or row.get("companyName") or ""
     location = row.get("Location") or row.get("location") or row.get("City") or row.get("city") or row.get("Region") or row.get("region") or ""
     education = row.get("Qualification") or row.get("education") or row.get("Education") or row.get("Degree") or ""
     experience = row.get("Experience") or row.get("experience") or row.get("Seniority") or ""
     salary_raw = row.get("Salary") or row.get("salary") or row.get("Salary Range") or row.get("Avg Salary") or row.get("Avg Salary(K)") or ""
     skills_raw = row.get("Skills") or row.get("skills") or row.get("Key Skills") or row.get("Technologies") or ""
     desc = row.get("Job Description") or row.get("job_description") or row.get("Description") or row.get("description") or row.get("Job_Description") or ""
-    publish_date = row.get("Publish Date") or row.get("publish_date") or row.get("Date") or row.get("Post Date") or ""
-    company_size = row.get("Company Size") or row.get("company_size") or row.get("Size") or ""
-    industry = row.get("Industry") or row.get("industry") or row.get("Sector") or ""
-    company_type = row.get("Company Type") or row.get("company_type") or row.get("Type") or ""
+    publish_date = row.get("Publish Date") or row.get("publish_date") or row.get("Date") or row.get("Post Date") or row.get("publishDate") or ""
+    company_size = row.get("Company Size") or row.get("company_size") or row.get("Size") or row.get("companySize") or ""
+    industry = row.get("Industry") or row.get("industry") or row.get("Sector") or row.get("industry") or ""
+    company_type = row.get("Company Type") or row.get("company_type") or row.get("Type") or row.get("companyType") or ""
     welfare = row.get("Welfare") or row.get("welfare") or row.get("Benefits") or ""
-    source_url = row.get("source_url") or row.get("Source URL") or row.get("URL") or row.get("url") or ""
+    source_url = row.get("source_url") or row.get("Source URL") or row.get("URL") or row.get("url") or row.get("sourceUrl") or ""
+    province_raw = row.get("province") or row.get("Province") or ""
+    city_tier_raw = row.get("cityTier") or row.get("CityTier") or ""
 
-    # 薪资解析
-    salary = parse_salary(salary_raw)
+    # 薪资解析：优先使用预分离的 min/max 列，其次解析 Salary 字符串
+    salary_min_raw = row.get("salaryMin") or row.get("Salary Min") or None
+    salary_max_raw = row.get("salaryMax") or row.get("Salary Max") or None
+    if salary_min_raw is not None and not pd.isna(salary_min_raw) and salary_max_raw is not None and not pd.isna(salary_max_raw):
+        salary = parse_salary(f"{salary_min_raw}-{salary_max_raw}")
+    else:
+        salary = parse_salary(salary_raw)
 
-    # 城市标准化
+    # 城市标准化：优先用 city 列查映射，辅以 province/tier 直传
     city_info = normalize_city(location, city_map)
+    if not city_info["province"] and province_raw and not pd.isna(province_raw):
+        city_info["province"] = str(province_raw).strip()
+    if not city_info["tier"] and city_tier_raw and not pd.isna(city_tier_raw):
+        city_info["tier"] = str(city_tier_raw).strip()
 
-    # 技能预处理（可能是逗号分隔的字符串 → 数组）
+    # 技能预处理（支持逗号或竖线分隔）
     skills = []
     if skills_raw and not pd.isna(skills_raw):
         if isinstance(skills_raw, str):
-            skills = [s.strip() for s in skills_raw.replace("，", ",").split(",") if s.strip()]
+            skills = [s.strip() for s in skills_raw.replace("|", ",").replace("，", ",").split(",") if s.strip()]
         elif isinstance(skills_raw, list):
             skills = skills_raw
 
-    # 福利预处理
+    # 福利预处理（支持逗号或竖线分隔）
     welfare_list = []
     if welfare and not pd.isna(welfare):
         if isinstance(welfare, str):
-            welfare_list = [w.strip() for w in welfare.replace("，", ",").split(",") if w.strip()]
+            welfare_list = [w.strip() for w in welfare.replace("|", ",").replace("，", ",").split(",") if w.strip()]
         elif isinstance(welfare, list):
             welfare_list = welfare
 
