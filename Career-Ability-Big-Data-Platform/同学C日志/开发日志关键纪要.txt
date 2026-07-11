@@ -1,0 +1,969 @@
+================================================================================
+同学C（张博源）开发日志 — 数据分析与可视化
+================================================================================
+
+项目：职业能力大数据服务平台 (Career-Ability-Big-Data-Platform)
+角色：岗位查询、统计分析、离线计算、数据大屏与岗位分析页面
+开发分支：feature/data-analysis-zby
+日期范围：2026年7月10日 ~ 2026年7月11日（按5个开发阶段整理）
+
+================================================================================
+一、职责范围与最终完成情况
+================================================================================
+
+【原始职责】
+1. 岗位查询 API
+   - 岗位分页搜索
+   - 岗位详情
+   - 热门/最新岗位
+   - 岗位搜索建议
+
+2. 多维度统计分析
+   - 就业概览
+   - 岗位分析
+   - 薪资分析
+   - 技能分析
+   - 学历分析
+   - 城市分析
+   - 企业/行业分析
+   - 时间趋势分析
+
+3. 离线统计
+   - 每日定时计算
+   - 写入 stat_* 统计表
+   - Redis 分布式锁
+   - 统计缓存更新与失效
+
+4. Vue 3 可视化页面
+   - 就业数据大屏
+   - 岗位筛选和岗位分析页
+   - ECharts 图表
+   - 响应式桌面/移动布局
+
+【最终完成】
+  岗位查询后端              ✓
+  结构化多条件筛选          ✓
+  岗位详情与搜索建议        ✓
+  8组统计结果               ✓
+  按岗位名称专项分析        ✓
+  大屏聚合接口              ✓
+  每日离线统计              ✓
+  Redis统计缓存             ✓
+  Vue数据大屏               ✓
+  Vue岗位分析页             ✓
+  Docker后端/前端镜像       ✓
+  自动化测试和真实数据测试  ✓
+
+================================================================================
+第1阶段：Spring Boot岗位模块、实体映射与查询接口
+================================================================================
+
+【前置条件】
+- 使用同学A提供的 sql/init.sql 表结构。
+- 数据来源为同学A的数据管道：CSV → Redis → ETL → MySQL。
+- 核心读取表为 job_position 和 job_company。
+- skills、welfare 在MySQL中是JSON字段，需要转换为Java字符串列表。
+
+【完成内容】
+1. 建立Spring Boot后端工程
+   - Spring Boot 2.7.18
+   - Java 17
+   - Spring Web
+   - Spring Data JPA
+   - Spring Security
+   - Spring Cache + Spring Data Redis
+   - MySQL Connector
+   - H2测试数据库
+
+2. 编写岗位实体
+   - JobPosition.java：映射job_position
+   - JobCompany.java：映射job_company
+   - JobPosition通过@ManyToOne关联JobCompany
+   - StringListJsonConverter.java：完成JSON字符串与List<String>互转
+   - 对空JSON、null、非法JSON做兼容处理，前端统一得到空数组而不是null
+
+3. 编写Repository
+   - PositionRepository继承JpaRepository和JpaSpecificationExecutor
+   - 使用@EntityGraph一次加载company，避免岗位列表中的N+1查询
+   - findLatest()：按createTime倒序获取最新岗位
+   - findAllWithCompany()：统计分析时一次加载岗位及企业
+   - suggestTitles()：岗位名称去重搜索建议
+   - CompanyRepository：企业基础CRUD接口
+
+4. 编写动态筛选Specification
+   PositionSpecifications支持以下条件自由组合：
+   - keyword：岗位名称或企业名称模糊匹配
+   - city：城市精确匹配
+   - salaryMin / salaryMax：薪资区间重叠匹配
+   - education：学历精确匹配
+   - experience：经验精确匹配
+   - industry：企业行业精确匹配
+
+   薪资筛选采用“区间重叠”语义：
+   - 岗位salaryMax >= 用户salaryMin
+   - 岗位salaryMin <= 用户salaryMax
+   因此用户查询15K~20K时，可以找到10K~18K、18K~25K等有交集的岗位。
+
+5. 编写PositionService
+   - 将数据库实体转换为PositionResponse，避免直接暴露JPA实体
+   - 列表接口不返回大段description和sourceUrl，减少响应体积
+   - 详情接口返回完整description、sourceUrl、skills、welfare和企业信息
+   - page从1开始，内部转换为Spring Data从0开始的页码
+   - size限制为1~100
+   - hot limit限制为1~100
+   - suggest limit限制为1~20
+   - 排序字段白名单：publishDate、createTime、salaryMin、salaryMax、title
+   - 非法页码、薪资、排序字段统一返回400
+
+6. 编写岗位Controller
+   ① GET /api/positions
+      用途：岗位分页和组合筛选
+      参数：keyword、city、salaryMin、salaryMax、education、experience、industry、
+            sortBy、sortDirection、page、size
+
+   ② GET /api/positions/{id}
+      用途：岗位详情
+      返回：岗位、企业、技能、福利、描述、发布日期、来源链接
+
+   ③ GET /api/positions/hot?limit=20
+      用途：返回按createTime倒序的最新岗位，当前作为热门岗位使用
+
+   ④ GET /api/positions/search/suggest?keyword=Java&limit=10
+      用途：岗位标题自动补全
+
+7. 编写统一响应结构
+   所有C模块接口使用：
+
+   {
+     "code": 200,
+     "message": "success",
+     "data": {},
+     "timestamp": 1780000000000
+   }
+
+   分页data结构：
+
+   {
+     "content": [],
+     "totalElements": 20,
+     "totalPages": 2,
+     "number": 1,
+     "size": 10
+   }
+
+8. 编写全局异常处理
+   - 资源不存在：HTTP 404 + code=404
+   - 参数错误：HTTP 400 + code=400
+   - 未处理异常：HTTP 500 + code=500
+   - 避免把Java堆栈和数据库信息直接返回前端
+
+【关键要点】
+- API页码对外从1开始，符合前端分页组件和一般用户习惯。
+- skills和welfare始终返回数组，前端不需要反复判断null。
+- 列表和详情使用不同的数据量，避免岗位分页时重复传输大段岗位描述。
+- 排序字段使用白名单，不能由请求参数任意指定实体字段。
+- 所有岗位接口使用@PreAuthorize("isAuthenticated()")，等待B模块提供最终JWT认证。
+
+【交付物】
+- position/entity/* ✓
+- position/repository/* ✓
+- position/service/PositionService.java ✓
+- position/controller/PositionController.java ✓
+- position/dto/PositionFilter.java、PositionResponse.java ✓
+- common/ApiResponse.java、PageResponse.java、GlobalExceptionHandler.java ✓
+
+================================================================================
+第2阶段：多维统计分析、专项分析与大屏接口
+================================================================================
+
+【完成内容】
+1. 编写AnalyticsService
+   统计时通过findAllWithCompany()统一读取岗位与企业数据，然后在服务层完成聚合。
+
+2. 就业概览 overview
+   输出字段：
+   - totalPositions：岗位总量
+   - newThisMonth：本月新增岗位量
+   - averageSalary：平均薪资，单位K/月
+   - activeCompanies：活跃企业数
+   - updatedAt：统计生成时间
+
+3. 岗位分析 positions
+   输出字段：
+   - total：岗位总量
+   - categories：岗位名称频次排行
+   - hotPositions：热门岗位排行
+   - monthlyGrowthRate：月度增长率
+
+4. 薪资分析 salary
+   输出字段：
+   - average：平均薪资
+   - median：薪资中位数
+   - distribution：薪资区间分布
+   - topPositions：高薪岗位排行
+   - cityComparison：各城市平均薪资对比
+
+5. 技能分析 skills
+   输出字段：
+   - topSkills：技能词频TOP 30
+   - associations：技能组合关联TOP 15
+   - totalTaggedPositions：包含技能标签的岗位数
+
+6. 学历分析 education
+   输出字段：
+   - distribution：学历岗位数量分布
+   - salaryComparison：各学历平均薪资
+
+7. 城市分析 city
+   输出字段：
+   - ranking：城市岗位数量排行
+   - salaryComparison：城市平均薪资对比
+   - heatmap：中国地图热力图数据
+
+8. 企业/行业分析 company
+   输出字段：
+   - industryDistribution：行业岗位数量分布
+   - industryCompanyCounts：各行业企业数量
+   - sizeDistribution：企业规模分布
+   - activeCompanies：招聘活跃企业排行
+
+9. 趋势分析 trends
+   输出字段：
+   - daily：每日岗位增量序列
+   - monthly：月度岗位增量序列
+   - monthOverMonth：环比增长率
+   - yearOverYear：同比增长率
+
+10. 编写统计接口 /api/stats/*
+    - GET /api/stats/overview
+    - GET /api/stats/positions
+    - GET /api/stats/salary
+    - GET /api/stats/skills
+    - GET /api/stats/education
+    - GET /api/stats/city
+    - GET /api/stats/company
+    - GET /api/stats/industry（company接口的兼容别名）
+    - GET /api/stats/trends
+
+    统计接口支持公共筛选参数：
+    - startDate：开始日期，格式yyyy-MM-dd
+    - endDate：结束日期，格式yyyy-MM-dd
+    - city：城市
+    - position：岗位名称模糊匹配
+    - industry：行业
+
+    示例：
+    GET /api/stats/overview?city=上海&position=Java&industry=互联网
+
+11. 编写岗位专项分析接口 /api/analysis/*
+    - GET /api/analysis/salary-distribution?position=Java
+    - GET /api/analysis/skills?position=Java
+    - GET /api/analysis/city-ranking?position=Java
+    - GET /api/analysis/education?position=Java
+
+    用途：岗位分析页选择某个岗位名称后，只分析这一类岗位。
+
+12. 编写大屏接口 /api/dashboard/*
+    - GET /api/dashboard/all：一次返回全部大屏数据
+    - GET /api/dashboard/overview：概览卡片
+    - GET /api/dashboard/hot-positions：热门岗位
+    - GET /api/dashboard/salary-ranking：城市薪资排行
+    - GET /api/dashboard/skill-cloud：技能词云数据
+    - GET /api/dashboard/trend：月度趋势
+
+【性能优化】
+最初大屏前端需要分别请求overview、trends、city、skills、education、company，
+一次刷新产生6个HTTP请求，后端也会多次查询岗位数据。
+
+优化后：
+1. 增加GET /api/dashboard/all。
+2. AnalyticsService.calculateSnapshot()只调用一次findAllWithCompany()。
+3. 同一份岗位列表生成overview、positions、salary、skills、education、city、company、trends。
+4. 前端由6个并行请求改为1个请求。
+5. 增加单元测试，验证完整快照只读取Repository一次。
+
+【关键要点】
+- 当前在线统计以job_position实时数据为输入，经过Redis缓存后返回。
+- stat_*表用于每日离线快照和D同学报告生成，不是在线接口的唯一数据源。
+- 统计值为空时返回空列表或0，不让前端图表因null而报错。
+- startDate晚于endDate会返回400，防止产生语义错误的结果。
+
+【交付物】
+- analytics/controller/StatsController.java ✓
+- analytics/controller/PositionAnalysisController.java ✓
+- analytics/controller/DashboardController.java ✓
+- analytics/dto/AnalyticsFilter.java ✓
+- analytics/service/AnalyticsService.java ✓
+
+================================================================================
+第3阶段：Redis缓存、每日离线计算与统计表持久化
+================================================================================
+
+【完成内容】
+1. 开启Spring Cache
+   - 本地默认可以使用simple cache快速启动
+   - Docker/联调环境设置SPRING_CACHE_TYPE=redis
+   - Redis缓存TTL为30分钟
+
+2. 为统计结果设计缓存区域
+   全量缓存：
+   - stat-dashboard
+   - stat-overview
+   - stat-position
+   - stat-salary
+   - stat-skills
+   - stat-education
+   - stat-city
+   - stat-company
+   - stat-trends
+
+   筛选缓存：
+   - stat-overview-filtered
+   - stat-position-filtered
+   - stat-salary-filtered
+   - stat-skills-filtered
+   - stat-education-filtered
+   - stat-city-filtered
+   - stat-company-filtered
+   - stat-trends-filtered
+
+3. 编写AnalyticsFilter.cacheKey()
+   - startDate、endDate、city、position、industry按固定顺序组成键
+   - 字符串trim并转小写，避免"Java"和" java "生成两份缓存
+   - 不同筛选条件使用不同键，防止上海数据错误复用北京缓存
+
+   实际Redis键示例：
+   stat-overview-filtered::||上海||
+
+4. 编写OfflineAnalysisService
+   每次离线任务：
+   ① 在方法执行前清理全量和筛选统计缓存
+   ② 调用calculateSnapshot()，只读取一次岗位数据
+   ③ 删除当天已有统计，保证重复执行不会产生重复日报
+   ④ 写入stat_position
+   ⑤ 写入stat_salary
+   ⑥ 批量写入stat_education
+   ⑦ 批量写入stat_skill
+   ⑧ 批量写入stat_city
+   ⑨ 批量写入stat_company
+   ⑩ 写入stat_trend
+
+5. 编写AnalyticsScheduler
+   - 默认每天02:00执行
+   - 可用ANALYTICS_CRON环境变量修改cron表达式
+   - Redis SET NX实现多实例互斥锁
+   - 锁默认有效期1800秒，防止进程异常退出后永久死锁
+   - 释放锁前核对lockValue，避免删除其他实例的锁
+   - Redis暂时不可用时退化为JVM内AtomicBoolean单实例锁
+
+6. 离线统计实际落库结果
+   使用20条真实岗位数据执行后：
+   - stat_position：1条日报
+   - stat_salary：1条日报
+   - stat_education：2条分组数据
+   - stat_skill：30条技能数据
+   - stat_city：5条城市数据
+   - stat_company：11条行业数据
+   - stat_trend：1条趋势日报
+
+【关键要点】
+- 定时任务加锁是为了防止Spring Boot多实例同时写同一天统计。
+- 离线任务是事务性的，任一写入失败时整次统计回滚。
+- 缓存失效使用allEntries=true，因为岗位数据变化会影响所有筛选组合。
+- beforeInvocation=true保证任务开始时先清除旧缓存，不继续返回明显过期的数据。
+- Redis锁不可用不会完全阻塞单机开发，但生产多实例必须保证Redis可用。
+
+【交付物】
+- analytics/service/OfflineAnalysisService.java ✓
+- analytics/service/AnalyticsScheduler.java ✓
+- Redis全量与筛选缓存 ✓
+- stat_*每日统计持久化 ✓
+
+================================================================================
+第4阶段：Vue 3数据大屏与岗位分析页面
+================================================================================
+
+【完成内容】
+1. 建立Vue 3前端
+   - Vue 3 Composition API
+   - Vite 6
+   - Element Plus
+   - Vue Router
+   - Pinia
+   - Axios
+   - ECharts 6.1
+   - 中国GeoJSON地图数据
+
+2. 页面路由
+   - /dashboard：就业数据大屏
+   - /positions：岗位筛选与岗位分析
+   - / 自动跳转 /dashboard
+   - 页面使用动态import，路由级代码分割
+
+3. 数据大屏DashboardView
+   - 岗位总量、本月新增、平均薪资、活跃企业概览卡片
+   - 月度岗位趋势折线图
+   - 城市岗位分布/中国地图
+   - 热门技能图表
+   - 学历分布图表
+   - 行业/企业分布图表
+   - 手动刷新
+   - 加载状态、错误状态、更新时间
+   - 桌面和移动端响应式布局
+
+4. 岗位分析PositionView
+   - 关键字搜索
+   - 城市、薪资、学历、经验、行业筛选
+   - 排序与分页
+   - 搜索建议
+   - 岗位卡片列表
+   - 岗位详情抽屉/弹层
+   - 针对选定岗位展示薪资和技能等专项图表
+   - URL/API参数与后端PositionFilter保持一致
+
+5. 封装Axios请求
+   - baseURL统一为/api
+   - 15秒请求超时
+   - 自动拆出统一响应中的data
+   - code不是200时转为Promise异常
+   - 401时清除localStorage中的accessToken
+   - 401时发送auth:expired事件，供B同学登录模块监听
+   - 统一Element Plus错误提示
+
+6. 认证兼容
+   - B模块合并后：读取localStorage.accessToken并发送Authorization: Bearer <token>
+   - B模块未合并时：开发环境可以使用VITE_DEV_USERNAME和VITE_DEV_PASSWORD发送Basic认证
+   - Basic回退只在import.meta.env.DEV中生效，生产构建不会启用
+
+7. 开发与生产代理
+   Vite开发环境：
+   - http://localhost:5173/api/* → http://localhost:8080/api/*
+
+   Nginx容器环境：
+   - /api/* → http://backend:8080/api/*
+   - history路由使用try_files回退到index.html
+   - 开启gzip压缩
+
+8. 前端构建优化
+   manualChunks拆分：
+   - vue：Vue、Vue Router、Pinia
+   - element：Element Plus和图标
+   - charts：ECharts
+
+【前端Bug修复】
+Bug #1：ChartPanel在DOM未准备好时执行ResizeObserver.observe(null)
+- 现象：父组件onMounted链路被异常打断，大屏API请求不执行，页面无真实数据。
+- 修复：await nextTick后检查element；创建图表后再observe；空数据时dispose图表。
+- 结果：大屏和岗位页API请求恢复，Canvas正常生成。
+
+Bug #2：ECharts 6网格containLabel兼容性
+- 现象：升级ECharts 6后部分坐标轴标签布局行为发生变化。
+- 修复：注册LegacyGridContainLabel feature。
+- 结果：柱状图、折线图标签布局恢复稳定。
+
+Bug #3：大屏请求数量过多
+- 现象：一次刷新需要6个统计请求，慢网络下加载时间长且各图表可能不是同一数据快照。
+- 修复：统一调用/api/dashboard/all。
+- 结果：请求数量由6降为1，所有图表来自同一快照。
+
+【交付物】
+- frontend/src/views/dashboard/DashboardView.vue ✓
+- frontend/src/views/positions/PositionView.vue ✓
+- frontend/src/components/ChartPanel.vue ✓
+- frontend/src/api/positions.js、analytics.js ✓
+- frontend/src/utils/request.js、echarts.js ✓
+- frontend/src/layout/MainLayout.vue ✓
+- frontend/Dockerfile、nginx.conf ✓
+
+================================================================================
+第5阶段：环境补齐、代码优化与真实测试
+================================================================================
+
+【本机环境】
+1. MySQL
+   - MySQL 9.7.1
+   - 地址：127.0.0.1:3306
+   - 数据库：career_ability
+   - 本地开发账号：root/root
+   - 执行sql/init.sql后共有25张表、5个角色及城市映射种子数据
+
+2. Redis
+   - Windows Redis 8.8.0
+   - 仅绑定127.0.0.1:6379
+   - protected-mode yes
+   - RDB + AOF
+   - maxmemory 256MB，allkeys-lru
+   - 新增scripts/start-redis.ps1和stop-redis.ps1
+   - 运行数据写入工作区外层.runtime/redis，不提交运行时文件
+
+3. WSL 2和Docker
+   - WSL 2.7.10
+   - Ubuntu 24.04 LTS
+   - 默认Linux用户：zby
+   - systemd正常
+   - Docker Desktop 4.81.0
+   - Docker Engine 29.6.1，linux/amd64
+
+4. Docker真实验证
+   - docker run --rm hello-world：通过
+   - redis:7-alpine测试容器：redis-cli PING返回PONG
+   - backend镜像构建成功，约354MB
+   - frontend镜像构建成功，约76.8MB
+   - docker compose config：通过
+
+【真实数据链路测试】
+使用同学A的data/test_sample.csv：
+  CSV 20条
+    → import_data.py写入Redis raw队列20条
+    → etl_clean.py消费20条
+    → MySQL写入20/20
+    → 丢弃0
+    → 异常0
+    → cleaned队列20条
+
+验证内容：
+- 薪资标准化正确 ✓
+- 城市、省份、城市层级正确 ✓
+- 学历和经验标准化正确 ✓
+- 技能提取正确 ✓
+- 公司关联正确 ✓
+- 岗位查询可读取真实数据 ✓
+
+【真实API测试结果】
+- 匿名访问/api/positions：HTTP 401
+- 认证访问：HTTP 200
+- 岗位总量：20
+- Java岗位匹配：1
+- 上海岗位匹配：5
+- 岗位详情技能数：5
+- 平均薪资：24.23K/月
+- 技能统计分组：30
+- 城市统计分组：5
+- 行业统计分组：11
+- 月度趋势点：12
+
+【Redis缓存测试】
+- 首次上海筛选请求：执行真实统计并写缓存
+- 第二次相同请求：命中缓存
+- 缓存键：stat-overview-filtered::||上海||
+- TTL：1800秒
+- 不同筛选条件生成不同缓存键
+
+【自动化测试】
+后端：
+- AnalyticsServiceTest
+- PositionControllerTest
+- StringListJsonConverterTest
+- PositionServiceIntegrationTest
+- 总计13个测试
+- 结果：13通过，0失败，0错误，0跳过
+
+前端：
+- npm run build：通过
+- Vite转换2273个模块
+- npm audit：0个漏洞
+
+浏览器运行测试：
+- /api/dashboard/all：200
+- 大屏展示20个岗位和真实统计
+- 大屏Canvas数量：5
+- 岗位卡片：12个/当前分页
+- 岗位页Canvas数量：2
+- 桌面截图：无重叠
+- 移动截图：无重叠，筛选和卡片可用
+
+【关键优化总结】
+1. JPA EntityGraph避免岗位-企业N+1查询。
+2. 列表DTO不返回description/sourceUrl，降低分页响应体积。
+3. 大屏6次HTTP请求合并为1次。
+4. 完整统计快照只读取Repository一次。
+5. 筛选统计增加30分钟Redis缓存。
+6. 离线任务统一清理全量和筛选缓存。
+7. 前端路由懒加载、依赖分包。
+8. Redis Windows配置限制为本机访问。
+
+================================================================================
+二、其他同学如何使用C模块
+================================================================================
+
+--------------------------------------------------------------------------------
+同学A（数据管道与基础设施）如何对接
+--------------------------------------------------------------------------------
+
+【A向C提供的数据】
+1. A负责把原始数据写入job_company和job_position。
+2. C不直接消费原始CSV，在线查询和统计以MySQL清洗结果为准。
+3. C依赖以下字段语义保持稳定：
+   - job_position.title：非空岗位名称
+   - job_position.company_id：关联job_company.id
+   - salary_min / salary_max：统一为K/月整数
+   - city / province / city_tier：标准化地域
+   - education / experience：标准枚举文本
+   - skills / welfare：合法JSON数组
+   - publish_date：岗位发布日期
+   - job_company.industry / company_size / company_type：企业维度
+
+【A更新数据后需要注意】
+- 在线统计缓存最长30分钟；批量导入完成后应触发缓存清理或等待TTL。
+- 每日02:00的离线任务会把当前job_position数据写入stat_*。
+- 如果A修改字段格式，应同步通知C，尤其是薪资单位、skills JSON和日期格式。
+- 不要让多个旧etl_clean.py进程同时竞争队列，避免测试数据量与预期不一致。
+
+【本地连接约定】
+- MySQL：localhost:3306，默认root/root
+- Redis：localhost:6379
+- Docker Compose内部：mysql:3306、redis:6379
+- Compose对宿主机暴露MySQL 3307，避免和本机3306冲突
+
+--------------------------------------------------------------------------------
+同学B（用户权限与API体系）如何对接
+--------------------------------------------------------------------------------
+
+【后端认证对接】
+1. C的Controller已使用@PreAuthorize("isAuthenticated()")。
+2. B需要在同一个Spring Boot应用中提供SecurityFilterChain和JWT过滤器。
+3. JWT过滤器验证成功后必须把Authentication写入SecurityContext。
+4. C模块不解析用户ID，只要求当前请求已认证。
+5. 未认证请求应返回HTTP 401；无权限请求应返回HTTP 403。
+
+【前端Token对接】
+1. B登录成功后将accessToken写入：
+   localStorage.setItem('accessToken', token)
+2. C的request.js会自动发送：
+   Authorization: Bearer <accessToken>
+3. Token失效时C模块会：
+   - 删除accessToken
+   - window.dispatchEvent(new CustomEvent('auth:expired'))
+4. B的主布局或用户Store应监听auth:expired并跳转/login。
+
+【统一响应对接】
+C模块已经采用B规划的统一响应：code、message、data、timestamp。
+B合并时应复用或统一common/ApiResponse，避免项目中出现两个同名响应类。
+
+【B模块未合并时的临时联调】
+启动后端时设置：
+  SPRING_SECURITY_USER_NAME=tester
+  SPRING_SECURITY_USER_PASSWORD=test123
+
+启动前端时设置：
+  VITE_DEV_USERNAME=tester
+  VITE_DEV_PASSWORD=test123
+
+这套Basic账号只用于本地开发，B的JWT合并后应删除启动环境变量。
+
+--------------------------------------------------------------------------------
+同学D（报告生成与岗位推荐）如何对接
+--------------------------------------------------------------------------------
+
+【报告生成可使用的数据】
+D可以直接读取stat_*日报表：
+- stat_position：岗位总量、增量、热门岗位、增长率
+- stat_salary：平均薪资、中位数、薪资分布、高薪岗位
+- stat_education：学历岗位数和平均薪资
+- stat_skill：技能频次
+- stat_city：城市岗位数、平均薪资、排名
+- stat_company：行业企业数、岗位数、活跃排名
+- stat_trend：日/月增量、同比、环比
+
+生成“最新实时报告”时，也可以调用：
+- /api/dashboard/all：一次取得完整统计快照
+- /api/stats/*：按时间、城市、岗位、行业筛选
+
+【推荐引擎可使用的数据】
+D的岗位推荐需要岗位候选集时可以：
+1. 在同一后端工程中注入PositionRepository/PositionService；或
+2. 调用GET /api/positions分页获取候选岗位。
+
+推荐需要的字段已经在PositionResponse中提供：
+- skills：技能Jaccard匹配
+- city/province：城市与同省降权匹配
+- education：学历匹配
+- salaryMin/salaryMax：期望薪资区间重叠
+- title/industry：专业和行业关键词匹配
+- companyName/companySize/companyType：推荐解释信息
+
+【推荐实现建议】
+- 批量计算推荐时优先使用Repository，避免循环调用HTTP详情接口。
+- 返回推荐结果时可以复用PositionResponse，不要再次定义一份岗位DTO。
+- 推荐缓存刷新后不需要清理C的统计缓存，两类缓存应使用不同cacheName。
+- D如果按岗位分析技能差距，可调用/api/analysis/skills?position=岗位名。
+
+================================================================================
+三、模块间完整数据流与调用关系
+================================================================================
+
+原始数据
+  │
+  │ 同学A：import_data.py
+  ▼
+Redis queue:raw-job-data
+  │
+  │ 同学A：etl_clean.py清洗、标准化、去重
+  ▼
+MySQL job_company + job_position
+  │
+  ├──────────────────────────────────────────────┐
+  │                                              │
+  │ 同学C：PositionService                       │ 同学C：AnalyticsService
+  ▼                                              ▼
+/api/positions                              /api/stats/*
+/api/positions/{id}                         /api/analysis/*
+/api/positions/hot                          /api/dashboard/all
+/api/positions/search/suggest                    │
+  │                                              ├── Redis统计缓存（30分钟）
+  │                                              │
+  │                                              └── 每日02:00离线计算
+  │                                                       │
+  │                                                       ▼
+  │                                                MySQL stat_*日报表
+  │                                                       │
+  └──────────────────────┬────────────────────────────────┘
+                         │
+                         ├── 同学B：JWT认证、用户登录、权限控制
+                         │
+                         ├── 同学C：Vue数据大屏和岗位分析页
+                         │
+                         └── 同学D：推荐候选集、就业报告和技能差距分析
+
+认证调用链：
+用户登录（B）
+  → accessToken写入localStorage
+  → C的Axios拦截器添加Bearer Token
+  → B的JWT Filter验证
+  → SecurityContext中存在Authentication
+  → C的@PreAuthorize通过
+  → 返回统一ApiResponse
+
+大屏调用链：
+DashboardView
+  → GET /api/dashboard/all
+  → Redis stat-dashboard缓存
+  → 未命中时findAllWithCompany一次
+  → 计算8组统计
+  → 返回同一时间点快照
+  → ECharts渲染图表
+
+================================================================================
+四、其他同学本地使用步骤
+================================================================================
+
+【方式一：直接使用本机MySQL和Redis】
+
+1. 初始化数据库
+   mysql -uroot -proot < sql/init.sql
+
+2. 启动Windows Redis
+   .\scripts\start-redis.ps1
+
+3. 准备测试数据（由A的数据管道完成）
+   cd data-pipeline
+   python import_data.py ../data/test_sample.csv
+   python etl_clean.py
+
+4. 启动后端（B模块未合并时）
+   cd backend
+   PowerShell执行：
+     $env:SPRING_DATASOURCE_USERNAME='root'
+     $env:SPRING_DATASOURCE_PASSWORD='root'
+     $env:SPRING_SECURITY_USER_NAME='tester'
+     $env:SPRING_SECURITY_USER_PASSWORD='test123'
+     $env:SPRING_CACHE_TYPE='redis'
+     mvn.cmd spring-boot:run
+
+5. 启动前端
+   cd frontend
+   PowerShell执行：
+     npm.cmd ci
+     $env:VITE_DEV_USERNAME='tester'
+     $env:VITE_DEV_PASSWORD='test123'
+     npm.cmd run dev
+
+6. 访问
+   - 前端：http://localhost:5173
+   - 后端：http://localhost:8080
+   - 大屏：http://localhost:5173/dashboard
+   - 岗位页：http://localhost:5173/positions
+
+【方式二：Docker构建】
+
+1. 验证配置
+   docker compose config
+
+2. 构建C模块镜像
+   docker compose build backend frontend
+
+3. 镜像名称
+   - career-ability-big-data-platform-backend:latest
+   - career-ability-big-data-platform-frontend:latest
+
+4. 容器内服务连接
+   - 后端访问mysql:3306
+   - 后端访问redis:6379
+   - 前端Nginx访问backend:8080
+
+说明：python-etl服务及其Dockerfile属于A的数据管道模块，完整Compose启动前由A确认该服务可构建。
+
+【最小API验证】
+
+1. 不带认证：
+   GET http://localhost:8080/api/positions
+   预期：401
+
+2. 带Basic开发认证：
+   curl -u tester:test123 "http://localhost:8080/api/positions?page=1&size=10"
+   预期：200，data.content包含岗位
+
+3. 筛选岗位：
+   curl -u tester:test123 "http://localhost:8080/api/positions?city=上海&salaryMin=15&salaryMax=30"
+
+4. 数据大屏：
+   curl -u tester:test123 "http://localhost:8080/api/dashboard/all"
+
+5. 上海统计：
+   curl -u tester:test123 "http://localhost:8080/api/stats/overview?city=上海"
+
+================================================================================
+五、测试清单与验收结果
+================================================================================
+
+【岗位查询】
+  分页从1开始                        ✓
+  keyword匹配岗位和企业              ✓
+  城市筛选                           ✓
+  薪资区间重叠筛选                   ✓
+  学历/经验/行业组合筛选             ✓
+  排序白名单                         ✓
+  非法参数返回400                    ✓
+  不存在详情返回404                  ✓
+  skills/welfare JSON转换            ✓
+  未认证返回401                      ✓
+
+【统计分析】
+  概览                               ✓
+  岗位                               ✓
+  薪资                               ✓
+  技能                               ✓
+  学历                               ✓
+  城市                               ✓
+  企业/行业                          ✓
+  趋势                               ✓
+  公共筛选条件                       ✓
+  大屏统一快照                       ✓
+  单次Repository读取                 ✓
+
+【缓存与离线计算】
+  Redis缓存写入                      ✓
+  筛选缓存键隔离                     ✓
+  TTL 1800秒                         ✓
+  离线统计落库                       ✓
+  重复执行不重复插入                 ✓
+  Redis分布式锁                      ✓
+  Redis不可用时单机锁降级            ✓
+  任务开始前缓存失效                 ✓
+
+【前端】
+  大屏真实数据                       ✓
+  岗位列表与详情                     ✓
+  搜索和筛选                         ✓
+  图表Canvas渲染                     ✓
+  桌面布局                           ✓
+  移动布局                           ✓
+  401处理                            ✓
+  JWT Bearer预留                     ✓
+  生产构建                           ✓
+  npm audit 0漏洞                    ✓
+
+【环境】
+  MySQL root/root                    ✓
+  Windows Redis PONG                 ✓
+  WSL 2 Ubuntu 24.04                 ✓
+  Docker hello-world                 ✓
+  Docker Redis PONG                  ✓
+  后端镜像构建                       ✓
+  前端镜像构建                       ✓
+
+================================================================================
+六、踩坑与解决记录
+================================================================================
+
+1. ChartPanel挂载顺序
+   - 问题：ResizeObserver.observe(null)阻断Vue挂载流程。
+   - 解决：nextTick + element判空，图表初始化后再observe。
+
+2. ECharts 6兼容
+   - 问题：规划使用ECharts 5，实际安装6.1后网格标签行为变化。
+   - 解决：显式注册LegacyGridContainLabel，并完成桌面/移动截图检查。
+
+3. 大屏重复读库
+   - 问题：多个统计接口分别findAllWithCompany，数据量增加后性能线性变差。
+   - 解决：calculateSnapshot单次读取生成完整快照，前端请求由6变1。
+
+4. 筛选缓存串数据风险
+   - 问题：如果所有筛选请求共用同一个缓存键，北京和上海会返回相同结果。
+   - 解决：AnalyticsFilter固定顺序生成标准化cacheKey。
+
+5. Docker Desktop无法启动Linux Engine
+   - 问题：WSL程序已安装，但Windows Hypervisor没有加载，报HCS_E_HYPERV_NOT_INSTALLED。
+   - 解决：启用Microsoft-Windows-Subsystem-Linux、VirtualMachinePlatform、
+           HypervisorPlatform，设置hypervisorlaunchtype auto并重启。
+
+6. Ubuntu商店安装长时间卡住
+   - 问题：wsl --install和winget下载Ubuntu超时。
+   - 解决：从Canonical官方cloud-images下载rootfs，校验SHA-256后用wsl --import导入。
+
+7. Docker组合构建超时假象
+   - 问题：docker compose build客户端在20分钟时超时，但BuildKit刚好完成后端镜像导出。
+   - 解决：使用docker buildx history inspect/logs核实15/15步骤完成，并检查最终镜像ID。
+
+8. Windows Redis重启后未自动运行
+   - 问题：便携版Redis不是Windows服务。
+   - 解决：提供start-redis.ps1和stop-redis.ps1，启动后验证127.0.0.1:6379返回PONG。
+
+9. Spring Boot临时账号丢失
+   - 问题：重启后未设置SPRING_SECURITY_USER_NAME/PASSWORD，Spring生成随机密码导致401。
+   - 解决：开发启动脚本显式设置tester/test123；正式合并B的JWT后不再使用临时账号。
+
+================================================================================
+七、提交记录与交付结论
+================================================================================
+
+【Git提交】
+1. dda72c0 feat(analytics): 完成数据分析与可视化模块
+   - 新增Spring Boot岗位查询和统计分析后端
+   - 新增Vue数据大屏和岗位分析页
+   - 新增后端/前端Dockerfile
+   - 新增13个后端测试
+
+2. 53f4bf3 perf(analytics): 优化统计缓存与本地联调
+   - 大屏6请求合并为1请求
+   - 完整统计单次读取数据库
+   - 增加筛选Redis缓存
+   - 修复ChartPanel和ECharts 6问题
+   - 统一本地MySQL root/root配置
+   - 增加Windows Redis配置和启停脚本
+
+【分支】
+feature/data-analysis-zby
+
+【对其他成员解除的阻塞】
+- A：清洗后的岗位数据已有完整查询和统计消费端，可以验证数据质量。
+- B：岗位、统计、大屏接口已统一加认证注解并预留JWT Token接入。
+- D：可直接使用岗位候选集、实时统计接口和stat_*日报表开发推荐与报告。
+
+【最终结论】
+C模块已经打通：
+  MySQL清洗数据
+    → JPA岗位查询
+    → 多维统计
+    → Redis缓存
+    → stat_*离线日报
+    → Vue数据大屏/岗位分析
+    → B的认证接口
+    → D的推荐和报告数据源
+
+后续合并时重点确认：
+1. B的JWT SecurityFilterChain与C的@PreAuthorize能共同工作。
+2. B的登录页将accessToken写入localStorage。
+3. D复用PositionResponse和stat_*字段，不重复定义冲突的数据模型。
+4. A修改ETL字段格式时同步更新C的实体和统计规则。
+5. 完整Compose启动前由A补齐/确认python-etl容器构建。
