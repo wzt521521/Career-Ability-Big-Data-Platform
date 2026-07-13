@@ -15,6 +15,7 @@ import {
   Monitor,
   Operation,
   Setting,
+  Star,
   User,
   UserFilled,
 } from '@element-plus/icons-vue'
@@ -41,6 +42,8 @@ const menuGroups = computed(() => [
     items: [
       { path: '/dashboard', label: '就业数据大屏', icon: DataAnalysis, requiresAuth: true },
       { path: '/positions', label: '岗位分析', icon: Histogram, requiresAuth: true },
+      { path: '/recommend', label: '岗位推荐', icon: Star, requiresAuth: true, permissions: ['recommend:view'] },
+      { path: '/report', label: '报告中心', icon: Document, requiresAuth: true, permissions: ['report:view'] },
     ],
   },
   {

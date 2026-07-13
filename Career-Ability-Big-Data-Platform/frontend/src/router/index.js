@@ -34,6 +34,18 @@ const routes = [
         meta: { title: '岗位分析', section: '数据分析', requiresAuth: true },
       },
       {
+        path: 'recommend',
+        name: 'Recommend',
+        component: () => import('../views/recommend/RecommendView.vue'),
+        meta: { title: '岗位推荐', section: '数据分析', requiresAuth: true, permissions: ['recommend:view'] },
+      },
+      {
+        path: 'report',
+        name: 'Reports',
+        component: () => import('../views/report/ReportCenterView.vue'),
+        meta: { title: '报告中心', section: '数据分析', requiresAuth: true, permissions: ['report:view'] },
+      },
+      {
         path: 'collect/sources',
         name: 'CollectSources',
         component: () => import('../views/collect/CollectSourceView.vue'),
