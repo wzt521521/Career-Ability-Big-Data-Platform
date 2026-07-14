@@ -7,6 +7,7 @@ PyMySQL==1.1.1
 pytest==8.3.5
 pytest-cov==6.0.0
 coverage==7.6.10
+cryptography==44.0.3
 
 # Transitive dependencies resolved for the Python 3.10 CI environment.
 async-timeout==5.0.1 ; python_version < "3.11"
@@ -21,3 +22,5 @@ pluggy==1.5.0
 pygments==2.18.0
 six==1.17.0
 colorama==0.4.6 ; sys_platform == "win32"
+cffi==1.17.1
+pycparser==2.22
