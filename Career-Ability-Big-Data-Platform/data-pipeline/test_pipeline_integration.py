@@ -1,8 +1,8 @@
-"""Opt-in Redis/MySQL integration coverage for the data pipeline.
+"""Opt-in service tests for the isolated Redis/MySQL data pipeline.
 
-Run this file only through ``python -m pytest -m integration``.  The test
-uses per-run Redis keys and removes only the row/company it created; it never
-clears shared queues or truncates application tables.
+Run with ``python -m pytest -m integration`` only after explicitly supplying
+``PIPELINE_TEST_MYSQL_DATABASE`` and ``PIPELINE_TEST_REDIS_DB``.  The suite
+never truncates tables, flushes Redis, or touches the application database.
 """
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ import os
 import re
 import sys
 import uuid
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
@@ -21,44 +22,62 @@ if str(PIPELINE_DIR) not in sys.path:
     sys.path.insert(0, str(PIPELINE_DIR))
 
 from config import (  # noqa: E402
-    CLEANED_QUEUE,
+    MYSQL_DATABASE,
     MYSQL_HOST,
     MYSQL_PASSWORD,
     MYSQL_PORT,
     MYSQL_USER,
-    RAW_QUEUE,
     REDIS_DB,
     REDIS_HOST,
     REDIS_PORT,
+    QueueKeys,
+    build_queue_keys,
 )
 from etl_clean import (  # noqa: E402
-    check_duplicate,
+    claim_batch,
     compute_md5,
-    extract_skills,
-    get_or_create_company,
-    insert_position,
-    normalize_city,
-    normalize_education,
-    normalize_experience,
-    normalize_salary,
+    process_batch,
+    recover_inflight_messages,
 )
+from import_data import enqueue_raw_job  # noqa: E402
 
 
 pytestmark = pytest.mark.integration
 
 
-def _test_database_name():
+@dataclass
+class IsolatedPipeline:
+    connection: object
+    redis_client: object
+    keys: QueueKeys
+    run_id: str
+
+
+def _test_database_name() -> str:
     database = os.getenv("PIPELINE_TEST_MYSQL_DATABASE")
     if not database:
-        pytest.fail(
-            "Set PIPELINE_TEST_MYSQL_DATABASE to a dedicated database before running integration tests."
-        )
+        pytest.fail("Set PIPELINE_TEST_MYSQL_DATABASE to a dedicated MySQL database.")
     if not re.fullmatch(r"[A-Za-z0-9_]+", database):
-        pytest.fail("PIPELINE_TEST_MYSQL_DATABASE must contain only letters, digits, and underscores.")
+        pytest.fail("PIPELINE_TEST_MYSQL_DATABASE may contain only letters, digits, and underscores.")
+    if database == MYSQL_DATABASE:
+        pytest.fail("PIPELINE_TEST_MYSQL_DATABASE must not equal MYSQL_DATABASE.")
     return database
 
 
-def _connect_test_database(database):
+def _test_redis_db() -> int:
+    configured = os.getenv("PIPELINE_TEST_REDIS_DB")
+    if configured is None:
+        pytest.fail("Set PIPELINE_TEST_REDIS_DB to a dedicated Redis logical database.")
+    try:
+        database = int(configured)
+    except ValueError:
+        pytest.fail("PIPELINE_TEST_REDIS_DB must be an integer.")
+    if database == REDIS_DB:
+        pytest.fail("PIPELINE_TEST_REDIS_DB must not equal REDIS_DB.")
+    return database
+
+
+def _connect_test_database(database: str):
     import pymysql
 
     admin_connection = pymysql.connect(
@@ -118,8 +137,8 @@ def _connect_test_database(database):
                 description TEXT DEFAULT NULL,
                 publish_date DATE DEFAULT NULL,
                 source_url VARCHAR(500) DEFAULT NULL,
-                source_md5 VARCHAR(32) DEFAULT NULL,
-                KEY idx_job_position_source_md5 (source_md5),
+                source_md5 VARCHAR(32) NOT NULL,
+                UNIQUE KEY uq_job_position_source_md5 (source_md5),
                 CONSTRAINT fk_job_position_company
                     FOREIGN KEY (company_id) REFERENCES job_company(id) ON DELETE SET NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
@@ -129,99 +148,155 @@ def _connect_test_database(database):
     return connection
 
 
-def test_redis_to_mysql_pipeline_round_trip():
+@pytest.fixture
+def isolated_pipeline():
     import redis
 
     test_database = _test_database_name()
+    test_redis_db = _test_redis_db()
     run_id = uuid.uuid4().hex
-    raw_queue = f"{RAW_QUEUE}:pytest:{run_id}"
-    cleaned_queue = f"{CLEANED_QUEUE}:pytest:{run_id}"
-    company_name = f"pytest-company-{run_id}"
-    job_id = f"pytest-job-{run_id}"
-    source_url = f"https://pipeline.integration.test/jobs/{run_id}"
-    source_md5 = compute_md5(job_id, source_url)
-
+    prefix = os.getenv("PIPELINE_TEST_REDIS_PREFIX", "pipeline:test").strip(":")
+    if not prefix:
+        pytest.fail("PIPELINE_TEST_REDIS_PREFIX must not be empty.")
+    keys = build_queue_keys(f"{prefix}:{run_id}")
     redis_client = redis.Redis(
         host=REDIS_HOST,
         port=REDIS_PORT,
-        db=REDIS_DB,
+        db=test_redis_db,
         decode_responses=True,
     )
     connection = None
-    redis_ready = False
-
     try:
         redis_client.ping()
-        redis_ready = True
         connection = _connect_test_database(test_database)
-
-        job = {
-            "jobId": job_id,
-            "title": "Data Engineer",
-            "company": {"name": company_name, "size": "50-99"},
-            "salary": {"min": 180, "max": 300},
-            "city": "Shanghai",
-            "province": None,
-            "education": "bachelor",
-            "experience": "5-10 years",
-            "skills": ["Python"],
-            "welfare": ["Remote"],
-            "description": "Python, SQL, and Spring Boot data pipeline.",
-            "publishDate": "2026-07-14T00:00:00",
-            "sourceUrl": source_url,
-        }
-        redis_client.lpush(raw_queue, json.dumps(job))
-        _, payload = redis_client.brpop(raw_queue, timeout=5)
-        job = json.loads(payload)
-
-        job["salary"] = normalize_salary(job["salary"])
-        job["city"], job["province"], job["cityTier"] = normalize_city(
-            job["city"], job["province"], {"Shanghai": {"province": "Shanghai", "tier": "tier-1"}}
-        )
-        job["education"] = normalize_education(job["education"])
-        job["experience"] = normalize_experience(job["experience"])
-        job["skills"] = extract_skills(
-            job["title"],
-            job["description"],
-            job["skills"],
-            {"python", "sql"},
-            {"spring boot": "Spring Boot"},
-        )
-        job["sourceMd5"] = source_md5
-
-        with connection.cursor() as cursor:
-            assert check_duplicate(cursor, source_md5) is False
-            company_id = get_or_create_company(cursor, job["company"])
-            insert_position(cursor, job, company_id, source_md5)
-            connection.commit()
-
-            assert check_duplicate(cursor, source_md5) is True
-            cursor.execute(
-                "SELECT job_id, title, salary_min, salary_max, city, source_md5 "
-                "FROM job_position WHERE source_md5 = %s",
-                (source_md5,),
-            )
-            assert cursor.fetchone() == (
-                job_id,
-                "Data Engineer",
-                15,
-                25,
-                "Shanghai",
-                source_md5,
-            )
-
-        redis_client.lpush(cleaned_queue, json.dumps(job))
-        _, cleaned_payload = redis_client.brpop(cleaned_queue, timeout=5)
-        assert json.loads(cleaned_payload)["sourceMd5"] == source_md5
+        yield IsolatedPipeline(connection, redis_client, keys, run_id)
     finally:
-        if redis_ready:
-            redis_client.delete(raw_queue, cleaned_queue)
+        # Only named keys for this test run are removed.  Never use FLUSHDB.
+        redis_client.delete(
+            keys.raw,
+            keys.processing,
+            keys.cleaned,
+            keys.failed,
+            keys.raw_dedupe,
+            keys.cleaned_dedupe,
+        )
         redis_client.close()
         if connection is not None:
+            company_prefix = f"pytest-company-{run_id}%"
+            source_prefix = f"https://pipeline.integration.test/{run_id}/%"
             try:
                 with connection.cursor() as cursor:
-                    cursor.execute("DELETE FROM job_position WHERE source_md5 = %s", (source_md5,))
-                    cursor.execute("DELETE FROM job_company WHERE company_name = %s", (company_name,))
+                    cursor.execute("DELETE FROM job_position WHERE source_url LIKE %s", (source_prefix,))
+                    cursor.execute("DELETE FROM job_company WHERE company_name LIKE %s", (company_prefix,))
                 connection.commit()
             finally:
                 connection.close()
+
+
+def _job(run_id: str, number: int) -> dict:
+    return {
+        "jobId": f"pytest-job-{run_id}-{number}",
+        "title": "Data Engineer",
+        "company": {"name": f"pytest-company-{run_id}", "size": "50-99"},
+        "salary": {"min": 180, "max": 300},
+        "city": "Shanghai",
+        "education": "bachelor",
+        "experience": "5-10 years",
+        "skills": ["Python"],
+        "welfare": ["Remote"],
+        "description": "Python and SQL data pipeline.",
+        "publishDate": "2026-07-14T00:00:00",
+        "sourceUrl": f"https://pipeline.integration.test/{run_id}/{number}",
+    }
+
+
+def _persisted_count(pipeline: IsolatedPipeline, jobs: list[dict]) -> int:
+    source_md5s = [compute_md5(job["jobId"], job["sourceUrl"]) for job in jobs]
+    placeholders = ",".join(["%s"] * len(source_md5s))
+    with pipeline.connection.cursor() as cursor:
+        cursor.execute(
+            f"SELECT COUNT(*) FROM job_position WHERE source_md5 IN ({placeholders})",
+            source_md5s,
+        )
+        return cursor.fetchone()[0]
+
+
+def test_batch_transaction_idempotency_and_error_isolation(isolated_pipeline: IsolatedPipeline):
+    pipeline = isolated_pipeline
+    first = _job(pipeline.run_id, 1)
+    second = _job(pipeline.run_id, 2)
+    assert enqueue_raw_job(pipeline.redis_client, first, pipeline.keys.raw, pipeline.keys.raw_dedupe)
+    assert enqueue_raw_job(pipeline.redis_client, second, pipeline.keys.raw, pipeline.keys.raw_dedupe)
+    assert not enqueue_raw_job(pipeline.redis_client, first, pipeline.keys.raw, pipeline.keys.raw_dedupe)
+    pipeline.redis_client.lpush(pipeline.keys.raw, "{not-json")
+
+    result = process_batch(
+        pipeline.connection,
+        pipeline.redis_client,
+        {"Shanghai": {"province": "Shanghai", "tier": "tier-1"}},
+        {"python", "sql"},
+        {},
+        raw_queue=pipeline.keys.raw,
+        processing_queue=pipeline.keys.processing,
+        cleaned_queue=pipeline.keys.cleaned,
+        failed_queue=pipeline.keys.failed,
+        cleaned_dedupe_set=pipeline.keys.cleaned_dedupe,
+        batch_size=10,
+        timeout=1,
+    )
+
+    assert result.success == 2
+    assert result.null_discard == 1
+    assert result.cleaned == 2
+    assert _persisted_count(pipeline, [first, second]) == 2
+    assert pipeline.redis_client.llen(pipeline.keys.processing) == 0
+    assert pipeline.redis_client.llen(pipeline.keys.cleaned) == 2
+    assert pipeline.redis_client.llen(pipeline.keys.failed) == 1
+
+    # Bypass import dedupe to model replay after an interrupted acknowledgment.
+    pipeline.redis_client.lpush(pipeline.keys.raw, json.dumps(first))
+    replay = process_batch(
+        pipeline.connection,
+        pipeline.redis_client,
+        {},
+        set(),
+        {},
+        raw_queue=pipeline.keys.raw,
+        processing_queue=pipeline.keys.processing,
+        cleaned_queue=pipeline.keys.cleaned,
+        failed_queue=pipeline.keys.failed,
+        cleaned_dedupe_set=pipeline.keys.cleaned_dedupe,
+        timeout=1,
+    )
+    assert replay.duplicate == 1
+    assert _persisted_count(pipeline, [first, second]) == 2
+    assert pipeline.redis_client.llen(pipeline.keys.cleaned) == 2
+
+
+def test_unacknowledged_processing_message_is_recovered(isolated_pipeline: IsolatedPipeline):
+    pipeline = isolated_pipeline
+    job = _job(pipeline.run_id, 3)
+    pipeline.redis_client.lpush(pipeline.keys.raw, json.dumps(job))
+
+    assert len(claim_batch(pipeline.redis_client, pipeline.keys.raw, pipeline.keys.processing, timeout=1)) == 1
+    assert pipeline.redis_client.llen(pipeline.keys.raw) == 0
+    assert pipeline.redis_client.llen(pipeline.keys.processing) == 1
+    assert recover_inflight_messages(pipeline.redis_client, pipeline.keys.raw, pipeline.keys.processing) == 1
+    assert pipeline.redis_client.llen(pipeline.keys.raw) == 1
+    assert pipeline.redis_client.llen(pipeline.keys.processing) == 0
+
+    result = process_batch(
+        pipeline.connection,
+        pipeline.redis_client,
+        {},
+        set(),
+        {},
+        raw_queue=pipeline.keys.raw,
+        processing_queue=pipeline.keys.processing,
+        cleaned_queue=pipeline.keys.cleaned,
+        failed_queue=pipeline.keys.failed,
+        cleaned_dedupe_set=pipeline.keys.cleaned_dedupe,
+        timeout=1,
+    )
+    assert result.success == 1
+    assert _persisted_count(pipeline, [job]) == 1

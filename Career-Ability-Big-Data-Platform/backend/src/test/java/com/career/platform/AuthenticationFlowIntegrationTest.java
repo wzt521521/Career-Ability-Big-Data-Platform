@@ -97,6 +97,13 @@ class AuthenticationFlowIntegrationTest {
     }
 
     @Test
+    void exposesUnauthenticatedLivenessProbe() throws Exception {
+        mockMvc.perform(get("/actuator/health/liveness"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+    }
+
+    @Test
     void completesAuthenticationAdministrationAndOpenApiFlow() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
                 .andExpect(status().isUnauthorized())

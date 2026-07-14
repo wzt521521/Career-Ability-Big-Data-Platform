@@ -144,7 +144,7 @@ CREATE TABLE job_position (
     INDEX idx_jp_experience (experience),
     INDEX idx_jp_salary (salary_min, salary_max),
     INDEX idx_jp_publish_date (publish_date),
-    INDEX idx_jp_source_md5 (source_md5),
+    UNIQUE KEY uq_job_position_source_md5 (source_md5),
     INDEX idx_jp_company_id (company_id),
     FOREIGN KEY (company_id) REFERENCES job_company(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='岗位信息';

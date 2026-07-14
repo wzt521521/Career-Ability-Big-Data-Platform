@@ -16,6 +16,10 @@ export const listTasksBySource = (sourceId) => request.get(`/collect/task/by-sou
 export const createTask = (data) => request.post('/collect/task', data).then(dataOf)
 export const updateTask = (id, data) => request.put(`/collect/task/${id}`, data).then(dataOf)
 export const deleteTask = (id) => request.delete(`/collect/task/${id}`).then(dataOf)
+export const runTask = (id) => request.post(`/collect/task/${id}/run`).then(dataOf)
+export const pauseTask = (id) => request.post(`/collect/task/${id}/pause`).then(dataOf)
+export const resumeTask = (id) => request.post(`/collect/task/${id}/resume`).then(dataOf)
+export const listTaskLogs = (id, params) => request.get(`/collect/task/${id}/logs`, { params }).then(dataOf)
 
 // ---- 执行日志 ----
 export const listLogs = () => request.get('/collect/log').then(dataOf)

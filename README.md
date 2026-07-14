@@ -45,7 +45,9 @@ $env:MYSQL_USER = "<dedicated-test-user-with-create-database>"
 $env:MYSQL_PASSWORD = "<dedicated-test-password>"
 $env:REDIS_HOST = "127.0.0.1"
 $env:REDIS_PORT = "6379"
-$env:REDIS_DB = "15"
+$env:REDIS_DB = "0"
+$env:PIPELINE_TEST_REDIS_DB = "15"
+$env:PIPELINE_TEST_REDIS_PREFIX = "pipeline:test"
 cd Career-Ability-Big-Data-Platform/data-pipeline
 .\.venv\Scripts\python.exe -m pytest -m integration
 ```
@@ -130,24 +132,17 @@ cd Career-Ability-Big-Data-Platform/data-pipeline
 ### 基础方案（5 个容器，推荐实训使用）
 
 ```bash
-# 1. 启动基础服务
-docker-compose up -d mysql redis
+# 1. 进入实际运行工程并配置 .env
+cd Career-Ability-Big-Data-Platform
 
-# 2. 初始化数据库
-# 执行 sql/init.sql 建表
+# 2. 构建并等待 MySQL、Redis、后端、前端和 ETL 全部健康
+docker compose up -d --build --wait
 
-# 3. 导入公开数据集
-cd data-pipeline && python import_data.py --source ../data/sample_jobs.csv
-
-# 4. 运行 ETL 清洗
-python etl_clean.py
-
-# 5. 启动后端
-cd backend && mvn spring-boot:run
-
-# 6. 启动前端
-cd frontend && npm install && npm run dev
+# 3. 导入并验证仓库 CSV 样本的端到端链路
+docker compose exec -T python-etl python scripts/verify_compose_pipeline.py --csv /data/kaggle_jobs_500.csv --timeout-seconds 180
 ```
+
+`data/kaggle_jobs_500.csv` 以只读卷挂载到 ETL 容器的 `/data`。验证不会截断 Redis 或 MySQL，成功时至少确认 500 条有效源记录，以及 400 条已写入 MySQL 和 cleaned 队列的岗位记录。
 
 ### 进阶方案（含大数据组件）
 

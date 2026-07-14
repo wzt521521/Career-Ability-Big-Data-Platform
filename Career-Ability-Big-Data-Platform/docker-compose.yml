@@ -3,7 +3,7 @@ services:
   # 1. MySQL 8.0 — 核心业务数据库
   # ============================================================
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.40
     container_name: job-mysql
     restart: unless-stopped
     environment:
@@ -34,7 +34,7 @@ services:
   # 2. Redis 7 — 缓存 + 消息队列
   # ============================================================
   redis:
-    image: redis:7-alpine
+    image: redis:7.4.2-alpine
     container_name: job-redis
     restart: unless-stopped
     ports:
@@ -77,6 +77,12 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/actuator/health/readiness || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
     networks:
       - job-data-net
 
@@ -92,7 +98,14 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - job-data-net
 
@@ -113,12 +126,16 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local-development-password}
       MYSQL_DATABASE: career_ability
+      CSV_PATH: /data/kaggle_jobs_500.csv
+      ETL_HEARTBEAT_FILE: /tmp/etl-heartbeat
       TZ: Asia/Shanghai
     depends_on:
       mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
+    volumes:
+      - ./data:/data:ro
     networks:
       - job-data-net
 
