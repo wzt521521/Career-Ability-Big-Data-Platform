@@ -1,7 +1,7 @@
 <script setup>
-import { ref, reactive, onMounted, watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Refresh, Search, StarFilled, CircleCheckFilled, CircleCloseFilled } from '@element-plus/icons-vue'
+import { Refresh, StarFilled, CircleCheckFilled, CircleCloseFilled } from '@element-plus/icons-vue'
 import { getMyProfile, saveMyProfile } from '../../api/profile'
 import { getRecommendations, getGapAnalysis } from '../../api/recommend'
 import PageContainer from '../../components/common/PageContainer.vue'
@@ -118,7 +118,7 @@ function renderRadar() {
   radarChart.setOption({
     tooltip: { formatter: (p) => `${p.name}: ${(p.value * 100).toFixed(0)}%` },
     radar: {
-      indicator: Object.entries(labels).map(([k, v]) => ({ name: v, max: 1 })),
+      indicator: Object.entries(labels).map(([, v]) => ({ name: v, max: 1 })),
       center: ['50%', '55%'],
       radius: '70%',
     },
@@ -309,7 +309,9 @@ onMounted(async () => {
               class="recommend-card"
             >
               <div class="card-header">
-                <h3 class="card-title">{{ item.title }}</h3>
+                <h3 class="card-title">
+                  {{ item.title }}
+                </h3>
                 <div class="match-area">
                   <div
                     class="match-badge"
