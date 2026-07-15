@@ -2,6 +2,7 @@ package com.career.platform.report.service;
 
 import com.career.platform.analytics.dto.AnalyticsSnapshotResponse;
 import com.career.platform.analytics.service.AnalyticsService;
+import com.career.platform.common.observability.OperationalMetrics;
 import com.career.platform.report.entity.ReportRecord;
 import com.career.platform.report.repository.ReportTemplateRepository;
 import freemarker.template.Configuration;
@@ -37,6 +38,7 @@ public class AsyncReportGenerator {
     private final PdfReportRenderer pdfReportRenderer;
     private final ReportStorage reportStorage;
     private final ReportGenerationStateService stateService;
+    private final OperationalMetrics operationalMetrics;
 
     public AsyncReportGenerator(ReportTemplateRepository templateRepository,
                                 AnalyticsService analyticsService,
@@ -44,7 +46,8 @@ public class AsyncReportGenerator {
                                 ReportSnapshotMapper snapshotMapper,
                                 PdfReportRenderer pdfReportRenderer,
                                 ReportStorage reportStorage,
-                                ReportGenerationStateService stateService) {
+                                ReportGenerationStateService stateService,
+                                OperationalMetrics operationalMetrics) {
         this.templateRepository = templateRepository;
         this.analyticsService = analyticsService;
         this.freemarkerConfig = freemarkerConfig;
@@ -52,6 +55,7 @@ public class AsyncReportGenerator {
         this.pdfReportRenderer = pdfReportRenderer;
         this.reportStorage = reportStorage;
         this.stateService = stateService;
+        this.operationalMetrics = operationalMetrics;
     }
 
     /**
@@ -110,6 +114,7 @@ public class AsyncReportGenerator {
             log.info("报告生成完成: recordId={}, title={}, size={}", recordId, record.getReportTitle(), fileSize);
 
         } catch (Exception e) {
+            operationalMetrics.recordReportGenerationFailure();
             if (pdfPath != null) {
                 try {
                     Files.deleteIfExists(pdfPath);

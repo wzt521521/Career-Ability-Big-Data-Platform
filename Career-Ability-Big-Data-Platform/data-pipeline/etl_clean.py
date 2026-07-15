@@ -28,6 +28,7 @@ from config import (
     RAW_QUEUE,
     REDIS_DB,
     REDIS_HOST,
+    REDIS_PASSWORD,
     REDIS_PORT,
 )
 
@@ -494,7 +495,13 @@ def main() -> None:
 
     city_map = load_city_mapping()
     keywords, aliases = load_skill_dict()
-    redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+    redis_client = redis.Redis(
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        password=REDIS_PASSWORD,
+        db=REDIS_DB,
+        decode_responses=True,
+    )
     connection = pymysql.connect(
         host=MYSQL_HOST,
         port=MYSQL_PORT,

@@ -8,6 +8,7 @@ import com.career.platform.collect.entity.CollectTask;
 import com.career.platform.collect.repository.CollectLogRepository;
 import com.career.platform.collect.repository.CollectSourceRepository;
 import com.career.platform.collect.repository.CollectTaskRepository;
+import com.career.platform.common.observability.OperationalMetrics;
 import com.career.platform.common.ResourceNotFoundException;
 import java.io.IOException;
 import java.net.ConnectException;
@@ -53,6 +54,7 @@ public class CollectTaskRuntimeService {
     private final CollectTaskExecutor executor;
     private final TaskScheduler scheduler;
     private final boolean schedulingEnabled;
+    private final OperationalMetrics operationalMetrics;
 
     private final Map<Long, ScheduledFuture<?>> cronFutures = new ConcurrentHashMap<>();
     private final Map<Long, ScheduledFuture<?>> retryFutures = new ConcurrentHashMap<>();
@@ -65,13 +67,15 @@ public class CollectTaskRuntimeService {
             CollectLogRepository logRepository,
             CollectTaskExecutor executor,
             @Qualifier("collectTaskScheduler") TaskScheduler scheduler,
-            @Value("${spring.task.scheduling.enabled:true}") boolean schedulingEnabled) {
+            @Value("${spring.task.scheduling.enabled:true}") boolean schedulingEnabled,
+            OperationalMetrics operationalMetrics) {
         this.taskRepository = taskRepository;
         this.sourceRepository = sourceRepository;
         this.logRepository = logRepository;
         this.executor = executor;
         this.scheduler = scheduler;
         this.schedulingEnabled = schedulingEnabled;
+        this.operationalMetrics = operationalMetrics;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -323,7 +327,8 @@ public class CollectTaskRuntimeService {
         String message = summarize(error);
         int retries = safeRetryCount(task);
         int maxRetries = Math.min(safeMaxRetries(task), MAX_SUPPORTED_RETRIES);
-        if (isRetryable(error) && retries < maxRetries) {
+        boolean retryable = isRetryable(error);
+        if (retryable && retries < maxRetries) {
             if (context.pauseRequested || isPaused(context.taskId)) {
                 finishPaused(context);
                 return;
@@ -345,7 +350,7 @@ public class CollectTaskRuntimeService {
             finishPaused(context);
             return;
         }
-        task.setStatus(isRetryable(error) ? "FAILED" : "ERROR");
+        task.setStatus(retryable ? "FAILED" : "ERROR");
         task.setNextRunTime(null);
         saveTask(task);
         cancelFuture(cronFutures, context.taskId);
@@ -353,6 +358,7 @@ public class CollectTaskRuntimeService {
         context.executionLog.setErrorMsg(finalFailureMessage(error, retries, maxRetries));
         context.executionLog.setEndTime(LocalDateTime.now());
         saveLog(context.executionLog);
+        operationalMetrics.recordCollectionTaskFailure(retryable);
         clearExecution(context);
     }
 

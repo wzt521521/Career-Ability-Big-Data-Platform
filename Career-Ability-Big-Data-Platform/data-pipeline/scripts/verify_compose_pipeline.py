@@ -26,6 +26,7 @@ from config import (  # noqa: E402
     RAW_DEDUPE_SET,
     REDIS_DB,
     REDIS_HOST,
+    REDIS_PASSWORD,
     REDIS_PORT,
 )
 from import_data import compute_source_md5, import_file, load_city_mapping, read_source_file, row_to_json  # noqa: E402
@@ -78,7 +79,13 @@ def main() -> int:
     import pymysql
     import redis
 
-    redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+    redis_client = redis.Redis(
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        password=REDIS_PASSWORD,
+        db=REDIS_DB,
+        decode_responses=True,
+    )
     connection = pymysql.connect(
         host=MYSQL_HOST,
         port=MYSQL_PORT,

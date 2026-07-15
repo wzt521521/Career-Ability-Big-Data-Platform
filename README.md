@@ -65,7 +65,7 @@ cd Career-Ability-Big-Data-Platform/data-pipeline
 平台核心功能模块：
 - 数据采集与清洗模块
 - 多维度就业数据分析模块
-- 报告自动生成模块（PDF / Word / Excel）
+- PDF 报告自动生成模块
 - 个性化岗位推荐模块
 - 对外开放 API
 
@@ -144,9 +144,9 @@ docker compose exec -T python-etl python scripts/verify_compose_pipeline.py --cs
 
 `data/kaggle_jobs_500.csv` 以只读卷挂载到 ETL 容器的 `/data`。验证不会截断 Redis 或 MySQL，成功时至少确认 500 条有效源记录，以及 400 条已写入 MySQL 和 cleaned 队列的岗位记录。
 
-### 进阶方案（含大数据组件）
+### 发行范围说明
 
-在基础方案之上，额外启动 Kafka、HDFS、Spark 容器，详见 `docker-compose-full.yml`。
+`v1.0.0` 只交付五服务基础方案：MySQL、Redis、Spring Boot 后端、Vue/Nginx 前端和 Python ETL worker。Kafka、HDFS、Spark、Hive 以及 Word/Excel 报告导出均不属于本次正式发行范围，后续进入 `v1.1` backlog。
 
 ---
 
