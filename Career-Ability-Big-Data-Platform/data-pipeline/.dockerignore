@@ -1,0 +1,14 @@
+.git/
+.venv/
+__pycache__/
+.pytest_cache/
+coverage.xml
+.coverage
+test-results/
+*.pyc
+.env
+.env.*
+!.env.example
+test_*.py
+requirements-test.txt
+constraints.txt

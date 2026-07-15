@@ -2,12 +2,19 @@ package com.career.platform.analytics.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.career.platform.recommend.service.RecommendationCacheInvalidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.interceptor.SimpleKey;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -20,11 +27,28 @@ public class OfflineAnalysisService {
     private final AnalyticsService analytics;
     private final JdbcTemplate jdbc;
     private final ObjectMapper objectMapper;
+    private final RecommendationCacheInvalidator recommendationCacheInvalidator;
+    private final CacheManager cacheManager;
 
-    public OfflineAnalysisService(AnalyticsService analytics, JdbcTemplate jdbc, ObjectMapper objectMapper) {
+    @Autowired
+    public OfflineAnalysisService(AnalyticsService analytics, JdbcTemplate jdbc, ObjectMapper objectMapper,
+                                  RecommendationCacheInvalidator recommendationCacheInvalidator,
+                                  CacheManager cacheManager) {
         this.analytics = analytics;
         this.jdbc = jdbc;
         this.objectMapper = objectMapper;
+        this.recommendationCacheInvalidator = recommendationCacheInvalidator;
+        this.cacheManager = cacheManager;
+    }
+
+    public OfflineAnalysisService(AnalyticsService analytics, JdbcTemplate jdbc, ObjectMapper objectMapper,
+                                  RecommendationCacheInvalidator recommendationCacheInvalidator) {
+        this(analytics, jdbc, objectMapper, recommendationCacheInvalidator, null);
+    }
+
+    /** Kept for focused unit tests which do not bootstrap the recommendation cache. */
+    public OfflineAnalysisService(AnalyticsService analytics, JdbcTemplate jdbc, ObjectMapper objectMapper) {
+        this(analytics, jdbc, objectMapper, null);
     }
 
     @Transactional
@@ -66,7 +90,53 @@ public class OfflineAnalysisService {
         jdbc.update("INSERT INTO stat_trend(stat_date, stat_type, daily_new, month_new, month_growth, year_growth) VALUES (?, 'DAILY', ?, ?, ?, ?)",
                 statDate, dailyNew, number(overview.get("newThisMonth")).intValue(),
                 number(trends.get("monthOverMonth")), number(trends.get("yearOverYear")));
+        refreshCachesAfterCommit(snapshot);
         LOGGER.info("Daily analytics persisted for {}", today);
+    }
+
+    private void refreshCachesAfterCommit(Map<String, Object> snapshot) {
+        Runnable refresh = () -> {
+            warmBaseAnalyticsCaches(snapshot);
+            if (recommendationCacheInvalidator != null) {
+                recommendationCacheInvalidator.evictAll();
+            }
+        };
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            refresh.run();
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                refresh.run();
+            }
+        });
+    }
+
+    private void warmBaseAnalyticsCaches(Map<String, Object> snapshot) {
+        if (cacheManager == null) {
+            return;
+        }
+        try {
+            put("stat-dashboard", snapshot);
+            put("stat-overview", snapshot.get("overview"));
+            put("stat-position", snapshot.get("positions"));
+            put("stat-salary", snapshot.get("salary"));
+            put("stat-skills", snapshot.get("skills"));
+            put("stat-education", snapshot.get("education"));
+            put("stat-city", snapshot.get("city"));
+            put("stat-company", snapshot.get("company"));
+            put("stat-trends", snapshot.get("trends"));
+        } catch (RuntimeException exception) {
+            LOGGER.warn("Unable to warm analytics caches after daily persistence", exception);
+        }
+    }
+
+    private void put(String cacheName, Object value) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            cache.put(SimpleKey.EMPTY, value);
+        }
     }
 
     private void deleteExisting(Date date) {

@@ -5,7 +5,7 @@ import { ElMessage } from 'element-plus'
 import { registerMap } from '../../utils/echarts.js'
 import chinaGeoJson from '@datapool/china.geojson'
 import ChartPanel from '../../components/ChartPanel.vue'
-import { getPositions, getPosition, getSuggestions } from '../../api/positions.js'
+import { comparePositions, getPositions, getPosition, getSuggestions } from '../../api/positions.js'
 import { getSkillStats, getCityStats } from '../../api/analytics.js'
 
 registerMap('china', chinaGeoJson)
@@ -16,8 +16,10 @@ const detailLoading = ref(false)
 const items = ref([])
 const total = ref(0)
 const detail = ref(null)
+const detailError = ref(false)
 const drawerVisible = ref(false)
 const compareVisible = ref(false)
+const comparisonLoading = ref(false)
 const compareItems = ref([])
 const viewMode = ref('card')
 const skillStats = ref({ topSkills: [] })
@@ -68,8 +70,8 @@ async function load() {
   loadError.value = false
   try {
     const data = await getPositions(cleanParams(filter))
-    items.value = data.content
-    total.value = data.totalElements
+    items.value = Array.isArray(data?.content) ? data.content : []
+    total.value = Number(data?.totalElements || 0)
   } catch {
     loadError.value = true
   } finally {
@@ -80,8 +82,8 @@ async function load() {
 async function loadAnalysis() {
   try {
     const [skills, citiesData] = await Promise.all([getSkillStats(), getCityStats()])
-    skillStats.value = skills
-    cityStats.value = citiesData
+    skillStats.value = skills && Array.isArray(skills.topSkills) ? skills : { topSkills: [] }
+    cityStats.value = citiesData && Array.isArray(citiesData.ranking) ? citiesData : { ranking: [] }
   } catch {
     // The list remains usable when the secondary analysis panels are unavailable.
   }
@@ -97,8 +99,15 @@ function pageChanged(page) { filter.page = page; load() }
 async function showDetail(id) {
   drawerVisible.value = true
   detailLoading.value = true
+  detailError.value = false
   detail.value = null
-  try { detail.value = await getPosition(id) } finally { detailLoading.value = false }
+  try {
+    detail.value = await getPosition(id)
+  } catch {
+    detailError.value = true
+  } finally {
+    detailLoading.value = false
+  }
 }
 
 async function fetchSuggestions(query, callback) {
@@ -130,6 +139,18 @@ function toggleCompare(item, checked) {
     return
   }
   compareItems.value.push(item)
+}
+
+async function openComparison() {
+  comparisonLoading.value = true
+  try {
+    compareItems.value = await comparePositions(compareItems.value.map(item => item.id))
+    compareVisible.value = true
+  } catch {
+    ElMessage.error('岗位对比暂时无法加载')
+  } finally {
+    comparisonLoading.value = false
+  }
 }
 
 function provinceName(value) {
@@ -199,7 +220,7 @@ onMounted(() => { load(); loadAnalysis() })
       <span>已选 {{ compareItems.length }}/3</span>
       <div class="compare-names"><el-tag v-for="item in compareItems" :key="item.id" closable @close="toggleCompare(item, false)">{{ item.title }}</el-tag></div>
       <el-button text @click="compareItems = []">清空</el-button>
-      <el-button type="primary" :disabled="compareItems.length < 2" @click="compareVisible = true">开始对比</el-button>
+      <el-button type="primary" :loading="comparisonLoading" :disabled="compareItems.length < 2" @click="openComparison">开始对比</el-button>
     </div>
 
     <el-dialog v-model="compareVisible" title="同类岗位对比" width="min(900px, 94vw)">
@@ -216,6 +237,7 @@ onMounted(() => { load(); loadAnalysis() })
 
     <el-drawer v-model="drawerVisible" title="岗位详情" size="min(560px, 94vw)" destroy-on-close>
       <div v-loading="detailLoading" class="detail-content">
+        <el-alert v-if="detailError" title="岗位详情暂时无法加载" type="error" show-icon :closable="false" />
         <template v-if="detail">
           <span class="detail-company">{{ detail.companyName }}</span>
           <h2>{{ detail.title }}</h2>

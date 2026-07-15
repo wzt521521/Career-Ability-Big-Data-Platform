@@ -42,7 +42,9 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     @Transactional(readOnly = true)
     public PageResponse<ApiKeyResponse> list(String appName, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-        Page<ApiKey> apiKeys = apiKeyRepository.findByAppNameContainingIgnoreCase(
+        Long userId = currentUserProvider.requireCurrentUser().getId();
+        Page<ApiKey> apiKeys = apiKeyRepository.findByUserIdAndAppNameContainingIgnoreCase(
+                userId,
                 appName == null ? "" : appName.trim(),
                 pageRequest);
         List<ApiKeyResponse> content = apiKeys.getContent().stream()
@@ -103,7 +105,8 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     private ApiKey requireApiKey(Long id) {
-        return apiKeyRepository.findById(id)
+        Long userId = currentUserProvider.requireCurrentUser().getId();
+        return apiKeyRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "API key not found"));
     }
 

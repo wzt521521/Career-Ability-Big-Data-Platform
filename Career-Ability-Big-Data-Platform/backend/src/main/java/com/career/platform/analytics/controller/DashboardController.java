@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dashboard")
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasAuthority('dashboard:view')")
 public class DashboardController {
     private final AnalyticsService analytics;
 

@@ -43,7 +43,7 @@ public class SysOperationLog {
 
     private Long duration;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer status = 1;
 
     @Column(name = "error_msg", columnDefinition = "TEXT")

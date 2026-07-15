@@ -97,6 +97,13 @@ class AuthenticationFlowIntegrationTest {
     }
 
     @Test
+    void exposesUnauthenticatedLivenessProbe() throws Exception {
+        mockMvc.perform(get("/actuator/health/liveness"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+    }
+
+    @Test
     void completesAuthenticationAdministrationAndOpenApiFlow() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
                 .andExpect(status().isUnauthorized())
@@ -136,7 +143,7 @@ class AuthenticationFlowIntegrationTest {
                         .param("page", "0")
                         .param("size", "20"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.totalElements").value(2));
+                .andExpect(jsonPath("$.data.totalElements").value(3));
 
         MvcResult createdKeyResult = postJson(
                         "/api/admin/api-keys",
@@ -159,6 +166,30 @@ class AuthenticationFlowIntegrationTest {
                         .header("X-API-Key", apiKey))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("available"));
+        mockMvc.perform(get("/api/open/v1/positions")
+                        .param("page", "1")
+                        .param("size", "20")
+                        .header("Authorization", bearer(adminAccessToken))
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content").isArray());
+        mockMvc.perform(get("/api/open/v1/skills/hot")
+                        .param("limit", "5")
+                        .header("Authorization", bearer(adminAccessToken))
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.scope.value").value("PUBLIC_RECRUITMENT"));
+        mockMvc.perform(get("/api/open/v1/cities/ranking")
+                        .param("limit", "5")
+                        .header("Authorization", bearer(adminAccessToken))
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/open/v1/salary/trends")
+                        .param("startDate", "2026-02-01")
+                        .param("endDate", "2026-01-01")
+                        .header("Authorization", bearer(adminAccessToken))
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isBadRequest());
 
         JsonNode refreshed = responseData(postJson(
                         "/api/auth/refresh",
@@ -179,6 +210,148 @@ class AuthenticationFlowIntegrationTest {
 
         mockMvc.perform(get("/api/auth/me").header("Authorization", bearer(refreshedAccessToken)))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void bindsEachOpenApiKeyToItsJwtOwnerBeforeControllerExecution() throws Exception {
+        String adminAccessToken = responseData(postJson(
+                        "/api/auth/login",
+                        "{\"username\":\"admin\",\"password\":\"admin123\"}"))
+                .get("accessToken")
+                .asText();
+        String apiKey = responseData(postJson(
+                        "/api/admin/api-keys",
+                        "{\"appName\":\"owner-binding\",\"rateLimit\":100}",
+                        adminAccessToken))
+                .get("apiKey")
+                .asText();
+
+        mockMvc.perform(get("/api/open/v1/platform/status")
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
+
+        postJson(
+                        "/api/auth/register",
+                        "{\"username\":\"keyother\",\"password\":\"secret1\",\"roleCode\":\"ROLE_STUDENT\"}")
+                .andExpect(status().isOk());
+        String otherAccessToken = responseData(postJson(
+                        "/api/auth/login",
+                        "{\"username\":\"keyother\",\"password\":\"secret1\"}"))
+                .get("accessToken")
+                .asText();
+
+        mockMvc.perform(get("/api/open/v1/platform/status")
+                        .header("Authorization", bearer(otherAccessToken))
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+        mockMvc.perform(get("/api/open/v1/positions")
+                        .header("Authorization", bearer(otherAccessToken))
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+    }
+
+    @Test
+    void requiresAnApiKeyForOpenApiRequestsBehindAContextPath() throws Exception {
+        String adminAccessToken = responseData(postJson(
+                        "/api/auth/login",
+                        "{\"username\":\"admin\",\"password\":\"admin123\"}"))
+                .get("accessToken")
+                .asText();
+        String apiKey = responseData(postJson(
+                        "/api/admin/api-keys",
+                        "{\"appName\":\"context-path\",\"rateLimit\":100}",
+                        adminAccessToken))
+                .get("apiKey")
+                .asText();
+
+        mockMvc.perform(get("/gateway/api/open/v1/platform/status")
+                        .contextPath("/gateway")
+                        .header("Authorization", bearer(adminAccessToken)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
+        mockMvc.perform(get("/gateway/api/open/v1/platform/status")
+                        .contextPath("/gateway")
+                        .header("Authorization", bearer(adminAccessToken))
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("available"));
+    }
+
+    @Test
+    void letsStudentsManageTheirOwnApiKeysWithoutApiAuditAccess() throws Exception {
+        postJson(
+                        "/api/auth/register",
+                        "{\"username\":\"studentkey\",\"password\":\"secret1\",\"roleCode\":\"ROLE_STUDENT\"}")
+                .andExpect(status().isOk());
+        String studentAccessToken = responseData(postJson(
+                        "/api/auth/login",
+                        "{\"username\":\"studentkey\",\"password\":\"secret1\"}"))
+                .get("accessToken")
+                .asText();
+        JsonNode createdKey = responseData(postJson(
+                "/api/admin/api-keys",
+                "{\"appName\":\"student-open-api\",\"rateLimit\":100}",
+                studentAccessToken));
+
+        mockMvc.perform(get("/api/admin/api-keys")
+                        .header("Authorization", bearer(studentAccessToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.totalElements").value(1));
+        mockMvc.perform(get("/api/admin/api-call-logs")
+                        .header("Authorization", bearer(studentAccessToken)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/open/v1/platform/status")
+                        .header("Authorization", bearer(studentAccessToken))
+                        .header("X-API-Key", createdKey.get("apiKey").asText()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void scopesApiKeyManagementAndCallHistoryToTheKeyOwner() throws Exception {
+        String ownerAccessToken = responseData(postJson(
+                        "/api/auth/login",
+                        "{\"username\":\"admin\",\"password\":\"admin123\"}"))
+                .get("accessToken")
+                .asText();
+        JsonNode createdKey = responseData(postJson(
+                "/api/admin/api-keys",
+                "{\"appName\":\"owner-only\",\"rateLimit\":100}",
+                ownerAccessToken));
+
+        SysRole adminRole = roleRepository.findByRoleCode("ROLE_ADMIN").orElseThrow();
+        SysUser otherApiUser = new SysUser();
+        otherApiUser.setUsername("otherapi");
+        otherApiUser.setPassword(passwordEncoder.encode("secret1"));
+        otherApiUser.setStatus(1);
+        otherApiUser.setRoles(Set.of(adminRole));
+        userRepository.save(otherApiUser);
+        String otherAccessToken = responseData(postJson(
+                        "/api/auth/login",
+                        "{\"username\":\"otherapi\",\"password\":\"secret1\"}"))
+                .get("accessToken")
+                .asText();
+
+        mockMvc.perform(get("/api/admin/api-keys")
+                        .header("Authorization", bearer(otherAccessToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.totalElements").value(0));
+        mockMvc.perform(get("/api/open/v1/platform/status")
+                        .header("Authorization", bearer(ownerAccessToken))
+                        .header("X-API-Key", createdKey.get("apiKey").asText()))
+                .andExpect(status().isOk());
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch(
+                        "/api/admin/api-keys/{id}/status", createdKey.get("id").asLong())
+                        .header("Authorization", bearer(otherAccessToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":0}"))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/admin/api-call-logs")
+                        .header("Authorization", bearer(otherAccessToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.totalElements").value(0));
     }
 
     @Test
@@ -231,6 +404,32 @@ class AuthenticationFlowIntegrationTest {
                 .andExpect(jsonPath("$.data.errors.length()").value(2));
 
         org.junit.jupiter.api.Assertions.assertTrue(userRepository.existsByUsername("batch001"));
+    }
+
+    @Test
+    void rejectsUnsupportedAndOversizedUserImportUploads() throws Exception {
+        String adminAccessToken = responseData(postJson(
+                        "/api/auth/login",
+                        "{\"username\":\"admin\",\"password\":\"admin123\"}"))
+                .get("accessToken")
+                .asText();
+        MockMultipartFile textFile = new MockMultipartFile(
+                "file", "users.xlsx", MediaType.TEXT_PLAIN_VALUE, "not an Excel workbook".getBytes());
+        mockMvc.perform(multipart("/api/admin/users/import")
+                        .file(textFile)
+                        .header("Authorization", bearer(adminAccessToken)))
+                .andExpect(status().isBadRequest());
+
+        MockMultipartFile oversized = new MockMultipartFile(
+                "file",
+                "users.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                new byte[(2 * 1024 * 1024) + 1]);
+        mockMvc.perform(multipart("/api/admin/users/import")
+                        .file(oversized)
+                        .header("Authorization", bearer(adminAccessToken)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("2MB")));
     }
 
     @Test
@@ -386,6 +585,36 @@ class AuthenticationFlowIntegrationTest {
     }
 
     @Test
+    void deniesOpenPersonalDataWhenTheApiKeyOwnerLacksTheFeaturePermission() throws Exception {
+        String accessToken = responseData(postJson(
+                        "/api/auth/login",
+                        "{\"username\":\"api-only\",\"password\":\"api-only-secret\"}"))
+                .get("accessToken")
+                .asText();
+        String apiKey = responseData(postJson(
+                        "/api/admin/api-keys",
+                        "{\"appName\":\"permission-negative\",\"rateLimit\":100}",
+                        accessToken))
+                .get("apiKey")
+                .asText();
+
+        mockMvc.perform(get("/api/open/v1/recommendations")
+                        .param("page", "1")
+                        .param("size", "20")
+                        .header("Authorization", bearer(accessToken))
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+        mockMvc.perform(get("/api/open/v1/reports")
+                        .param("page", "1")
+                        .param("size", "20")
+                        .header("Authorization", bearer(accessToken))
+                        .header("X-API-Key", apiKey))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+    }
+
+    @Test
     void operationLogsDoNotPersistPasswords() throws Exception {
         String adminAccessToken = responseData(postJson(
                         "/api/auth/login",
@@ -470,7 +699,8 @@ class AuthenticationFlowIntegrationTest {
         SysPermission roleRead = permission("Role read", "role:read", "menu", 6L);
         SysPermission roleUpdate = permission("Role update", "role:update", "button", 7L);
         SysPermission logRead = permission("Log read", "log:read", "menu", 8L);
-        SysPermission apiView = permission("API management", "api:view", "menu", 9L);
+        SysPermission apiView = permission("API audit", "api:view", "menu", 9L);
+        SysPermission apiKeyManage = permission("API Key management", "api:key:manage", "menu", 10L);
         SysPermission collectView = permission("Collection view", "collect:view", "menu", 10L);
         SysPermission collectToggle = permission("Collection management", "collect:toggle", "button", 11L);
         Set<SysPermission> allPermissions = new LinkedHashSet<>(permissionRepository.saveAll(Set.of(
@@ -483,12 +713,14 @@ class AuthenticationFlowIntegrationTest {
                 roleUpdate,
                 logRead,
                 apiView,
+                apiKeyManage,
                 collectView,
                 collectToggle)));
 
         SysRole adminRole = role("Administrator", "ROLE_ADMIN", allPermissions);
-        SysRole studentRole = role("Student", "ROLE_STUDENT", Set.of(dashboard));
-        roleRepository.saveAll(Set.of(adminRole, studentRole));
+        SysRole studentRole = role("Student", "ROLE_STUDENT", Set.of(dashboard, apiKeyManage));
+        SysRole apiOnlyRole = role("API-only", "ROLE_API_ONLY", Set.of(apiKeyManage));
+        roleRepository.saveAll(Set.of(adminRole, studentRole, apiOnlyRole));
 
         SysUser admin = new SysUser();
         admin.setUsername("admin");
@@ -497,6 +729,14 @@ class AuthenticationFlowIntegrationTest {
         admin.setStatus(1);
         admin.setRoles(Set.of(adminRole));
         userRepository.save(admin);
+
+        SysUser apiOnly = new SysUser();
+        apiOnly.setUsername("api-only");
+        apiOnly.setPassword(passwordEncoder.encode("api-only-secret"));
+        apiOnly.setRealName("API Only");
+        apiOnly.setStatus(1);
+        apiOnly.setRoles(Set.of(apiOnlyRole));
+        userRepository.save(apiOnly);
     }
 
     private SysPermission permission(String name, String code, String type, Long order) {

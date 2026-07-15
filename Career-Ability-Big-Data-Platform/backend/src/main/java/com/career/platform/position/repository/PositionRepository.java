@@ -9,12 +9,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Collection;
 
 public interface PositionRepository extends JpaRepository<JobPosition, Long>, JpaSpecificationExecutor<JobPosition> {
 
     @Override
     @EntityGraph(attributePaths = "company")
     org.springframework.data.domain.Page<JobPosition> findAll(Specification<JobPosition> specification, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = "company")
+    List<JobPosition> findAll(Specification<JobPosition> specification);
 
     @EntityGraph(attributePaths = "company")
     @Query("select p from JobPosition p order by p.createTime desc")
@@ -26,6 +31,9 @@ public interface PositionRepository extends JpaRepository<JobPosition, Long>, Jp
 
     @EntityGraph(attributePaths = "company")
     List<JobPosition> findByTitleContainingIgnoreCase(String title);
+
+    @EntityGraph(attributePaths = "company")
+    List<JobPosition> findByIdIn(Collection<Long> ids);
 
     @Query("select distinct p.title from JobPosition p where lower(p.title) like lower(concat('%', :keyword, '%')) order by p.title")
     List<String> suggestTitles(String keyword, Pageable pageable);

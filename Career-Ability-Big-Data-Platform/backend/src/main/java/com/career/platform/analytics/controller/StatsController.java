@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/stats")
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasAuthority('dashboard:view')")
 public class StatsController {
     private final AnalyticsService analytics;
 

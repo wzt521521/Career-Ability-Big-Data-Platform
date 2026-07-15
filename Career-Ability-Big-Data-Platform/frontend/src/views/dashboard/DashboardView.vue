@@ -83,12 +83,15 @@ async function load() {
   loadError.value = false
   try {
     const snapshot = await getDashboard()
-    overview.value = snapshot.overview
-    trends.value = snapshot.trends
-    cities.value = snapshot.city
-    skills.value = snapshot.skills
-    education.value = snapshot.education
-    companies.value = snapshot.company
+    overview.value = snapshot?.overview || {}
+    trends.value = snapshot?.trends && Array.isArray(snapshot.trends.monthly) ? snapshot.trends : { monthly: [] }
+    cities.value = snapshot?.city && Array.isArray(snapshot.city.salaryComparison)
+      ? snapshot.city : { salaryComparison: [] }
+    skills.value = snapshot?.skills && Array.isArray(snapshot.skills.topSkills) ? snapshot.skills : { topSkills: [] }
+    education.value = snapshot?.education && Array.isArray(snapshot.education.distribution)
+      ? snapshot.education : { distribution: [] }
+    companies.value = snapshot?.company && Array.isArray(snapshot.company.industryDistribution)
+      ? snapshot.company : { industryDistribution: [] }
     refreshedAt.value = new Date()
   } catch {
     loadError.value = true

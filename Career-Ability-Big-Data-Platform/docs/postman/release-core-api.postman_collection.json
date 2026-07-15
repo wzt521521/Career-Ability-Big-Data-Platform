@@ -1,0 +1,295 @@
+{
+  "info": {
+    "_postman_id": "33c0d61f-a50d-4d0d-8e6e-899a5d0382b4",
+    "name": "Career Ability Platform - Release Core API",
+    "description": "Release verification collection for authentication, collection management, analytics, profile, recommendations, reports, and the double-authenticated Open API. Set accessToken after login and apiKey after creating a key; key management requires api:key:manage.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "username", "value": "", "type": "string" },
+    { "key": "password", "value": "", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "refreshToken", "value": "", "type": "string" },
+    { "key": "apiKey", "value": "", "type": "string" },
+    { "key": "positionId", "value": "", "type": "string" },
+    { "key": "reportId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "B - Authentication and API key",
+      "item": [
+        {
+          "name": "Login and save token pair",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('login succeeds', () => pm.response.to.have.status(200));",
+            "const data = pm.response.json().data;",
+            "pm.collectionVariables.set('accessToken', data.accessToken);",
+            "pm.collectionVariables.set('refreshToken', data.refreshToken);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Create API key and save once-only key",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('key is created', () => pm.response.to.have.status(200));",
+            "pm.collectionVariables.set('apiKey', pm.response.json().data.apiKey);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"appName\": \"postman-release-check\",\n  \"rateLimit\": 60\n}" },
+            "url": "{{baseUrl}}/api/admin/api-keys"
+          }
+        },
+        {
+          "name": "Refresh token rotation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+            "url": "{{baseUrl}}/api/auth/refresh"
+          }
+        }
+      ]
+    },
+    {
+      "name": "A - Collection management",
+      "item": [
+        {
+          "name": "List collection sources (pagination)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/collect/source?page=1&size=20"
+          }
+        },
+        {
+          "name": "List collection tasks (pagination)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/collect/task?page=1&size=20"
+          }
+        },
+        {
+          "name": "List collection logs (pagination)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/collect/log?page=1&size=20"
+          }
+        }
+      ]
+    },
+    {
+      "name": "C - Recruitment analytics",
+      "item": [
+        {
+          "name": "Search positions (pagination and filters)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/positions?keyword=Java&city=%E4%B8%8A%E6%B5%B7&page=1&size=20&sortBy=publishDate&sortDirection=desc"
+          }
+        },
+        {
+          "name": "Dashboard overview",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/stats/overview"
+          }
+        },
+        {
+          "name": "Trend analytics with date range",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/stats/trends?startDate=2026-01-01&endDate=2026-12-31"
+          }
+        }
+      ]
+    },
+    {
+      "name": "D - Profile, recommendation, and reports",
+      "item": [
+        {
+          "name": "Get my profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/profile"
+          }
+        },
+        {
+          "name": "Get my recommendations (pagination)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/recommend?page=1&size=20"
+          }
+        },
+        {
+          "name": "List my reports (pagination)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/reports?page=1&size=10"
+          }
+        },
+        {
+          "name": "Download my report (file response)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/reports/{{reportId}}/download"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Open API v1 (Bearer + X-API-Key)",
+      "item": [
+        {
+          "name": "Open positions with rate-limit headers",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('rate limit headers are returned', () => {",
+            "  pm.expect(pm.response.headers.get('X-RateLimit-Limit')).to.exist;",
+            "  pm.expect(pm.response.headers.get('X-RateLimit-Remaining')).to.exist;",
+            "});"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/positions?page=1&size=20"
+          }
+        },
+        {
+          "name": "Open hot skills",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/skills/hot?limit=10"
+          }
+        },
+        {
+          "name": "Open city ranking",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/cities/ranking?limit=10"
+          }
+        },
+        {
+          "name": "Open salary and trends",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/salary/trends?startDate=2026-01-01&endDate=2026-12-31"
+          }
+        },
+        {
+          "name": "Open my profile (owner-bound)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/profile"
+          }
+        },
+        {
+          "name": "Open my recommendations (owner-bound pagination)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/recommendations?page=1&size=20"
+          }
+        },
+        {
+          "name": "Open my recommendation gap (owner-bound)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/recommendations/gap?positionId={{positionId}}"
+          }
+        },
+        {
+          "name": "Open my reports (owner-bound pagination)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/reports?page=1&size=20"
+          }
+        },
+        {
+          "name": "Open my report download (owner-bound file response)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/reports/{{reportId}}/download"
+          }
+        },
+        {
+          "name": "Double-auth success example (Bearer and API key)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('both credentials are accepted', () => pm.response.to.have.status(200));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "X-API-Key", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrl}}/api/open/v1/platform/status"
+          }
+        },
+        {
+          "name": "Double-auth error example (missing API key)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('missing key is rejected', () => pm.expect(pm.response.code).to.be.oneOf([401, 403]));"
+          ] } }],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/api/open/v1/platform/status"
+          }
+        }
+      ]
+    }
+  ]
+}

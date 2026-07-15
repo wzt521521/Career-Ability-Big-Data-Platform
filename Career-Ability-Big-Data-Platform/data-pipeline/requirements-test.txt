@@ -1,0 +1,7 @@
+# Install the Python 3.10 test environment with:
+# python -m pip install -r requirements-test.txt
+-c constraints.txt
+-r requirements.txt
+pytest
+pytest-cov
+cryptography

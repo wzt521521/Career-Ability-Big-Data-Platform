@@ -1,11 +1,12 @@
+<#ftl output_format="HTML" auto_esc=true>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>${reportTitle!""}</title>
 <style>
   @page { size: A4; margin: 2cm; }
-  body { font-family: SimSun, serif; font-size: 12pt; color: #333; line-height: 1.8; }
+  body { font-family: "Noto Sans SC", sans-serif; font-size: 12pt; color: #333; line-height: 1.8; }
   .cover { text-align: center; padding: 120px 0 60px; }
   .cover h1 { font-size: 28pt; color: #1a1a2e; margin-bottom: 24px; }
   .cover .subtitle { font-size: 14pt; color: #666; margin-bottom: 48px; }
@@ -36,6 +37,10 @@
     <p>职业能力大数据服务平台</p>
   </div>
 </div>
+
+<#if emptyData!false>
+<div class="section"><p>当前筛选范围暂无岗位数据，以下统计表为空。</p></div>
+</#if>
 
 <#assign overview = overview!{} >
 <#assign trends = trends!{} >

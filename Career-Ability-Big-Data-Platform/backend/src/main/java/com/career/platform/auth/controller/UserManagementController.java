@@ -19,9 +19,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.Set;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -47,6 +49,11 @@ import org.springframework.web.multipart.MultipartFile;
 @SecurityRequirement(name = "bearerAuth")
 public class UserManagementController {
 
+    private static final long MAX_IMPORT_SIZE = 2L * 1024 * 1024;
+    private static final Set<String> EXCEL_CONTENT_TYPES = Set.of(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/octet-stream");
+
     private final UserManagementService userManagementService;
     private final UserImportService userImportService;
 
@@ -61,7 +68,7 @@ public class UserManagementController {
     @Operation(summary = "分页查询用户")
     @PreAuthorize("hasAuthority('user:read')")
     public ApiResponse<PageResponse<UserResponse>> list(
-            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "") @Size(max = 100) String keyword,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         return ApiResponse.success(userManagementService.list(keyword, page, size));
@@ -159,10 +166,18 @@ public class UserManagementController {
                     ErrorCode.BAD_REQUEST,
                     "Excel file is required");
         }
+        if (file.getSize() > MAX_IMPORT_SIZE) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Excel file exceeds the 2MB upload limit");
+        }
         if (filename == null || !filename.toLowerCase(Locale.ROOT).endsWith(".xlsx")) {
             throw new BusinessException(
                     ErrorCode.BAD_REQUEST,
                     "Only .xlsx files are supported");
+        }
+        String contentType = file.getContentType();
+        if (contentType != null && !contentType.isBlank()
+                && !EXCEL_CONTENT_TYPES.contains(contentType.toLowerCase(Locale.ROOT))) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Unsupported Excel content type");
         }
     }
 }

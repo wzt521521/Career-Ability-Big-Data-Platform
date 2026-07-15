@@ -40,8 +40,8 @@ const menuGroups = computed(() => [
   {
     label: '数据分析',
     items: [
-      { path: '/dashboard', label: '就业数据大屏', icon: DataAnalysis, requiresAuth: true },
-      { path: '/positions', label: '岗位分析', icon: Histogram, requiresAuth: true },
+      { path: '/dashboard', label: '就业数据大屏', icon: DataAnalysis, requiresAuth: true, permissions: ['dashboard:view'] },
+      { path: '/positions', label: '岗位分析', icon: Histogram, requiresAuth: true, permissions: ['position:view'] },
       { path: '/recommend', label: '岗位推荐', icon: Star, requiresAuth: true, permissions: ['recommend:view'] },
       { path: '/report', label: '报告中心', icon: Document, requiresAuth: true, permissions: ['report:view'] },
     ],
@@ -49,9 +49,9 @@ const menuGroups = computed(() => [
   {
     label: '采集管理',
     items: [
-      { path: '/collect/sources', label: '数据源管理', icon: Document, requiresAuth: true },
-      { path: '/collect/tasks', label: '采集任务管理', icon: Monitor, requiresAuth: true },
-      { path: '/collect/logs', label: '采集执行日志', icon: List, requiresAuth: true },
+      { path: '/collect/sources', label: '数据源管理', icon: Document, requiresAuth: true, permissions: ['collect:view'] },
+      { path: '/collect/tasks', label: '采集任务管理', icon: Monitor, requiresAuth: true, permissions: ['collect:view'] },
+      { path: '/collect/logs', label: '采集执行日志', icon: List, requiresAuth: true, permissions: ['collect:view'] },
     ],
   },
   {
@@ -72,9 +72,9 @@ const menuGroups = computed(() => [
   {
     label: '开发者服务',
     items: [
-      { path: '/open-api/keys', label: 'API Key', icon: Key, requiresAuth: true, permissions: ['api:view'] },
+      { path: '/open-api/keys', label: 'API Key', icon: Key, requiresAuth: true, permissions: ['api:key:manage'] },
       { path: '/open-api/calls', label: '调用统计', icon: DataAnalysis, requiresAuth: true, permissions: ['api:view'] },
-      { path: '/api-docs', label: 'API 文档', icon: Document, requiresAuth: true, permissions: ['api:docs', 'api:view'] },
+      { path: '/api-docs', label: 'API 文档', icon: Document, requiresAuth: true, permissions: ['api:docs', 'api:view', 'api:key:manage'] },
     ],
   },
 ].map((group) => ({

@@ -18,6 +18,31 @@ export function getReportStatus(id) {
   return client.get(`${BASE}/${id}/status`)
 }
 
+export function downloadReportFile(id) {
+  return client.get(`${BASE}/${id}/download`, {
+    responseType: 'blob',
+    suppressErrorMessage: true,
+  })
+}
+
+export function previewReportFile(id) {
+  return client.get(`${BASE}/${id}/preview`, {
+    responseType: 'blob',
+    suppressErrorMessage: true,
+  })
+}
+
+export async function readReportBinaryError(error) {
+  const payload = error?.response?.data
+  try {
+    const text = payload instanceof Blob ? await payload.text() : String(payload || '')
+    const parsed = JSON.parse(text)
+    return parsed.message || '报告文件请求失败'
+  } catch {
+    return error?.message || '报告文件请求失败'
+  }
+}
+
 export function getReportDownloadUrl(id) {
   // window.open 直接使用浏览器原生请求，Axios baseURL (/api) 不会自动附加
   // 因此需要显式加上 /api 前缀，与 Nginx 反向代理规则匹配

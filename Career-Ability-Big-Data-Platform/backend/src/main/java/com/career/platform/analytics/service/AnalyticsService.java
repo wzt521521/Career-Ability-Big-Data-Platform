@@ -1,16 +1,25 @@
 package com.career.platform.analytics.service;
 
 import com.career.platform.analytics.dto.AnalyticsFilter;
+import com.career.platform.analytics.dto.AnalyticsDimension;
+import com.career.platform.analytics.dto.AnalyticsSnapshotRequest;
+import com.career.platform.analytics.dto.AnalyticsSnapshotResponse;
+import com.career.platform.common.security.PublicRecruitmentScope;
+import com.career.platform.common.security.PublicRecruitmentScopePolicy;
+import com.career.platform.analytics.repository.AnalyticsSpecifications;
 import com.career.platform.position.entity.JobCompany;
 import com.career.platform.position.entity.JobPosition;
 import com.career.platform.position.repository.PositionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.function.Function;
@@ -20,9 +29,23 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class AnalyticsService {
     private final PositionRepository positionRepository;
+    private final PublicRecruitmentScopePolicy scopePolicy;
+    private final Clock clock;
 
+    @Autowired
+    public AnalyticsService(PositionRepository positionRepository, PublicRecruitmentScopePolicy scopePolicy) {
+        this(positionRepository, scopePolicy, Clock.systemDefaultZone());
+    }
+
+    /** Kept for lightweight unit tests and external adapters compiled against the former API. */
     public AnalyticsService(PositionRepository positionRepository) {
+        this(positionRepository, new PublicRecruitmentScopePolicy(), Clock.systemDefaultZone());
+    }
+
+    AnalyticsService(PositionRepository positionRepository, PublicRecruitmentScopePolicy scopePolicy, Clock clock) {
         this.positionRepository = positionRepository;
+        this.scopePolicy = scopePolicy;
+        this.clock = clock;
     }
 
     @Cacheable("stat-dashboard")
@@ -32,15 +55,48 @@ public class AnalyticsService {
 
     public Map<String, Object> calculateSnapshot() {
         List<JobPosition> values = positions();
+        return snapshotData(values, EnumSet.allOf(AnalyticsDimension.class), null, null);
+    }
+
+    /**
+     * Returns an immutable, filter-backed snapshot for reporting and the public API. Date limits
+     * are inclusive. No supplied range is silently expanded to all history.
+     */
+    public AnalyticsSnapshotResponse snapshot(AnalyticsSnapshotRequest request) {
+        AnalyticsSnapshotRequest effectiveRequest = request == null ? new AnalyticsSnapshotRequest() : request;
+        AnalyticsFilter filter = effectiveRequest.toFilter();
+        List<JobPosition> values = filteredPositions(filter);
+        Set<AnalyticsDimension> dimensions = effectiveRequest.getDimensions();
+        return new AnalyticsSnapshotResponse(
+                scopePolicy.resolve(),
+                effectiveRequest.getStartDate(),
+                effectiveRequest.getEndDate(),
+                dimensions,
+                snapshotData(values, dimensions, effectiveRequest.getStartDate(), effectiveRequest.getEndDate()),
+                values.isEmpty(),
+                LocalDateTime.now(clock));
+    }
+
+    /** Explicit alias used by Open API adapters. */
+    public AnalyticsSnapshotResponse publicSnapshot(AnalyticsSnapshotRequest request) {
+        return snapshot(request);
+    }
+
+    public PublicRecruitmentScope publicRecruitmentScope() {
+        return scopePolicy.resolve();
+    }
+
+    private Map<String, Object> snapshotData(List<JobPosition> values, Set<AnalyticsDimension> dimensions,
+                                             LocalDate startDate, LocalDate endDate) {
         Map<String, Object> snapshot = new LinkedHashMap<>();
         snapshot.put("overview", overview(values));
-        snapshot.put("positions", positionsAnalysis(values));
-        snapshot.put("salary", salary(values));
-        snapshot.put("skills", skills(values));
-        snapshot.put("education", education(values));
-        snapshot.put("city", city(values));
-        snapshot.put("company", company(values));
-        snapshot.put("trends", trends(values));
+        if (dimensions.contains(AnalyticsDimension.POSITION)) snapshot.put("positions", positionsAnalysis(values));
+        if (dimensions.contains(AnalyticsDimension.SALARY)) snapshot.put("salary", salary(values));
+        if (dimensions.contains(AnalyticsDimension.SKILL)) snapshot.put("skills", skills(values));
+        if (dimensions.contains(AnalyticsDimension.EDUCATION)) snapshot.put("education", education(values));
+        if (dimensions.contains(AnalyticsDimension.CITY)) snapshot.put("city", city(values));
+        if (dimensions.contains(AnalyticsDimension.COMPANY)) snapshot.put("company", company(values));
+        if (dimensions.contains(AnalyticsDimension.TREND)) snapshot.put("trends", trends(values, startDate, endDate));
         return snapshot;
     }
 
@@ -55,7 +111,7 @@ public class AnalyticsService {
     }
 
     private Map<String, Object> overview(List<JobPosition> positions) {
-        LocalDate firstDay = LocalDate.now().withDayOfMonth(1);
+        LocalDate firstDay = LocalDate.now(clock).withDayOfMonth(1);
         long newThisMonth = positions.stream()
                 .filter(position -> position.getPublishDate() != null && !position.getPublishDate().isBefore(firstDay))
                 .count();
@@ -68,7 +124,7 @@ public class AnalyticsService {
         result.put("newThisMonth", newThisMonth);
         result.put("averageSalary", averageSalary(positions));
         result.put("activeCompanies", activeCompanies);
-        result.put("updatedAt", java.time.LocalDateTime.now());
+        result.put("updatedAt", LocalDateTime.now(clock));
         return result;
     }
 
@@ -88,7 +144,7 @@ public class AnalyticsService {
         result.put("total", positions.size());
         result.put("categories", categories);
         result.put("hotPositions", categories);
-        result.put("monthlyGrowthRate", monthlyGrowth(positions));
+        result.put("monthlyGrowthRate", monthlyGrowth(positions, YearMonth.now(clock)));
         return result;
     }
 
@@ -245,35 +301,45 @@ public class AnalyticsService {
 
     @Cacheable("stat-trends")
     public Map<String, Object> trends() {
-        return trends(positions());
+        return trends(positions(), null, null);
     }
 
     @Cacheable(cacheNames = "stat-trends-filtered", key = "#filter.cacheKey()")
-    public Map<String, Object> trendsFor(AnalyticsFilter filter) { return trends(filteredPositions(filter)); }
+    public Map<String, Object> trendsFor(AnalyticsFilter filter) {
+        return trends(filteredPositions(filter),
+                filter == null ? null : filter.getStartDate(),
+                filter == null ? null : filter.getEndDate());
+    }
 
-    private Map<String, Object> trends(List<JobPosition> positions) {
-        LocalDate today = LocalDate.now();
+    private Map<String, Object> trends(List<JobPosition> positions, LocalDate startDate, LocalDate endDate) {
+        LocalDate anchorDate = endDate == null ? LocalDate.now(clock) : endDate;
+        LocalDate dailyStart = anchorDate.minusDays(29);
+        if (startDate != null && startDate.isAfter(dailyStart)) {
+            dailyStart = startDate;
+        }
         Map<LocalDate, Long> dailyCounts = positions.stream().filter(position -> position.getPublishDate() != null)
                 .collect(Collectors.groupingBy(JobPosition::getPublishDate, Collectors.counting()));
         List<Map<String, Object>> daily = new ArrayList<>();
-        for (int daysAgo = 29; daysAgo >= 0; daysAgo--) {
-            LocalDate date = today.minusDays(daysAgo);
+        for (LocalDate date = dailyStart; !date.isAfter(anchorDate); date = date.plusDays(1)) {
             daily.add(item(date.toString(), dailyCounts.getOrDefault(date, 0L), "value"));
         }
 
         Map<YearMonth, Long> monthlyCounts = positions.stream().filter(position -> position.getPublishDate() != null)
                 .collect(Collectors.groupingBy(position -> YearMonth.from(position.getPublishDate()), Collectors.counting()));
         List<Map<String, Object>> monthly = new ArrayList<>();
-        YearMonth current = YearMonth.now();
-        for (int monthsAgo = 11; monthsAgo >= 0; monthsAgo--) {
-            YearMonth month = current.minusMonths(monthsAgo);
+        YearMonth anchorMonth = YearMonth.from(anchorDate);
+        YearMonth monthlyStart = anchorMonth.minusMonths(11);
+        if (startDate != null && YearMonth.from(startDate).isAfter(monthlyStart)) {
+            monthlyStart = YearMonth.from(startDate);
+        }
+        for (YearMonth month = monthlyStart; !month.isAfter(anchorMonth); month = month.plusMonths(1)) {
             monthly.add(item(month.toString(), monthlyCounts.getOrDefault(month, 0L), "value"));
         }
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("daily", daily);
         result.put("monthly", monthly);
-        result.put("monthOverMonth", monthlyGrowth(positions));
-        result.put("yearOverYear", yearGrowth(positions));
+        result.put("monthOverMonth", monthlyGrowth(positions, anchorMonth));
+        result.put("yearOverYear", yearGrowth(positions, anchorMonth));
         return result;
     }
 
@@ -294,17 +360,11 @@ public class AnalyticsService {
                 && filter.getStartDate().isAfter(filter.getEndDate())) {
             throw new IllegalArgumentException("startDate 不能晚于 endDate");
         }
-        return positions().stream()
-                .filter(position -> filter.getStartDate() == null || position.getPublishDate() != null
-                        && !position.getPublishDate().isBefore(filter.getStartDate()))
-                .filter(position -> filter.getEndDate() == null || position.getPublishDate() != null
-                        && !position.getPublishDate().isAfter(filter.getEndDate()))
-                .filter(position -> !hasText(filter.getCity()) || filter.getCity().trim().equals(position.getCity()))
-                .filter(position -> !hasText(filter.getPosition()) || position.getTitle() != null
-                        && position.getTitle().toLowerCase(Locale.ROOT).contains(filter.getPosition().trim().toLowerCase(Locale.ROOT)))
-                .filter(position -> !hasText(filter.getIndustry()) || position.getCompany() != null
-                        && filter.getIndustry().trim().equals(position.getCompany().getIndustry()))
-                .collect(Collectors.toList());
+        if (filter.getStartDate() == null && filter.getEndDate() == null && !hasText(filter.getCity())
+                && !hasText(filter.getPosition()) && !hasText(filter.getIndustry())) {
+            return positions();
+        }
+        return positionRepository.findAll(AnalyticsSpecifications.from(filter));
     }
 
     private boolean hasText(String value) { return value != null && !value.isBlank(); }
@@ -362,16 +422,14 @@ public class AnalyticsService {
         return round(value);
     }
 
-    private double monthlyGrowth(List<JobPosition> positions) {
-        YearMonth current = YearMonth.now();
-        long currentCount = countMonth(positions, current);
-        long previousCount = countMonth(positions, current.minusMonths(1));
+    private double monthlyGrowth(List<JobPosition> positions, YearMonth anchorMonth) {
+        long currentCount = countMonth(positions, anchorMonth);
+        long previousCount = countMonth(positions, anchorMonth.minusMonths(1));
         return growth(currentCount, previousCount);
     }
 
-    private double yearGrowth(List<JobPosition> positions) {
-        YearMonth current = YearMonth.now();
-        return growth(countMonth(positions, current), countMonth(positions, current.minusYears(1)));
+    private double yearGrowth(List<JobPosition> positions, YearMonth anchorMonth) {
+        return growth(countMonth(positions, anchorMonth), countMonth(positions, anchorMonth.minusYears(1)));
     }
 
     private long countMonth(List<JobPosition> positions, YearMonth month) {

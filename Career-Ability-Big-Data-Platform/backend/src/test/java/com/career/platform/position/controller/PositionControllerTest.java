@@ -15,6 +15,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -27,9 +28,9 @@ class PositionControllerTest {
     @MockBean PositionService service;
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "position:view")
     void wrapsPageUsingTheSharedContract() throws Exception {
-        when(service.search(any())).thenReturn(new PageResponse<PositionResponse>(List.of(), 0, 0, 1, 20));
+        when(service.searchPublicRecruitment(any())).thenReturn(new PageResponse<PositionResponse>(List.of(), 0, 0, 1, 20));
         mvc.perform(get("/api/positions").param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
@@ -38,12 +39,24 @@ class PositionControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(authorities = "position:view")
     void mapsValidationErrorsToCode400() throws Exception {
         when(service.latest(0)).thenThrow(new IllegalArgumentException("limit 必须在 1 到 100 之间"));
         mvc.perform(get("/api/positions/hot").param("limit", "0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
+    }
+
+    @Test
+    @WithMockUser(authorities = "position:view")
+    void bindsCommaSeparatedComparisonIdsToThePublicComparisonService() throws Exception {
+        when(service.comparePublicRecruitment(any())).thenReturn(List.of());
+
+        mvc.perform(get("/api/positions/compare").param("ids", "2,1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(service).comparePublicRecruitment(List.of(2L, 1L));
     }
 
     @Test

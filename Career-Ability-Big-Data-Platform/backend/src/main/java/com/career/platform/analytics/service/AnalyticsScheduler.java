@@ -4,16 +4,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class AnalyticsScheduler {
     private static final Logger LOGGER = LoggerFactory.getLogger(AnalyticsScheduler.class);
+    private static final DefaultRedisScript<Long> RELEASE_LOCK = new DefaultRedisScript<>(
+            "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end",
+            Long.class);
     private final OfflineAnalysisService analysisService;
     private final StringRedisTemplate redis;
     private final AtomicBoolean localLock = new AtomicBoolean(false);
@@ -51,8 +56,7 @@ public class AnalyticsScheduler {
         } finally {
             if (redisLocked) {
                 try {
-                    String currentValue = redis.opsForValue().get(lockKey);
-                    if (lockValue.equals(currentValue)) redis.delete(lockKey);
+                    redis.execute(RELEASE_LOCK, List.of(lockKey), lockValue);
                 } catch (RuntimeException ignored) {
                     LOGGER.warn("Unable to release Redis analytics lock; it will expire automatically");
                 }

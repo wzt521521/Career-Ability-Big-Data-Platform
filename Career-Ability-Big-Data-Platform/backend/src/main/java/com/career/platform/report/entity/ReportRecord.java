@@ -27,6 +27,21 @@ public class ReportRecord {
     @Column(name = "time_range_end")
     private LocalDate timeRangeEnd;
 
+    @Column(name = "filter_city", length = 100)
+    private String filterCity;
+
+    @Column(name = "filter_position", length = 100)
+    private String filterPosition;
+
+    @Column(name = "filter_industry", length = 100)
+    private String filterIndustry;
+
+    @Column(name = "analysis_dimensions", length = 500)
+    private String analysisDimensions;
+
+    @Column(name = "analysis_scope", columnDefinition = "TEXT")
+    private String analysisScope;
+
     @Column(length = 20, nullable = false)
     private String status = "PENDING";
 
@@ -38,6 +53,12 @@ public class ReportRecord {
 
     @Column(name = "error_msg", columnDefinition = "TEXT")
     private String errorMsg;
+
+    @Column(name = "generation_started_at")
+    private LocalDateTime generationStartedAt;
+
+    @Column(name = "generation_attempts", nullable = false)
+    private Integer generationAttempts = 0;
 
     @Column(name = "create_time", insertable = false, updatable = false)
     private LocalDateTime createTime;
@@ -57,6 +78,16 @@ public class ReportRecord {
     public void setTimeRangeStart(LocalDate timeRangeStart) { this.timeRangeStart = timeRangeStart; }
     public LocalDate getTimeRangeEnd() { return timeRangeEnd; }
     public void setTimeRangeEnd(LocalDate timeRangeEnd) { this.timeRangeEnd = timeRangeEnd; }
+    public String getFilterCity() { return filterCity; }
+    public void setFilterCity(String filterCity) { this.filterCity = filterCity; }
+    public String getFilterPosition() { return filterPosition; }
+    public void setFilterPosition(String filterPosition) { this.filterPosition = filterPosition; }
+    public String getFilterIndustry() { return filterIndustry; }
+    public void setFilterIndustry(String filterIndustry) { this.filterIndustry = filterIndustry; }
+    public String getAnalysisDimensions() { return analysisDimensions; }
+    public void setAnalysisDimensions(String analysisDimensions) { this.analysisDimensions = analysisDimensions; }
+    public String getAnalysisScope() { return analysisScope; }
+    public void setAnalysisScope(String analysisScope) { this.analysisScope = analysisScope; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getFilePath() { return filePath; }
@@ -65,6 +96,10 @@ public class ReportRecord {
     public void setFileSize(Long fileSize) { this.fileSize = fileSize; }
     public String getErrorMsg() { return errorMsg; }
     public void setErrorMsg(String errorMsg) { this.errorMsg = errorMsg; }
+    public LocalDateTime getGenerationStartedAt() { return generationStartedAt; }
+    public void setGenerationStartedAt(LocalDateTime generationStartedAt) { this.generationStartedAt = generationStartedAt; }
+    public Integer getGenerationAttempts() { return generationAttempts; }
+    public void setGenerationAttempts(Integer generationAttempts) { this.generationAttempts = generationAttempts; }
     public LocalDateTime getCreateTime() { return createTime; }
     public LocalDateTime getUpdateTime() { return updateTime; }
 }

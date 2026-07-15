@@ -10,6 +10,50 @@
 
 > 严格遵循上述 Git 协作流程，养成良好的团队开发习惯。
 
+## R1 本机质量门禁
+
+实际运行工程位于 `Career-Ability-Big-Data-Platform/`。在提交前从该目录依次执行：
+
+```powershell
+cd Career-Ability-Big-Data-Platform/backend
+.\mvnw.cmd -B clean verify
+
+cd ../frontend
+npm ci
+npm run test:coverage
+npm run lint
+npm run build
+
+cd ../data-pipeline
+py -3.10 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements-test.txt
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe scripts/check_coverage.py coverage.xml
+
+cd ..
+docker compose config --quiet
+```
+
+`pytest` 默认只运行无外部副作用的单元测试。MySQL 8 和 Redis 7 集成测试仅在专用测试库、临时 Redis key 和显式环境变量齐备时运行：
+
+```powershell
+$env:PIPELINE_TEST_MYSQL_DATABASE = "career_ability_pipeline_test"
+$env:MYSQL_HOST = "127.0.0.1"
+$env:MYSQL_PORT = "3306"
+$env:MYSQL_USER = "<dedicated-test-user-with-create-database>"
+$env:MYSQL_PASSWORD = "<dedicated-test-password>"
+$env:REDIS_HOST = "127.0.0.1"
+$env:REDIS_PORT = "6379"
+$env:REDIS_DB = "0"
+$env:PIPELINE_TEST_REDIS_DB = "15"
+$env:PIPELINE_TEST_REDIS_PREFIX = "pipeline:test"
+cd Career-Ability-Big-Data-Platform/data-pipeline
+.\.venv\Scripts\python.exe -m pytest -m integration
+```
+
+提交前还必须执行 `git diff --check`，确认 `git status --short` 只包含本次任务文件，并通过 PR 合并；不得绕过受保护分支。
+
 # 职业能力大数据服务平台
 
 ---
@@ -21,7 +65,7 @@
 平台核心功能模块：
 - 数据采集与清洗模块
 - 多维度就业数据分析模块
-- 报告自动生成模块（PDF / Word / Excel）
+- PDF 报告自动生成模块
 - 个性化岗位推荐模块
 - 对外开放 API
 
@@ -88,28 +132,21 @@
 ### 基础方案（5 个容器，推荐实训使用）
 
 ```bash
-# 1. 启动基础服务
-docker-compose up -d mysql redis
+# 1. 进入实际运行工程并配置 .env
+cd Career-Ability-Big-Data-Platform
 
-# 2. 初始化数据库
-# 执行 sql/init.sql 建表
+# 2. 构建并等待 MySQL、Redis、后端、前端和 ETL 全部健康
+docker compose up -d --build --wait
 
-# 3. 导入公开数据集
-cd data-pipeline && python import_data.py --source ../data/sample_jobs.csv
-
-# 4. 运行 ETL 清洗
-python etl_clean.py
-
-# 5. 启动后端
-cd backend && mvn spring-boot:run
-
-# 6. 启动前端
-cd frontend && npm install && npm run dev
+# 3. 导入并验证仓库 CSV 样本的端到端链路
+docker compose exec -T python-etl python scripts/verify_compose_pipeline.py --csv /data/kaggle_jobs_500.csv --timeout-seconds 180
 ```
 
-### 进阶方案（含大数据组件）
+`data/kaggle_jobs_500.csv` 以只读卷挂载到 ETL 容器的 `/data`。验证不会截断 Redis 或 MySQL，成功时至少确认 500 条有效源记录，以及 400 条已写入 MySQL 和 cleaned 队列的岗位记录。
 
-在基础方案之上，额外启动 Kafka、HDFS、Spark 容器，详见 `docker-compose-full.yml`。
+### 发行范围说明
+
+`v1.0.0` 只交付五服务基础方案：MySQL、Redis、Spring Boot 后端、Vue/Nginx 前端和 Python ETL worker。Kafka、HDFS、Spark、Hive 以及 Word/Excel 报告导出均不属于本次正式发行范围，后续进入 `v1.1` backlog。
 
 ---
 

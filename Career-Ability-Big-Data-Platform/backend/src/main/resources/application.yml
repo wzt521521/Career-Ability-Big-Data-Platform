@@ -1,6 +1,14 @@
 server:
   port: ${SERVER_PORT:8080}
   forward-headers-strategy: framework
+  tomcat:
+    max-http-form-post-size: ${SERVER_MAX_HTTP_FORM_POST_SIZE:2MB}
+    max-swallow-size: ${SERVER_MAX_SWALLOW_SIZE:2MB}
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
 
 spring:
   application:
@@ -24,6 +32,7 @@ spring:
   redis:
     host: ${SPRING_REDIS_HOST:localhost}
     port: ${SPRING_REDIS_PORT:6379}
+    password: ${SPRING_REDIS_PASSWORD:}
   cache:
     type: ${SPRING_CACHE_TYPE:simple}
     redis:
@@ -41,10 +50,20 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics
   endpoint:
     health:
       show-details: when_authorized
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState,ping
+        readiness:
+          include: readinessState,db,redis,reportStorage
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 springdoc:
   swagger-ui:
@@ -59,12 +78,29 @@ security:
     refresh-token-ttl: ${JWT_REFRESH_TTL:P7D}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost}
+  rate-limit:
+    enabled: ${BUSINESS_RATE_LIMIT_ENABLED:true}
+    requests-per-minute: ${BUSINESS_RATE_LIMIT_REQUESTS_PER_MINUTE:600}
 
 app:
+  bootstrap:
+    admin:
+      username: ${INITIAL_ADMIN_USERNAME:}
+      password: ${INITIAL_ADMIN_PASSWORD:}
   analytics:
     schedule: ${ANALYTICS_CRON:0 0 2 * * *}
     lock-key: lock:analytics:daily
     lock-seconds: 1800
+  report:
+    output-dir: ${REPORT_OUTPUT_DIR:/var/lib/career-ability/reports}
+    font-file: ${REPORT_FONT_FILE:/usr/share/fonts/noto/NotoSansSC.ttf}
+    require-chinese-font: ${REPORT_REQUIRE_CHINESE_FONT:false}
+    max-attempts: ${REPORT_MAX_ATTEMPTS:3}
+    pending-timeout-seconds: ${REPORT_PENDING_TIMEOUT_SECONDS:120}
+    generating-timeout-seconds: ${REPORT_GENERATING_TIMEOUT_SECONDS:1800}
+    recovery-delay-ms: ${REPORT_RECOVERY_DELAY_MS:60000}
+  recommend:
+    position-data-version-key: ${POSITION_DATA_VERSION_KEY:career:position-data-version}
 
 logging:
   level:

@@ -5,10 +5,6 @@ USE career_ability;
 
 START TRANSACTION;
 
-UPDATE sys_user
-SET password = '$2a$10$R.ly2ozcryr0uP/apBwJBOfWv/eCIE3wwXkr7HCOXTd1Qc4IYfwZu'
-WHERE username = 'admin';
-
 INSERT IGNORE INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id
 FROM sys_role r

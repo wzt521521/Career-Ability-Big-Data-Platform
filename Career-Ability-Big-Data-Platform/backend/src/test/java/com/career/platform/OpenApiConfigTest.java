@@ -41,5 +41,8 @@ class OpenApiConfigTest {
         assertEquals(1, operation.getSecurity().size());
         assertNotNull(operation.getSecurity().get(0).get(OpenApiConfig.BEARER_AUTH));
         assertNotNull(operation.getSecurity().get(0).get(OpenApiConfig.API_KEY_AUTH));
+        assertNotNull(operation.getResponses().get("400"));
+        assertNotNull(operation.getResponses().get("429"));
+        assertNotNull(operation.getResponses().get("429").getHeaders().get("X-RateLimit-Limit"));
     }
 }

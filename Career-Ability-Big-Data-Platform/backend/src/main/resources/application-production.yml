@@ -1,0 +1,15 @@
+security:
+  jwt:
+    # Production deliberately has no development fallback. Startup validation rejects a missing or weak value.
+    secret: ${SECURITY_JWT_SECRET:${JWT_SECRET:}}
+  cors:
+    # Production must declare browser origins explicitly; there is no localhost fallback.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+
+app:
+  bootstrap:
+    admin:
+      username: ${INITIAL_ADMIN_USERNAME:}
+      password: ${INITIAL_ADMIN_PASSWORD:}
+  report:
+    require-chinese-font: true

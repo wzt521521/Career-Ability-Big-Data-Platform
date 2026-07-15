@@ -1,6 +1,7 @@
 package com.career.platform.openapi.service.impl;
 
 import com.career.platform.common.PageResponse;
+import com.career.platform.common.security.CurrentUserProvider;
 import com.career.platform.openapi.dto.ApiCallLogResponse;
 import com.career.platform.openapi.dto.ApiCallStatisticsResponse;
 import com.career.platform.openapi.entity.ApiCallLog;
@@ -22,12 +23,15 @@ public class ApiCallLogServiceImpl implements ApiCallLogService {
 
     private final ApiCallLogRepository callLogRepository;
     private final ApiKeyRepository apiKeyRepository;
+    private final CurrentUserProvider currentUserProvider;
 
     public ApiCallLogServiceImpl(
             ApiCallLogRepository callLogRepository,
-            ApiKeyRepository apiKeyRepository) {
+            ApiKeyRepository apiKeyRepository,
+            CurrentUserProvider currentUserProvider) {
         this.callLogRepository = callLogRepository;
         this.apiKeyRepository = apiKeyRepository;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @Override
@@ -56,7 +60,12 @@ public class ApiCallLogServiceImpl implements ApiCallLogService {
     @Transactional(readOnly = true)
     public PageResponse<ApiCallLogResponse> list(String path, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
-        Page<ApiCallLog> logs = callLogRepository.findByApiPathContainingIgnoreCase(
+        List<Long> apiKeyIds = currentApiKeyIds();
+        if (apiKeyIds.isEmpty()) {
+            return PageResponse.from(Page.empty(pageRequest), List.of());
+        }
+        Page<ApiCallLog> logs = callLogRepository.findByApiKeyIdInAndApiPathContainingIgnoreCase(
+                apiKeyIds,
                 path == null ? "" : path.trim(),
                 pageRequest);
         List<ApiCallLogResponse> content = logs.getContent().stream()
@@ -68,13 +77,24 @@ public class ApiCallLogServiceImpl implements ApiCallLogService {
     @Override
     @Transactional(readOnly = true)
     public ApiCallStatisticsResponse statistics() {
-        long total = callLogRepository.count();
-        long successful = callLogRepository.countByStatusCodeBetween(200, 399);
-        Double averageDuration = callLogRepository.averageDuration();
+        List<Long> apiKeyIds = currentApiKeyIds();
+        if (apiKeyIds.isEmpty()) {
+            return new ApiCallStatisticsResponse(0L, 0L, 0L, 0.0);
+        }
+        long total = callLogRepository.countByApiKeyIdIn(apiKeyIds);
+        long successful = callLogRepository.countByApiKeyIdInAndStatusCodeBetween(apiKeyIds, 200, 399);
+        Double averageDuration = callLogRepository.averageDurationByApiKeyIdIn(apiKeyIds);
         return new ApiCallStatisticsResponse(
                 total,
                 successful,
                 total - successful,
                 averageDuration == null ? 0.0 : averageDuration);
+    }
+
+    private List<Long> currentApiKeyIds() {
+        Long userId = currentUserProvider.requireCurrentUser().getId();
+        return apiKeyRepository.findByUserId(userId).stream()
+                .map(ApiKey::getId)
+                .collect(Collectors.toList());
     }
 }

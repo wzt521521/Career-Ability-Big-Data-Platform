@@ -1,6 +1,8 @@
 package com.career.platform.recommend.dto;
 
 import com.career.platform.position.entity.JobPosition;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -60,22 +62,45 @@ public class RecommendationResponse {
     public RecommendationResponse(JobPosition position, double score,
                                   List<String> matchedSkills, List<String> unmatchedSkills,
                                   Map<String, Double> scoreBreakdown) {
-        this.positionId = position.getId();
-        this.title = position.getTitle();
-        this.companyName = position.getCompany() == null ? null : position.getCompany().getCompanyName();
-        this.companySize = position.getCompany() == null ? null : position.getCompany().getCompanySize();
-        this.industry = position.getCompany() == null ? null : position.getCompany().getIndustry();
-        this.salaryMin = position.getSalaryMin();
-        this.salaryMax = position.getSalaryMax();
-        this.city = position.getCity();
-        this.education = position.getEducation();
-        this.experience = position.getExperience();
-        this.skills = position.getSkills() == null ? List.of() : List.copyOf(position.getSkills());
+        this(position.getId(), position.getTitle(), position.getCompany() == null ? null : position.getCompany().getCompanyName(),
+                position.getCompany() == null ? null : position.getCompany().getCompanySize(),
+                position.getCompany() == null ? null : position.getCompany().getIndustry(),
+                position.getSalaryMin(), position.getSalaryMax(), position.getCity(), position.getEducation(),
+                position.getExperience(), position.getSkills(), score, matchedSkills, unmatchedSkills, scoreBreakdown);
+    }
+
+    @JsonCreator
+    public RecommendationResponse(@JsonProperty("positionId") Long positionId,
+                                  @JsonProperty("title") String title,
+                                  @JsonProperty("companyName") String companyName,
+                                  @JsonProperty("companySize") String companySize,
+                                  @JsonProperty("industry") String industry,
+                                  @JsonProperty("salaryMin") Integer salaryMin,
+                                  @JsonProperty("salaryMax") Integer salaryMax,
+                                  @JsonProperty("city") String city,
+                                  @JsonProperty("education") String education,
+                                  @JsonProperty("experience") String experience,
+                                  @JsonProperty("skills") List<String> skills,
+                                  @JsonProperty("score") double score,
+                                  @JsonProperty("matchedSkills") List<String> matchedSkills,
+                                  @JsonProperty("unmatchedSkills") List<String> unmatchedSkills,
+                                  @JsonProperty("scoreBreakdown") Map<String, Double> scoreBreakdown) {
+        this.positionId = positionId;
+        this.title = title;
+        this.companyName = companyName;
+        this.companySize = companySize;
+        this.industry = industry;
+        this.salaryMin = salaryMin;
+        this.salaryMax = salaryMax;
+        this.city = city;
+        this.education = education;
+        this.experience = experience;
+        this.skills = skills == null ? List.of() : List.copyOf(skills);
         this.score = Math.round(score * 10000.0) / 10000.0;
         this.matchPercent = (int) Math.round(score * 100);
-        this.matchedSkills = List.copyOf(matchedSkills);
-        this.unmatchedSkills = List.copyOf(unmatchedSkills);
-        this.scoreBreakdown = Map.copyOf(scoreBreakdown);
+        this.matchedSkills = matchedSkills == null ? List.of() : List.copyOf(matchedSkills);
+        this.unmatchedSkills = unmatchedSkills == null ? List.of() : List.copyOf(unmatchedSkills);
+        this.scoreBreakdown = scoreBreakdown == null ? Map.of() : Map.copyOf(scoreBreakdown);
     }
 
     public Long getPositionId() { return positionId; }

@@ -2,6 +2,7 @@ package com.career.platform.common;
 
 import com.career.platform.common.error.BusinessException;
 import com.career.platform.common.error.ErrorCode;
+import com.career.platform.common.security.SensitiveDataRedactor;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,13 +26,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException exception) {
         ErrorCode errorCode = exception.getErrorCode();
         return ResponseEntity.status(errorCode.getStatus())
-                .body(ApiResponse.error(errorCode.getCode(), exception.getMessage()));
+                .body(ApiResponse.error(errorCode.getCode(), safeMessage(exception.getMessage())));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNotFound(ResourceNotFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), exception.getMessage()));
+                .body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), safeMessage(exception.getMessage())));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -61,6 +63,13 @@ public class GlobalExceptionHandler {
         return badRequest("Malformed request body");
     }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUploadTooLarge(MaxUploadSizeExceededException exception) {
+        return ResponseEntity.status(org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(ApiResponse.error(org.springframework.http.HttpStatus.PAYLOAD_TOO_LARGE.value(),
+                        "Uploaded file exceeds the configured size limit"));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleUnexpected(Exception exception) {
         log.error("Unhandled request failure", exception);
@@ -72,6 +81,10 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ApiResponse<Void>> badRequest(String message) {
         return ResponseEntity.status(ErrorCode.BAD_REQUEST.getStatus())
-                .body(ApiResponse.error(ErrorCode.BAD_REQUEST.getCode(), message));
+                .body(ApiResponse.error(ErrorCode.BAD_REQUEST.getCode(), safeMessage(message)));
+    }
+
+    private String safeMessage(String message) {
+        return SensitiveDataRedactor.redact(message);
     }
 }

@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete, VideoPlay, VideoPause, Refresh } from '@element-plus/icons-vue'
-import { listTasks, createTask, updateTask, deleteTask, listSources } from '../../api/collect.js'
+import { listTasks, createTask, updateTask, deleteTask, listSources, pauseTask, resumeTask, runTask } from '../../api/collect.js'
 import { init } from '../../utils/echarts.js'
 
 const loading = ref(false)
@@ -82,14 +82,19 @@ function sourceName(sourceId) {
 
 // ---- 任务开关 ----
 async function toggleStatus(row) {
-  const newStatus = row.status === 'RUNNING' ? 'IDLE' : 'RUNNING'
+  const action = row.status === 'RUNNING'
+    ? pauseTask
+    : row.status === 'PAUSED'
+      ? resumeTask
+      : runTask
+  const actionLabel = row.status === 'RUNNING' ? '已暂停' : row.status === 'PAUSED' ? '已恢复' : '已启动'
   try {
-    await updateTask(row.id, { ...row, status: newStatus, id: undefined, createTime: undefined, updateTime: undefined })
-    row.status = newStatus
-    ElMessage.success(newStatus === 'RUNNING' ? '任务已启动' : '任务已暂停')
+    const updated = await action(row.id)
+    Object.assign(row, updated)
+    ElMessage.success(actionLabel)
     setTimeout(renderChart, 100)
   } catch {
-    ElMessage.error('状态切换失败')
+    ElMessage.error('任务状态切换失败')
   }
 }
 
@@ -126,6 +131,7 @@ async function submit() {
     await updateTask(form.id, payload)
     ElMessage.success('任务已更新')
   } else {
+    payload.status = payload.cronExpression?.trim() ? 'SCHEDULED' : 'IDLE'
     await createTask(payload)
     ElMessage.success('任务已创建')
   }
@@ -134,7 +140,14 @@ async function submit() {
 }
 
 function statusTag(status) {
-  const map = { RUNNING: { type: 'success', text: '运行中' }, IDLE: { type: 'info', text: '空闲' }, FAILED: { type: 'danger', text: '失败' }, PAUSED: { type: 'warning', text: '已暂停' } }
+  const map = {
+    RUNNING: { type: 'success', text: '运行中' },
+    SCHEDULED: { type: 'primary', text: '已调度' },
+    IDLE: { type: 'info', text: '空闲' },
+    FAILED: { type: 'danger', text: '失败' },
+    ERROR: { type: 'danger', text: '异常' },
+    PAUSED: { type: 'warning', text: '已暂停' }
+  }
   return map[status] || { type: 'info', text: status }
 }
 
@@ -149,7 +162,7 @@ onBeforeUnmount(() => taskChart?.dispose())
       <div class="toolbar-right">
         <span class="refresh-note" v-if="statsRefreshedAt">更新于 {{ statsRefreshedAt.toLocaleTimeString('zh-CN', { hour12: false }) }}</span>
         <el-button :icon="Refresh" :loading="loading" title="刷新" circle @click="load" />
-        <el-button type="primary" :icon="Plus" @click="openCreate">新增任务</el-button>
+        <el-button v-permission="'collect:toggle'" type="primary" :icon="Plus" @click="openCreate">新增任务</el-button>
       </div>
     </div>
 
@@ -181,13 +194,13 @@ onBeforeUnmount(() => taskChart?.dispose())
             </template>
           </el-table-column>
           <el-table-column prop="lastRunTime" label="上次执行" width="170" />
-          <el-table-column label="操作" width="200" fixed="right">
+          <el-table-column label="操作" width="220" fixed="right">
             <template #default="{ row }">
-              <el-button type="success" link size="small" :icon="row.status === 'RUNNING' ? VideoPause : VideoPlay" @click="toggleStatus(row)">
-                {{ row.status === 'RUNNING' ? '暂停' : '启动' }}
+              <el-button v-permission="'collect:toggle'" type="success" link size="small" :icon="row.status === 'RUNNING' ? VideoPause : VideoPlay" @click="toggleStatus(row)">
+                {{ row.status === 'RUNNING' ? '暂停' : row.status === 'PAUSED' ? '恢复' : '启动' }}
               </el-button>
-              <el-button type="primary" link :icon="Edit" size="small" @click="openEdit(row)">编辑</el-button>
-              <el-button type="danger" link :icon="Delete" size="small" @click="handleDelete(row)">删除</el-button>
+              <el-button v-permission="'collect:toggle'" type="primary" link :icon="Edit" size="small" @click="openEdit(row)">编辑</el-button>
+              <el-button v-permission="'collect:toggle'" type="danger" link :icon="Delete" size="small" @click="handleDelete(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -209,7 +222,7 @@ onBeforeUnmount(() => taskChart?.dispose())
           <el-input v-model="form.cronExpression" placeholder="如：0 0 6 * * ?（每天6点）" />
         </el-form-item>
         <el-form-item label="最大重试次数">
-          <el-input-number v-model="form.maxRetries" :min="1" :max="10" />
+          <el-input-number v-model="form.maxRetries" :min="0" :max="3" />
         </el-form-item>
       </el-form>
       <template #footer>

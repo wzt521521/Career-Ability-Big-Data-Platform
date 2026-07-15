@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,9 +42,9 @@ public class ApiKeyManagementController {
 
     @GetMapping
     @Operation(summary = "分页查询 API Key")
-    @PreAuthorize("hasAuthority('api:view')")
+    @PreAuthorize("hasAuthority('api:key:manage')")
     public ApiResponse<PageResponse<ApiKeyResponse>> list(
-            @RequestParam(defaultValue = "") String appName,
+            @RequestParam(defaultValue = "") @Size(max = 100) String appName,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         return ApiResponse.success(apiKeyService.list(appName, page, size));
@@ -51,7 +52,7 @@ public class ApiKeyManagementController {
 
     @PostMapping
     @Operation(summary = "创建 API Key", description = "密钥原文仅在本次响应中返回")
-    @PreAuthorize("hasAuthority('api:view')")
+    @PreAuthorize("hasAuthority('api:key:manage')")
     @Log(module = "open-api", operation = "create-key", description = "Create API key")
     public ApiResponse<CreatedApiKeyResponse> create(
             @Valid @RequestBody CreateApiKeyRequest request) {
@@ -60,7 +61,7 @@ public class ApiKeyManagementController {
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "启用或停用 API Key")
-    @PreAuthorize("hasAuthority('api:view')")
+    @PreAuthorize("hasAuthority('api:key:manage')")
     @Log(module = "open-api", operation = "key-status", description = "Change API key status")
     public ApiResponse<ApiKeyResponse> updateStatus(
             @PathVariable Long id,
@@ -70,7 +71,7 @@ public class ApiKeyManagementController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "删除 API Key")
-    @PreAuthorize("hasAuthority('api:view')")
+    @PreAuthorize("hasAuthority('api:key:manage')")
     @Log(module = "open-api", operation = "delete-key", description = "Delete API key")
     public ApiResponse<Void> delete(@PathVariable Long id) {
         apiKeyService.delete(id);

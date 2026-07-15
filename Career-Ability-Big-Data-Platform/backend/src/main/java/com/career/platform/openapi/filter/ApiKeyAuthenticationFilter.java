@@ -3,9 +3,11 @@ package com.career.platform.openapi.filter;
 import com.career.platform.common.ApiResponse;
 import com.career.platform.common.error.BusinessException;
 import com.career.platform.common.error.ErrorCode;
+import com.career.platform.auth.security.CustomUserPrincipal;
 import com.career.platform.openapi.entity.ApiKey;
 import com.career.platform.openapi.ratelimit.ApiRateLimiter;
 import com.career.platform.openapi.ratelimit.RateLimitResult;
+import com.career.platform.openapi.security.OpenApiRequestContext;
 import com.career.platform.openapi.service.ApiCallLogService;
 import com.career.platform.openapi.service.ApiKeyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
@@ -43,8 +47,16 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return "OPTIONS".equalsIgnoreCase(request.getMethod())
-                || !request.getRequestURI().startsWith(OPEN_API_PREFIX);
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+        String requestUri = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String applicationPath = requestUri;
+        if (contextPath != null && !contextPath.isEmpty() && requestUri.startsWith(contextPath)) {
+            applicationPath = requestUri.substring(contextPath.length());
+        }
+        return !applicationPath.startsWith(OPEN_API_PREFIX);
     }
 
     @Override
@@ -59,6 +71,19 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
             writeError(response, exception.getErrorCode(), exception.getMessage());
             return;
         }
+
+        CustomUserPrincipal principal = authenticatedPrincipal();
+        if (principal == null) {
+            writeError(response, ErrorCode.UNAUTHORIZED, "Bearer token is required for Open API requests");
+            record(apiKey, request, response, 0L);
+            return;
+        }
+        if (apiKey.getUserId() == null || !apiKey.getUserId().equals(principal.getId())) {
+            writeError(response, ErrorCode.FORBIDDEN, "API key does not belong to the authenticated user");
+            record(apiKey, request, response, 0L);
+            return;
+        }
+        OpenApiRequestContext.attach(request, apiKey);
 
         RateLimitResult rateLimit = rateLimiter.tryAcquire(apiKey.getId(), apiKey.getRateLimit());
         response.setHeader("X-RateLimit-Limit", Integer.toString(rateLimit.getLimit()));
@@ -75,6 +100,14 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         } finally {
             record(apiKey, request, response, System.currentTimeMillis() - startedAt);
         }
+    }
+
+    private CustomUserPrincipal authenticatedPrincipal() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserPrincipal)) {
+            return null;
+        }
+        return (CustomUserPrincipal) authentication.getPrincipal();
     }
 
     private void record(
@@ -103,10 +136,6 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String clientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
         return request.getRemoteAddr();
     }
 

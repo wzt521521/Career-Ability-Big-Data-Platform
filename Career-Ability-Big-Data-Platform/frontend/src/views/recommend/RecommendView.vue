@@ -1,7 +1,7 @@
 <script setup>
-import { ref, reactive, onMounted, watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Refresh, Search, StarFilled, CircleCheckFilled, CircleCloseFilled } from '@element-plus/icons-vue'
+import { Refresh, StarFilled, CircleCheckFilled, CircleCloseFilled } from '@element-plus/icons-vue'
 import { getMyProfile, saveMyProfile } from '../../api/profile'
 import { getRecommendations, getGapAnalysis } from '../../api/recommend'
 import PageContainer from '../../components/common/PageContainer.vue'
@@ -118,7 +118,7 @@ function renderRadar() {
   radarChart.setOption({
     tooltip: { formatter: (p) => `${p.name}: ${(p.value * 100).toFixed(0)}%` },
     radar: {
-      indicator: Object.entries(labels).map(([k, v]) => ({ name: v, max: 1 })),
+      indicator: Object.entries(labels).map(([, v]) => ({ name: v, max: 1 })),
       center: ['50%', '55%'],
       radius: '70%',
     },
@@ -206,6 +206,7 @@ onMounted(async () => {
             <el-select
               v-model="profile.skills"
               multiple
+              :multiple-limit="30"
               filterable
               allow-create
               default-first-option
@@ -284,6 +285,7 @@ onMounted(async () => {
         <div
           v-else-if="recommendLoading"
           v-loading="recommendLoading"
+          class="recommend-list-loading"
           style="min-height: 300px"
         />
 
@@ -309,7 +311,9 @@ onMounted(async () => {
               class="recommend-card"
             >
               <div class="card-header">
-                <h3 class="card-title">{{ item.title }}</h3>
+                <h3 class="card-title">
+                  {{ item.title }}
+                </h3>
                 <div class="match-area">
                   <div
                     class="match-badge"
@@ -416,6 +420,7 @@ onMounted(async () => {
       v-model="gapDialog"
       title="技能差距分析"
       width="640px"
+      class="gap-dialog"
       destroy-on-close
     >
       <div
@@ -705,6 +710,27 @@ onMounted(async () => {
 
   .gap-summary {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 540px) {
+  .recommend-card {
+    padding: var(--space-4);
+  }
+
+  .card-header {
+    flex-direction: column;
+  }
+
+  .match-area {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: var(--space-3);
+  }
+
+  .gap-dialog :deep(.el-dialog) {
+    width: calc(100vw - 32px) !important;
+    margin: var(--space-4) auto;
   }
 }
 </style>

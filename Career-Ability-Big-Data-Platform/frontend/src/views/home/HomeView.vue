@@ -33,9 +33,9 @@ const actionDefinitions = [
   { label: '用户管理', path: '/system/users', icon: UserFilled, permissions: ['user:read'] },
   { label: '角色权限', path: '/system/roles', icon: Setting, permissions: ['role:read'] },
   { label: '操作日志', path: '/system/logs', icon: List, permissions: ['log:read'] },
-  { label: 'API Key', path: '/open-api/keys', icon: Key, permissions: ['api:view'] },
+  { label: 'API Key', path: '/open-api/keys', icon: Key, permissions: ['api:key:manage'] },
   { label: '调用统计', path: '/open-api/calls', icon: DataAnalysis, permissions: ['api:view'] },
-  { label: 'API 文档', path: '/api-docs', icon: Document, permissions: ['api:docs', 'api:view'] },
+  { label: 'API 文档', path: '/api-docs', icon: Document, permissions: ['api:docs', 'api:view', 'api:key:manage'] },
 ]
 
 const availableActions = computed(() => actionDefinitions.filter((action) => (

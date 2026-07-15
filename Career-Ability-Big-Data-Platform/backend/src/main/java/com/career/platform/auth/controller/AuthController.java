@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,6 +58,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "查询当前用户")
     @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<UserResponse> me() {
@@ -64,6 +66,7 @@ public class AuthController {
     }
 
     @PutMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "修改个人资料")
     @SecurityRequirement(name = "bearerAuth")
     @Log(module = "auth", operation = "update-profile", description = "Update current user profile")
@@ -72,6 +75,7 @@ public class AuthController {
     }
 
     @PutMapping("/password")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "修改当前用户密码")
     @SecurityRequirement(name = "bearerAuth")
     @Log(module = "auth", operation = "change-password", description = "Change current user password")
@@ -81,6 +85,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "退出登录", description = "撤销当前 Access Token，并使对应 Refresh Token 失效")
     @SecurityRequirement(name = "bearerAuth")
     @Log(module = "auth", operation = "logout", description = "Logout current user")

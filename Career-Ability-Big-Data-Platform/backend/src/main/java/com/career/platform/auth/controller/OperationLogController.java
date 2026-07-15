@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,8 +35,8 @@ public class OperationLogController {
     @Operation(summary = "分页查询操作日志")
     @PreAuthorize("hasAuthority('log:read')")
     public ApiResponse<PageResponse<OperationLogResponse>> list(
-            @RequestParam(defaultValue = "") String username,
-            @RequestParam(defaultValue = "") String module,
+            @RequestParam(defaultValue = "") @Size(max = 50) String username,
+            @RequestParam(defaultValue = "") @Size(max = 50) String module,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         return ApiResponse.success(operationLogService.list(username, module, page, size));

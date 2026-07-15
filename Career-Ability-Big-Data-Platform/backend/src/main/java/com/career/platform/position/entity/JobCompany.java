@@ -4,7 +4,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "job_company")
+@Table(name = "job_company", indexes = {
+        @Index(name = "idx_jc_industry", columnList = "industry")
+})
 public class JobCompany {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

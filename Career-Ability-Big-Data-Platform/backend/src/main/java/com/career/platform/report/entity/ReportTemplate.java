@@ -30,10 +30,10 @@ public class ReportTemplate {
     @Column(columnDefinition = "JSON")
     private List<String> dimensions;
 
-    @Column(name = "is_default", nullable = false)
+    @Column(name = "is_default", nullable = false, columnDefinition = "TINYINT")
     private Integer isDefault = 0;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer status = 1;
 
     @Column(name = "create_time", insertable = false, updatable = false)

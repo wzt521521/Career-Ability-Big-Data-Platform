@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { computed, ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Download, Delete, RefreshRight, View, Search } from '@element-plus/icons-vue'
 import {
@@ -7,13 +7,19 @@ import {
   generateReport,
   getReports,
   getReportStatus,
-  getReportDownloadUrl,
-  getReportPreviewUrl,
+  downloadReportFile,
+  previewReportFile,
+  readReportBinaryError,
   deleteReport,
 } from '../../api/report'
 import PageContainer from '../../components/common/PageContainer.vue'
 import PageHeader from '../../components/common/PageHeader.vue'
 import EmptyState from '../../components/common/EmptyState.vue'
+import { useUserStore } from '../../stores/user'
+
+const POLL_INTERVAL_MS = 2000
+const MAX_POLL_ATTEMPTS = 150
+const userStore = useUserStore()
 
 const loading = ref(false)
 const reports = ref([])
@@ -24,13 +30,19 @@ const searchKeyword = ref('')
 const templates = ref([])
 const generateDialog = ref(false)
 const generating = ref(false)
-const pollingTimers = ref({})
+const pollingTimers = new Map()
+let unmounted = false
+const canGenerate = computed(() => userStore.hasPermission('report:generate'))
+const canDelete = computed(() => userStore.hasPermission('report:delete'))
 
 const generateForm = reactive({
   templateId: null,
   title: '',
   timeRangeStart: '',
   timeRangeEnd: '',
+  city: '',
+  position: '',
+  industry: '',
 })
 
 const statusLabels = {
@@ -92,6 +104,11 @@ async function handleGenerate() {
     ElMessage.warning('请填写完整信息')
     return
   }
+  if (generateForm.timeRangeStart && generateForm.timeRangeEnd
+      && generateForm.timeRangeStart > generateForm.timeRangeEnd) {
+    ElMessage.warning('开始日期不能晚于结束日期')
+    return
+  }
   generating.value = true
   try {
     const res = await generateReport({
@@ -99,6 +116,9 @@ async function handleGenerate() {
       title: generateForm.title,
       timeRangeStart: generateForm.timeRangeStart || null,
       timeRangeEnd: generateForm.timeRangeEnd || null,
+      city: generateForm.city || null,
+      position: generateForm.position || null,
+      industry: generateForm.industry || null,
     })
     generateDialog.value = false
     ElMessage.success('报告生成任务已提交')
@@ -112,14 +132,22 @@ async function handleGenerate() {
 }
 
 function startPolling(recordId) {
-  if (pollingTimers.value[recordId]) return
-  pollingTimers.value[recordId] = setInterval(async () => {
+  if (pollingTimers.has(recordId) || unmounted) return
+  const state = { attempts: 0, inFlight: false, timer: null }
+  state.timer = setInterval(async () => {
+    if (state.inFlight || unmounted) return
+    state.attempts += 1
+    if (state.attempts > MAX_POLL_ATTEMPTS) {
+      stopPolling(recordId)
+      ElMessage.error('报告生成超时，请稍后刷新状态')
+      return
+    }
+    state.inFlight = true
     try {
       const res = await getReportStatus(recordId)
       const status = res.data?.status
       if (status === 'COMPLETED' || status === 'FAILED') {
-        clearInterval(pollingTimers.value[recordId])
-        delete pollingTimers.value[recordId]
+        stopPolling(recordId)
         if (status === 'COMPLETED') {
           ElMessage.success('报告生成完成')
         } else {
@@ -128,26 +156,57 @@ function startPolling(recordId) {
         await loadReports()
       }
     } catch {
-      clearInterval(pollingTimers.value[recordId])
-      delete pollingTimers.value[recordId]
+      stopPolling(recordId)
+      if (!unmounted) ElMessage.error('报告状态查询失败')
+    } finally {
+      state.inFlight = false
     }
-  }, 2000)
+  }, POLL_INTERVAL_MS)
+  pollingTimers.set(recordId, state)
 }
 
-function downloadReport(id) {
-  window.open(getReportDownloadUrl(id), '_blank')
+function stopPolling(recordId) {
+  const state = pollingTimers.get(recordId)
+  if (state) {
+    clearInterval(state.timer)
+    pollingTimers.delete(recordId)
+  }
 }
 
-function previewReport(id) {
-  window.open(getReportPreviewUrl(id), '_blank')
+async function saveBinary(blob, id, preview) {
+  const url = URL.createObjectURL(blob)
+  if (preview) {
+    window.open(url, '_blank', 'noopener')
+  } else {
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `report-${id}.pdf`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+  }
+  window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+}
+
+async function downloadReport(id) {
+  try {
+    await saveBinary(await downloadReportFile(id), id, false)
+  } catch (error) {
+    ElMessage.error(await readReportBinaryError(error))
+  }
+}
+
+async function previewReport(id) {
+  try {
+    await saveBinary(await previewReportFile(id), id, true)
+  } catch (error) {
+    ElMessage.error(await readReportBinaryError(error))
+  }
 }
 
 async function handleDelete(id) {
   // 清理该报告的轮询定时器
-  if (pollingTimers.value[id]) {
-    clearInterval(pollingTimers.value[id])
-    delete pollingTimers.value[id]
-  }
+  stopPolling(id)
   try {
     await ElMessageBox.confirm('确定要删除这份报告吗？删除后不可恢复。', '确认删除', {
       confirmButtonText: '删除',
@@ -184,7 +243,8 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  Object.values(pollingTimers.value).forEach(clearInterval)
+  unmounted = true
+  pollingTimers.forEach((_, id) => stopPolling(id))
 })
 </script>
 
@@ -196,6 +256,7 @@ onUnmounted(() => {
     >
       <template #actions>
         <el-button
+          v-if="canGenerate"
           type="primary"
           :icon="Plus"
           @click="openGenerateDialog"
@@ -251,6 +312,7 @@ onUnmounted(() => {
     <div
       v-if="loading"
       v-loading="loading"
+      class="report-list-loading"
       style="min-height: 300px"
     />
 
@@ -266,115 +328,118 @@ onUnmounted(() => {
     </div>
 
     <template v-else>
-      <el-table
-        :data="reports"
-        stripe
-        style="width: 100%"
-      >
-        <el-table-column
-          prop="reportTitle"
-          label="报告标题"
-          min-width="200"
-        />
-        <el-table-column
-          label="模板"
-          width="130"
+      <div class="report-table-wrap">
+        <el-table
+          :data="reports"
+          stripe
+          style="width: 100%"
         >
-          <template #default="{ row }">
-            <span class="template-name">{{ row.templateName || '--' }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="状态"
-          width="110"
-        >
-          <template #default="{ row }">
-            <el-tag
-              :type="statusLabels[row.status]?.type || 'info'"
-              size="small"
-              :class="{ 'is-loading-tag': row.status === 'GENERATING' }"
-            >
-              {{ statusLabels[row.status]?.text || row.status }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="时间范围"
-          width="200"
-        >
-          <template #default="{ row }">
-            <span v-if="row.timeRangeStart || row.timeRangeEnd">
-              {{ row.timeRangeStart || '--' }} ~ {{ row.timeRangeEnd || '--' }}
-            </span>
-            <span
-              v-else
-              style="color: #aaa"
-            >--</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="文件大小"
-          width="100"
-        >
-          <template #default="{ row }">
-            {{ formatFileSize(row.fileSize) }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="创建时间"
-          width="170"
-        >
-          <template #default="{ row }">
-            {{ row.createTime ? row.createTime.slice(0, 16).replace('T', ' ') : '--' }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          width="180"
-          fixed="right"
-        >
-          <template #default="{ row }">
-            <el-button
-              v-if="row.status === 'COMPLETED'"
-              size="small"
-              text
-              type="primary"
-              :icon="View"
-              @click="previewReport(row.id)"
-            >
-              预览
-            </el-button>
-            <el-button
-              v-if="row.status === 'COMPLETED'"
-              size="small"
-              text
-              type="primary"
-              :icon="Download"
-              @click="downloadReport(row.id)"
-            >
-              下载
-            </el-button>
-            <el-button
-              v-if="row.status === 'GENERATING'"
-              size="small"
-              text
-              :icon="RefreshRight"
-              @click="startPolling(row.id)"
-            >
-              刷新
-            </el-button>
-            <el-button
-              size="small"
-              text
-              type="danger"
-              :icon="Delete"
-              @click="handleDelete(row.id)"
-            >
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+          <el-table-column
+            prop="reportTitle"
+            label="报告标题"
+            min-width="200"
+          />
+          <el-table-column
+            label="模板"
+            width="130"
+          >
+            <template #default="{ row }">
+              <span class="template-name">{{ row.templateName || '--' }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="状态"
+            width="110"
+          >
+            <template #default="{ row }">
+              <el-tag
+                :type="statusLabels[row.status]?.type || 'info'"
+                size="small"
+                :class="{ 'is-loading-tag': row.status === 'GENERATING' }"
+              >
+                {{ statusLabels[row.status]?.text || row.status }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="时间范围"
+            width="200"
+          >
+            <template #default="{ row }">
+              <span v-if="row.timeRangeStart || row.timeRangeEnd">
+                {{ row.timeRangeStart || '--' }} ~ {{ row.timeRangeEnd || '--' }}
+              </span>
+              <span
+                v-else
+                style="color: #aaa"
+              >--</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="文件大小"
+            width="100"
+          >
+            <template #default="{ row }">
+              {{ formatFileSize(row.fileSize) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="创建时间"
+            width="170"
+          >
+            <template #default="{ row }">
+              {{ row.createTime ? row.createTime.slice(0, 16).replace('T', ' ') : '--' }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="操作"
+            width="180"
+            fixed="right"
+          >
+            <template #default="{ row }">
+              <el-button
+                v-if="row.status === 'COMPLETED'"
+                size="small"
+                text
+                type="primary"
+                :icon="View"
+                @click="previewReport(row.id)"
+              >
+                预览
+              </el-button>
+              <el-button
+                v-if="row.status === 'COMPLETED'"
+                size="small"
+                text
+                type="primary"
+                :icon="Download"
+                @click="downloadReport(row.id)"
+              >
+                下载
+              </el-button>
+              <el-button
+                v-if="row.status === 'PENDING' || row.status === 'GENERATING'"
+                size="small"
+                text
+                :icon="RefreshRight"
+                @click="startPolling(row.id)"
+              >
+                刷新
+              </el-button>
+              <el-button
+                v-if="canDelete"
+                size="small"
+                text
+                type="danger"
+                :icon="Delete"
+                @click="handleDelete(row.id)"
+              >
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
 
       <div
         v-if="pagination.totalPages > 1"
@@ -395,6 +460,7 @@ onUnmounted(() => {
       v-model="generateDialog"
       title="生成新报告"
       width="500px"
+      class="report-generate-dialog"
       destroy-on-close
     >
       <el-form
@@ -421,11 +487,20 @@ onUnmounted(() => {
           <el-input
             v-model="generateForm.title"
             placeholder="输入报告标题"
-            maxlength="200"
+            maxlength="120"
           />
         </el-form-item>
+        <el-form-item label="城市筛选（可选）">
+          <el-input v-model.trim="generateForm.city" maxlength="100" />
+        </el-form-item>
+        <el-form-item label="岗位筛选（可选）">
+          <el-input v-model.trim="generateForm.position" maxlength="100" />
+        </el-form-item>
+        <el-form-item label="行业筛选（可选）">
+          <el-input v-model.trim="generateForm.industry" maxlength="100" />
+        </el-form-item>
         <el-form-item label="数据时间范围（可选）">
-          <div style="display:flex;gap:12px;width:100%">
+          <div class="date-range">
             <el-date-picker
               v-model="generateForm.timeRangeStart"
               type="date"
@@ -433,7 +508,7 @@ onUnmounted(() => {
               value-format="YYYY-MM-DD"
               style="flex:1"
             />
-            <span style="line-height:32px;color:#aaa">至</span>
+            <span class="date-range-separator">至</span>
             <el-date-picker
               v-model="generateForm.timeRangeEnd"
               type="date"
@@ -449,6 +524,7 @@ onUnmounted(() => {
           取消
         </el-button>
         <el-button
+          v-if="canGenerate"
           type="primary"
           :loading="generating"
           @click="handleGenerate"
@@ -463,6 +539,50 @@ onUnmounted(() => {
 <style scoped>
 .search-bar {
   margin-bottom: var(--space-4);
+}
+
+.report-table-wrap {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.date-range {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.date-range :deep(.el-date-editor) {
+  flex: 1;
+  min-width: 0;
+}
+
+.date-range-separator {
+  flex: 0 0 auto;
+  align-self: center;
+  color: var(--app-muted);
+}
+
+@media (max-width: 768px) {
+  .search-bar :deep(.el-input) {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 540px) {
+  .date-range {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .date-range-separator {
+    display: none;
+  }
+
+  :deep(.report-generate-dialog) {
+    width: calc(100vw - 32px) !important;
+    margin: var(--space-4) auto;
+  }
 }
 
 .template-name {

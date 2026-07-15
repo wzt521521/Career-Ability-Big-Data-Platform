@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,7 @@ public class ApiCallLogController {
     @Operation(summary = "分页查询 API 调用日志")
     @PreAuthorize("hasAuthority('api:view')")
     public ApiResponse<PageResponse<ApiCallLogResponse>> list(
-            @RequestParam(defaultValue = "") String path,
+            @RequestParam(defaultValue = "") @Size(max = 200) String path,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         return ApiResponse.success(callLogService.list(path, page, size));

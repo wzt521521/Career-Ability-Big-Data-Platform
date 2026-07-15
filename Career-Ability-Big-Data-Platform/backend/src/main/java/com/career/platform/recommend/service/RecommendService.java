@@ -7,9 +7,17 @@ import com.career.platform.position.repository.PositionRepository;
 import com.career.platform.profile.entity.StudentProfile;
 import com.career.platform.profile.repository.ProfileRepository;
 import com.career.platform.recommend.dto.GapAnalysisResponse;
+import com.career.platform.recommend.dto.RecommendationCacheEntry;
 import com.career.platform.recommend.dto.RecommendationResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +27,11 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class RecommendService {
+
+    private static final int MAX_RECOMMENDATIONS = 20;
+    private static final int MAX_CANDIDATES = 500;
+    private static final String DEFAULT_POSITION_DATA_VERSION_KEY = "career:position-data-version";
+    private static final Logger log = LoggerFactory.getLogger(RecommendService.class);
 
     private static final Map<String, Integer> EDUCATION_LEVEL = Map.of(
             "博士", 5, "硕士", 4, "本科", 3, "大专", 2, "不限", 1
@@ -31,16 +44,56 @@ public class RecommendService {
     private static final double SALARY_WEIGHT = 0.15;
     private static final double MAJOR_WEIGHT = 0.10;
 
+    private static final Map<String, String> CITY_PROVINCES = Map.ofEntries(
+            Map.entry("北京", "北京"), Map.entry("上海", "上海"), Map.entry("天津", "天津"),
+            Map.entry("重庆", "重庆"), Map.entry("广州", "广东"), Map.entry("深圳", "广东"),
+            Map.entry("东莞", "广东"), Map.entry("佛山", "广东"), Map.entry("杭州", "浙江"),
+            Map.entry("宁波", "浙江"), Map.entry("南京", "江苏"), Map.entry("苏州", "江苏"),
+            Map.entry("无锡", "江苏"), Map.entry("成都", "四川"), Map.entry("武汉", "湖北"),
+            Map.entry("西安", "陕西"), Map.entry("长沙", "湖南"), Map.entry("郑州", "河南"),
+            Map.entry("青岛", "山东"), Map.entry("济南", "山东"), Map.entry("厦门", "福建"),
+            Map.entry("福州", "福建"), Map.entry("合肥", "安徽"), Map.entry("沈阳", "辽宁"),
+            Map.entry("大连", "辽宁"), Map.entry("昆明", "云南"), Map.entry("南昌", "江西"),
+            Map.entry("贵阳", "贵州"), Map.entry("南宁", "广西"), Map.entry("哈尔滨", "黑龙江"),
+            Map.entry("石家庄", "河北"), Map.entry("太原", "山西"), Map.entry("海口", "海南"),
+            Map.entry("兰州", "甘肃"), Map.entry("银川", "宁夏"), Map.entry("呼和浩特", "内蒙古"),
+            Map.entry("乌鲁木齐", "新疆")
+    );
+
     private final ProfileRepository profileRepository;
     private final PositionRepository positionRepository;
     private final CacheManager cacheManager;
+    private final StringRedisTemplate redisTemplate;
+    private final String positionDataVersionKey;
 
+    @Autowired
     public RecommendService(ProfileRepository profileRepository,
-                           PositionRepository positionRepository,
-                           CacheManager cacheManager) {
+                            PositionRepository positionRepository,
+                            CacheManager cacheManager,
+                            ObjectProvider<StringRedisTemplate> redisTemplateProvider,
+                            @Value("${app.recommend.position-data-version-key:${POSITION_DATA_VERSION_KEY:career:position-data-version}}")
+                            String positionDataVersionKey) {
+        this(profileRepository, positionRepository, cacheManager, redisTemplateProvider.getIfAvailable(), positionDataVersionKey);
+    }
+
+    /** Kept for focused unit tests without a Redis connection factory. */
+    public RecommendService(ProfileRepository profileRepository,
+                            PositionRepository positionRepository,
+                            CacheManager cacheManager) {
+        this(profileRepository, positionRepository, cacheManager, (StringRedisTemplate) null,
+                DEFAULT_POSITION_DATA_VERSION_KEY);
+    }
+
+    RecommendService(ProfileRepository profileRepository,
+                     PositionRepository positionRepository,
+                     CacheManager cacheManager,
+                     StringRedisTemplate redisTemplate,
+                     String positionDataVersionKey) {
         this.profileRepository = profileRepository;
         this.positionRepository = positionRepository;
         this.cacheManager = cacheManager;
+        this.redisTemplate = redisTemplate;
+        this.positionDataVersionKey = positionDataVersionKey;
     }
 
     /**
@@ -51,12 +104,8 @@ public class RecommendService {
      * </p>
      */
     public List<RecommendationResponse> recommend(Long userId, int page, int size) {
-        // 尝试从缓存获取完整推荐列表
-        List<RecommendationResponse> all = getCachedResult(userId);
-        if (all == null) {
-            all = computeAll(userId);
-            putCachedResult(userId, all);
-        }
+        validatePage(page, size);
+        List<RecommendationResponse> all = getOrComputeRecommendations(userId);
 
         // 内存分页
         int from = (page - 1) * size;
@@ -67,20 +116,64 @@ public class RecommendService {
         return all.subList(from, to);
     }
 
-    private List<RecommendationResponse> getCachedResult(Long userId) {
-        Cache cache = cacheManager.getCache("recommend");
-        if (cache == null) return null;
-        Cache.ValueWrapper wrapper = cache.get(userId);
-        if (wrapper == null) return null;
-        @SuppressWarnings("unchecked")
-        List<RecommendationResponse> result = (List<RecommendationResponse>) wrapper.get();
-        return result;
+    private List<RecommendationResponse> getOrComputeRecommendations(Long userId) {
+        String cacheKey = cacheKey(userId);
+        List<RecommendationResponse> all = cacheKey == null ? null : getCachedResult(cacheKey);
+        if (all == null) {
+            all = computeAll(userId);
+            if (cacheKey != null) {
+                putCachedResult(cacheKey, all);
+            }
+        }
+        return all.size() <= MAX_RECOMMENDATIONS
+                ? List.copyOf(all)
+                : List.copyOf(all.subList(0, MAX_RECOMMENDATIONS));
     }
 
-    private void putCachedResult(Long userId, List<RecommendationResponse> result) {
-        Cache cache = cacheManager.getCache("recommend");
-        if (cache != null) {
-            cache.put(userId, result);
+    private List<RecommendationResponse> getCachedResult(String cacheKey) {
+        try {
+            Cache cache = cacheManager.getCache("recommend");
+            if (cache == null) return null;
+            Cache.ValueWrapper wrapper = cache.get(cacheKey);
+            if (wrapper == null || !(wrapper.get() instanceof RecommendationCacheEntry)) return null;
+            RecommendationCacheEntry entry = (RecommendationCacheEntry) wrapper.get();
+            List<RecommendationResponse> values = entry.getRecommendations();
+            if (values.size() > MAX_RECOMMENDATIONS) {
+                List<RecommendationResponse> bounded = List.copyOf(values.subList(0, MAX_RECOMMENDATIONS));
+                // Trim old cache entries written by pre-v1.0 versions without requiring a profile lookup.
+                cache.put(cacheKey, new RecommendationCacheEntry(bounded));
+                return bounded;
+            }
+            return values;
+        } catch (RuntimeException exception) {
+            log.warn("读取推荐缓存失败，改为实时计算", exception);
+            return null;
+        }
+    }
+
+    private void putCachedResult(String cacheKey, List<RecommendationResponse> result) {
+        try {
+            Cache cache = cacheManager.getCache("recommend");
+            if (cache != null) {
+                // Redis only stores the globally bounded TOP20, never an unbounded candidate set.
+                cache.put(cacheKey, new RecommendationCacheEntry(
+                        result.subList(0, Math.min(result.size(), MAX_RECOMMENDATIONS))));
+            }
+        } catch (RuntimeException exception) {
+            log.warn("写入推荐缓存失败，继续返回实时结果", exception);
+        }
+    }
+
+    private String cacheKey(Long userId) {
+        if (redisTemplate == null) {
+            return "local:" + userId;
+        }
+        try {
+            String version = redisTemplate.opsForValue().get(positionDataVersionKey);
+            return userId + ":position-data:" + (version == null || version.isBlank() ? "0" : version);
+        } catch (RuntimeException exception) {
+            log.warn("读取岗位数据版本失败，跳过推荐缓存并实时计算: userId={}", userId, exception);
+            return null;
         }
     }
 
@@ -91,7 +184,7 @@ public class RecommendService {
         StudentProfile profile = profileRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "请先创建就业画像"));
 
-        List<JobPosition> positions = positionRepository.findAllWithCompany();
+        List<JobPosition> positions = positionRepository.findLatest(PageRequest.of(0, MAX_CANDIDATES));
         if (positions.isEmpty()) {
             return List.of();
         }
@@ -104,7 +197,7 @@ public class RecommendService {
             List<String> positionSkills = normalizeSkills(position.getSkills());
 
             double skillScore = calcSkillScore(studentSkills, positionSkills);
-            double cityScore = calcCityScore(preferredCities, position.getCity());
+            double cityScore = calcCityScore(preferredCities, position.getCity(), position.getProvince());
             double educationScore = calcEducationScore(profile.getEducation(), position.getEducation());
             double salaryScore = calcSalaryScore(profile.getSalaryMin(), profile.getSalaryMax(),
                     position.getSalaryMin(), position.getSalaryMax());
@@ -116,9 +209,9 @@ public class RecommendService {
                     + salaryScore * SALARY_WEIGHT
                     + majorScore * MAJOR_WEIGHT;
 
-            Set<String> matched = new HashSet<>(studentSkills);
-            matched.retain(new HashSet<>(positionSkills));
-            Set<String> unmatched = new HashSet<>(positionSkills);
+            Set<String> matched = new LinkedHashSet<>(studentSkills);
+            matched.retainAll(new HashSet<>(positionSkills));
+            Set<String> unmatched = new LinkedHashSet<>(positionSkills);
             unmatched.removeAll(new HashSet<>(studentSkills));
 
             Map<String, Double> breakdown = new LinkedHashMap<>();
@@ -129,20 +222,22 @@ public class RecommendService {
             breakdown.put("major", round(majorScore));
 
             results.add(new RecommendationResponse(position, total,
-                    new ArrayList<>(matched), new ArrayList<>(unmatched), breakdown));
+                    displaySkills(position.getSkills(), matched), displaySkills(position.getSkills(), unmatched), breakdown));
         }
 
-        results.sort(Comparator.comparingDouble(RecommendationResponse::getScore).reversed());
-        return results;
+        results.sort(Comparator.comparingDouble(RecommendationResponse::getScore).reversed()
+                .thenComparing(RecommendationResponse::getPositionId,
+                        Comparator.nullsLast(Comparator.naturalOrder())));
+        return results.stream()
+                .limit(MAX_RECOMMENDATIONS)
+                .collect(Collectors.toList());
     }
 
     /**
      * 获取推荐结果总数。
      */
     public long count(Long userId) {
-        profileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "请先创建就业画像"));
-        return positionRepository.count();
+        return getOrComputeRecommendations(userId).size();
     }
 
     /**
@@ -159,15 +254,15 @@ public class RecommendService {
         List<String> positionSkills = normalizeSkills(position.getSkills());
         List<String> preferredCities = parseCities(profile.getPreferredCity());
 
-        Set<String> matched = new HashSet<>(studentSkills);
-        matched.retain(new HashSet<>(positionSkills));
-        Set<String> missing = new HashSet<>(positionSkills);
+        Set<String> matched = new LinkedHashSet<>(studentSkills);
+        matched.retainAll(new HashSet<>(positionSkills));
+        Set<String> missing = new LinkedHashSet<>(positionSkills);
         missing.removeAll(new HashSet<>(studentSkills));
-        Set<String> extra = new HashSet<>(studentSkills);
+        Set<String> extra = new LinkedHashSet<>(studentSkills);
         extra.removeAll(new HashSet<>(positionSkills));
 
         double skillScore = calcSkillScore(studentSkills, positionSkills);
-        double cityScore = calcCityScore(preferredCities, position.getCity());
+        double cityScore = calcCityScore(preferredCities, position.getCity(), position.getProvince());
         double educationScore = calcEducationScore(profile.getEducation(), position.getEducation());
         double salaryScore = calcSalaryScore(profile.getSalaryMin(), profile.getSalaryMax(),
                 position.getSalaryMin(), position.getSalaryMax());
@@ -187,7 +282,8 @@ public class RecommendService {
         String suggestion = buildSuggestion(missing);
 
         return new GapAnalysisResponse(position.getId(), position.getTitle(),
-                new ArrayList<>(matched), new ArrayList<>(missing), new ArrayList<>(extra),
+                displaySkills(position.getSkills(), matched), displaySkills(position.getSkills(), missing),
+                displaySkills(profile.getSkills(), extra),
                 breakdown, total, suggestion);
     }
 
@@ -210,6 +306,10 @@ public class RecommendService {
     }
 
     double calcCityScore(List<String> preferredCities, String positionCity) {
+        return calcCityScore(preferredCities, positionCity, null);
+    }
+
+    double calcCityScore(List<String> preferredCities, String positionCity, String positionProvince) {
         if (preferredCities.isEmpty() || positionCity == null || positionCity.isBlank()) {
             return 0.0;
         }
@@ -219,16 +319,20 @@ public class RecommendService {
                 return 1.0;
             }
         }
-        return 0.0;
+        String targetProvince = normalizeProvince(positionProvince == null ? normalized : positionProvince);
+        for (String city : preferredCities) {
+            if (targetProvince != null && targetProvince.equals(normalizeProvince(city))) {
+                return 0.7;
+            }
+        }
+        return 0.3;
     }
 
     double calcEducationScore(String studentEducation, String positionEducation) {
         int studentLevel = toEducationLevel(studentEducation);
         int positionLevel = toEducationLevel(positionEducation);
-        if (positionLevel == 1) return 1.0; // 岗位不限学历
-        if (studentLevel >= positionLevel) return 1.0; // 学历满足或超出要求
-        int diff = positionLevel - studentLevel;
-        return Math.max(0.0, 1.0 - diff / 4.0);
+        if (positionLevel == 1 || studentLevel == positionLevel) return 1.0;
+        return studentLevel > positionLevel ? 0.8 : 0.4;
     }
 
     double calcSalaryScore(Integer studentMin, Integer studentMax,
@@ -275,7 +379,7 @@ public class RecommendService {
 
     // ---- 辅助方法 ----
 
-    private List<String> normalizeSkills(List<String> skills) {
+    List<String> normalizeSkills(List<String> skills) {
         if (skills == null) return List.of();
         return skills.stream()
                 .filter(Objects::nonNull)
@@ -291,6 +395,41 @@ public class RecommendService {
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
+    }
+
+    private List<String> displaySkills(List<String> originals, Set<String> selectedNormalizedSkills) {
+        if (originals == null || selectedNormalizedSkills.isEmpty()) {
+            return List.of();
+        }
+        LinkedHashMap<String, String> displays = new LinkedHashMap<>();
+        for (String original : originals) {
+            if (original == null || original.trim().isEmpty()) {
+                continue;
+            }
+            String display = original.trim();
+            String normalized = display.toLowerCase(Locale.ROOT);
+            if (selectedNormalizedSkills.contains(normalized)) {
+                displays.putIfAbsent(normalized, display);
+            }
+        }
+        return new ArrayList<>(displays.values());
+    }
+
+    private String normalizeProvince(String cityOrProvince) {
+        if (cityOrProvince == null || cityOrProvince.isBlank()) {
+            return null;
+        }
+        String normalized = cityOrProvince.trim().replaceAll("(市|省|自治区|特别行政区)$", "");
+        return CITY_PROVINCES.getOrDefault(normalized, normalized);
+    }
+
+    private void validatePage(int page, int size) {
+        if (page < 1) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "page 必须大于等于 1");
+        }
+        if (size < 1 || size > MAX_RECOMMENDATIONS) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "size 必须在 1 到 20 之间");
+        }
     }
 
     private int toEducationLevel(String education) {

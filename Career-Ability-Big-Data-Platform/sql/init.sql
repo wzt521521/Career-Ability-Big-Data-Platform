@@ -112,7 +112,8 @@ CREATE TABLE job_company (
     industry     VARCHAR(100)    DEFAULT NULL COMMENT '行业分类',
     company_type VARCHAR(50)     DEFAULT NULL COMMENT '企业性质（民营/国企/外企/合资/上市公司）',
     create_time  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE INDEX idx_job_company_name (company_name)
+    UNIQUE INDEX idx_job_company_name (company_name),
+    INDEX idx_jc_industry (industry)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='企业信息';
 
 -- 8. 岗位信息（核心表）
@@ -144,8 +145,11 @@ CREATE TABLE job_position (
     INDEX idx_jp_experience (experience),
     INDEX idx_jp_salary (salary_min, salary_max),
     INDEX idx_jp_publish_date (publish_date),
-    INDEX idx_jp_source_md5 (source_md5),
+    INDEX idx_jp_city_publish_date (city, publish_date, id),
+    INDEX idx_jp_education_publish_date (education, publish_date),
+    UNIQUE KEY uq_job_position_source_md5 (source_md5),
     INDEX idx_jp_company_id (company_id),
+    INDEX idx_jp_company_publish_date (company_id, publish_date),
     FOREIGN KEY (company_id) REFERENCES job_company(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='岗位信息';
 
@@ -383,13 +387,21 @@ CREATE TABLE report_record (
     report_title     VARCHAR(200) NOT NULL COMMENT '报告标题',
     time_range_start DATE         DEFAULT NULL,
     time_range_end   DATE         DEFAULT NULL,
+    filter_city      VARCHAR(100) DEFAULT NULL,
+    filter_position  VARCHAR(100) DEFAULT NULL,
+    filter_industry  VARCHAR(100) DEFAULT NULL,
+    analysis_dimensions VARCHAR(500) DEFAULT NULL COMMENT '实际使用的统计维度',
+    analysis_scope   TEXT         DEFAULT NULL COMMENT '实际查询范围快照(JSON)',
     status           VARCHAR(20)  NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING/GENERATING/COMPLETED/FAILED',
     file_path        VARCHAR(500) DEFAULT NULL,
     file_size        BIGINT       DEFAULT NULL COMMENT '字节',
     error_msg        TEXT         DEFAULT NULL,
+    generation_started_at DATETIME DEFAULT NULL,
+    generation_attempts INT        NOT NULL DEFAULT 0,
     create_time      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_report_status (status),
+    INDEX idx_report_status_update (status, update_time),
     INDEX idx_report_user (user_id),
     INDEX idx_report_time (create_time),
     FOREIGN KEY (template_id) REFERENCES report_template(id),
@@ -465,7 +477,10 @@ INSERT INTO sys_permission (id, permission_name, permission_code, parent_id, typ
 (13, '采集管理',     'collect:view',     5, 'menu', '/system/collect', NULL,         4),
 (14, '采集启停',     'collect:toggle',   13,'button', NULL,          NULL,           1),
 (15, 'API管理',      'api:view',         5, 'menu', '/system/api',   NULL,           5),
-(16, 'API文档',      'api:docs',         0, 'menu', '/api-docs',    'Guide',        8);
+(16, 'API文档',      'api:docs',         0, 'menu', '/api-docs',    'Guide',        8),
+(17, '生成报告',     'report:generate',  3, 'button', NULL,          NULL,           1),
+(18, '删除报告',     'report:delete',    3, 'button', NULL,          NULL,           2),
+(19, 'API Key management', 'api:key:manage', 0, 'menu', '/open-api/keys', 'Key',        7);
 
 -- 城市层级映射（37个城市，含中英文别名）
 INSERT INTO city_tier (city, alias, province, tier) VALUES
@@ -516,18 +531,8 @@ INSERT INTO report_template (template_name, template_type, template_file, descri
 ('技能需求报告',     'skill',   'skill_report.ftl',   '热门技能排行、技能组合关联度、技能需求趋势分析',
  '["skill","salary","education"]', 1);
 
--- ============================================================
--- 管理员账号（初始密码: admin123）
--- ============================================================
-INSERT INTO sys_user (username, password, real_name, email, status) VALUES
-('admin', '$2a$10$R.ly2ozcryr0uP/apBwJBOfWv/eCIE3wwXkr7HCOXTd1Qc4IYfwZu', '系统管理员', 'admin@example.com', 1);
-
--- admin 分配系统管理员角色
-INSERT INTO sys_user_role (user_id, role_id)
-SELECT u.id, r.id FROM sys_user u, sys_role r
-WHERE u.username = 'admin' AND r.role_code = 'ROLE_ADMIN';
-
--- 管理员角色分配全部 16 项权限
+-- ROLE_ADMIN permissions are seeded here. The first administrator is created only by
+-- INITIAL_ADMIN_USERNAME + INITIAL_ADMIN_PASSWORD at application startup.
 INSERT INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id FROM sys_role r, sys_permission p
 WHERE r.role_code = 'ROLE_ADMIN';
@@ -537,24 +542,25 @@ INSERT INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id FROM sys_role r, sys_permission p
 WHERE r.role_code = 'ROLE_ANALYST'
   AND p.permission_code IN (
-      'dashboard:view', 'position:view', 'report:view',
+      'dashboard:view', 'position:view', 'report:view', 'report:generate', 'report:delete',
       'system:view', 'collect:view', 'collect:toggle',
-      'api:view', 'api:docs');
+      'api:view', 'api:key:manage', 'api:docs');
 
 -- 学院管理员：仅由后端数据范围组件限制到所属学院
 INSERT INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id FROM sys_role r, sys_permission p
 WHERE r.role_code = 'ROLE_COLLEGE_ADMIN'
-  AND p.permission_code IN ('dashboard:view', 'position:view', 'report:view');
+  AND p.permission_code IN ('dashboard:view', 'position:view', 'report:view', 'api:key:manage');
 
 -- 学生角色分配基础权限（数据大屏 + 岗位分析 + 岗位推荐）
 INSERT INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id FROM sys_role r, sys_permission p
 WHERE r.role_code = 'ROLE_STUDENT'
-  AND p.permission_code IN ('dashboard:view', 'position:view', 'recommend:view');
+  AND p.permission_code IN ('dashboard:view', 'position:view', 'recommend:view', 'api:key:manage');
 
 -- 教师角色分配查看权限（数据大屏 + 岗位分析 + 报告中心 + 岗位推荐）
 INSERT INTO sys_role_permission (role_id, permission_id)
 SELECT r.id, p.id FROM sys_role r, sys_permission p
 WHERE r.role_code = 'ROLE_TEACHER'
-  AND p.permission_code IN ('dashboard:view', 'position:view', 'report:view', 'recommend:view');
+  AND p.permission_code IN ('dashboard:view', 'position:view', 'report:view', 'recommend:view',
+      'api:key:manage');

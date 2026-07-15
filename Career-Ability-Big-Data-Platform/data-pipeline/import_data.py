@@ -1,230 +1,259 @@
-"""
-数据导入脚本 — 读取 CSV/Excel → 标准化 JSON → LPUSH 到 Redis List
-用法: python import_data.py [文件路径]
-      不传参数则使用 config.py 中的默认路径
-"""
-import sys
-import json
+"""Import CSV or Excel job data into the durable Redis raw queue."""
+from __future__ import annotations
+
 import hashlib
+import json
+import re
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Mapping
+
 import pandas as pd
-import redis
+
 from config import (
-    REDIS_HOST, REDIS_PORT, REDIS_DB,
-    RAW_QUEUE, DEFAULT_CSV_PATH, BATCH_SIZE
+    DEFAULT_CSV_PATH,
+    RAW_DEDUPE_SET,
+    RAW_QUEUE,
+    REDIS_DB,
+    REDIS_HOST,
+    REDIS_PASSWORD,
+    REDIS_PORT,
 )
 
 
-def load_city_mapping():
-    """加载城市→省份→层级映射表"""
+PIPELINE_DIR = Path(__file__).resolve().parent
+RAW_ENQUEUE_SCRIPT = """
+local inserted = redis.call('SADD', KEYS[2], ARGV[1])
+if inserted == 1 then
+    redis.call('LPUSH', KEYS[1], ARGV[2])
+end
+return inserted
+"""
+
+
+def load_city_mapping() -> dict[str, dict[str, str]]:
+    """Load the city mapping relative to this module, not the current shell."""
     try:
-        with open("city_mapping.json", "r", encoding="utf-8") as f:
-            return json.load(f)
+        with (PIPELINE_DIR / "city_mapping.json").open("r", encoding="utf-8") as source:
+            return json.load(source)
     except FileNotFoundError:
-        print("[WARN] city_mapping.json 未找到，城市标准化将跳过")
+        print("[WARN] city_mapping.json not found; city enrichment is disabled")
         return {}
 
 
-def normalize_city(raw, mapping):
-    """城市标准化：查映射表，返回 {city, province, tier}"""
-    if not raw or pd.isna(raw):
+def _is_value(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, (list, tuple, set, dict)):
+        return bool(value)
+    return not pd.isna(value) and str(value).strip() != ""
+
+
+def _first_value(row: Mapping[str, Any], *names: str) -> Any:
+    for name in names:
+        value = row.get(name)
+        if _is_value(value):
+            return value
+    return ""
+
+
+def _optional_text(value: Any) -> str | None:
+    return str(value).strip() if _is_value(value) else None
+
+
+def normalize_city(raw: Any, mapping: Mapping[str, Mapping[str, str]]) -> dict[str, str | None]:
+    if not _is_value(raw):
         return {"city": None, "province": None, "tier": None}
-    raw = str(raw).strip()
-    if raw in mapping:
-        m = mapping[raw]
-        return {"city": raw, "province": m["province"], "tier": m["tier"]}
-    return {"city": raw, "province": None, "tier": "其他"}
+    city = str(raw).strip()
+    if city in mapping:
+        mapped = mapping[city]
+        return {"city": city, "province": mapped.get("province"), "tier": mapped.get("tier")}
+    return {"city": city, "province": None, "tier": "\u5176\u4ed6"}
 
 
-def parse_salary(raw):
-    """
-    薪资解析 → {min, max} 单位 K
-    支持格式: "8K-15K", "8000-15000", "8-15K", "面议", 纯数字
-    """
-    if raw is None or pd.isna(raw):
+def parse_salary(raw: Any) -> dict[str, int | None]:
+    """Parse common monthly salary strings into thousands of CNY."""
+    if not _is_value(raw):
         return {"min": None, "max": None}
 
-    s = str(raw).strip()
-
-    # 去掉 K/k、空格、货币符号、单位（先清理再做面议判断）
-    s = s.replace("K", "").replace("k", "").replace(" ", "").replace("￥", "").replace("¥", "")
-    s = s.replace("/月", "").replace("/month", "").replace("每月", "")
-
-    # "面议" 或类似表述（清理后再判断，避免空格/大小写干扰）
-    s_lower = s.lower()
-    if any(w in s_lower for w in ["面议", "薪资open", "open", "negotiable", "薪资面议"]):
+    value = str(raw).strip().lower()
+    if any(token in value for token in ("negotiable", "open", "\u9762\u8bae")):
         return {"min": 0, "max": 0}
-
-    # 尝试用 - 或 ~ 分割
-    import re
-    parts = re.split(r"[-~–—到至]", s)
-    if len(parts) == 2:
-        try:
-            lo = float(parts[0])
-            hi = float(parts[1])
-            # 如果数字 > 100 说明是元，转 K
-            if lo > 100:
-                lo /= 1000
-            if hi > 100:
-                hi /= 1000
-            return {"min": int(lo), "max": int(hi)}
-        except ValueError:
-            pass
-
-    # 单个数字
+    value = re.sub(r"(?i)(k|/month|\u6bcf\u6708|\u5143|\uffe5|\$|\s)", "", value)
+    parts = re.split(r"[-~\u2013\u2014\u5230\u81f3]", value)
     try:
-        val = float(s)
-        if val > 100:
-            val /= 1000
-        return {"min": int(val), "max": int(val)}
+        numbers = [float(part) for part in parts]
     except ValueError:
-        pass
-
-    return {"min": None, "max": None}
-
-
-def make_job_id(row, idx):
-    """生成唯一 jobId"""
-    # 优先用原始 ID
-    for col in ["Job ID", "job_id", "jobId", "id", "ID", "index"]:
-        if col in row and not pd.isna(row[col]):
-            return str(row[col])
-    # fallback：用行号 + 来源标识
-    return f"import-{datetime.now().strftime('%Y%m%d')}-{idx:06d}"
+        return {"min": None, "max": None}
+    if len(numbers) not in (1, 2):
+        return {"min": None, "max": None}
+    if len(numbers) == 1:
+        numbers *= 2
+    low, high = numbers
+    if low > 100:
+        low /= 1000
+    if high > 100:
+        high /= 1000
+    return {"min": int(low), "max": int(high)}
 
 
-def row_to_json(row, idx, city_map):
-    """单行 CSV → 标准 JSON"""
-    # 列映射：优先匹配常见列名（支持 Kaggle / synthetic 等多来源）
-    title = row.get("Job Title") or row.get("job_title") or row.get("Title") or row.get("title") or row.get("position") or ""
-    company_name = row.get("Company") or row.get("Company Name") or row.get("company") or row.get("company_name") or row.get("Employer") or row.get("companyName") or ""
-    location = row.get("Location") or row.get("location") or row.get("City") or row.get("city") or row.get("Region") or row.get("region") or ""
-    education = row.get("Qualification") or row.get("education") or row.get("Education") or row.get("Degree") or ""
-    experience = row.get("Experience") or row.get("experience") or row.get("Seniority") or ""
-    salary_raw = row.get("Salary") or row.get("salary") or row.get("Salary Range") or row.get("Avg Salary") or row.get("Avg Salary(K)") or ""
-    skills_raw = row.get("Skills") or row.get("skills") or row.get("Key Skills") or row.get("Technologies") or ""
-    desc = row.get("Job Description") or row.get("job_description") or row.get("Description") or row.get("description") or row.get("Job_Description") or ""
-    publish_date = row.get("Publish Date") or row.get("publish_date") or row.get("Date") or row.get("Post Date") or row.get("publishDate") or ""
-    company_size = row.get("Company Size") or row.get("company_size") or row.get("Size") or row.get("companySize") or ""
-    industry = row.get("Industry") or row.get("industry") or row.get("Sector") or row.get("industry") or ""
-    company_type = row.get("Company Type") or row.get("company_type") or row.get("Type") or row.get("companyType") or ""
-    welfare = row.get("Welfare") or row.get("welfare") or row.get("Benefits") or ""
-    source_url = row.get("source_url") or row.get("Source URL") or row.get("URL") or row.get("url") or row.get("sourceUrl") or ""
-    province_raw = row.get("province") or row.get("Province") or ""
-    city_tier_raw = row.get("cityTier") or row.get("CityTier") or ""
+def make_job_id(row: Mapping[str, Any], index: int) -> str:
+    for column in ("Job ID", "job_id", "jobId", "\ufeffjobId", "id", "ID", "index"):
+        value = row.get(column)
+        if _is_value(value):
+            return str(value).strip()
+    return f"import-{index:06d}"
 
-    # 薪资解析：优先使用预分离的 min/max 列，其次解析 Salary 字符串
-    salary_min_raw = row.get("salaryMin") or row.get("Salary Min") or None
-    salary_max_raw = row.get("salaryMax") or row.get("Salary Max") or None
-    if salary_min_raw is not None and not pd.isna(salary_min_raw) and salary_max_raw is not None and not pd.isna(salary_max_raw):
-        salary = parse_salary(f"{salary_min_raw}-{salary_max_raw}")
-    else:
-        salary = parse_salary(salary_raw)
 
-    # 城市标准化：优先用 city 列查映射，辅以 province/tier 直传
-    city_info = normalize_city(location, city_map)
-    if not city_info["province"] and province_raw and not pd.isna(province_raw):
-        city_info["province"] = str(province_raw).strip()
-    if not city_info["tier"] and city_tier_raw and not pd.isna(city_tier_raw):
-        city_info["tier"] = str(city_tier_raw).strip()
+def _split_values(value: Any) -> list[str]:
+    if not _is_value(value):
+        return []
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if _is_value(item)]
+    return [item.strip() for item in re.split(r"[|,\uff0c]", str(value)) if item.strip()]
 
-    # 技能预处理（支持逗号或竖线分隔）
-    skills = []
-    if skills_raw and not pd.isna(skills_raw):
-        if isinstance(skills_raw, str):
-            skills = [s.strip() for s in skills_raw.replace("|", ",").replace("，", ",").split(",") if s.strip()]
-        elif isinstance(skills_raw, list):
-            skills = skills_raw
 
-    # 福利预处理（支持逗号或竖线分隔）
-    welfare_list = []
-    if welfare and not pd.isna(welfare):
-        if isinstance(welfare, str):
-            welfare_list = [w.strip() for w in welfare.replace("|", ",").replace("，", ",").split(",") if w.strip()]
-        elif isinstance(welfare, list):
-            welfare_list = welfare
+def row_to_json(row: Mapping[str, Any], index: int, city_map: Mapping[str, Mapping[str, str]]) -> dict[str, Any]:
+    """Convert one common job-source row to the pipeline contract."""
+    title = _first_value(row, "Job Title", "job_title", "Title", "title", "position")
+    company_name = _first_value(
+        row, "Company", "Company Name", "company", "company_name", "Employer", "companyName"
+    )
+    location = _first_value(row, "Location", "location", "City", "city", "Region", "region")
+    salary_min = _first_value(row, "salaryMin", "Salary Min")
+    salary_max = _first_value(row, "salaryMax", "Salary Max")
+    salary = parse_salary(
+        f"{salary_min}-{salary_max}"
+        if _is_value(salary_min) and _is_value(salary_max)
+        else _first_value(row, "Salary", "salary", "Salary Range", "Avg Salary", "Avg Salary(K)")
+    )
+    city = normalize_city(location, city_map)
+    province = _first_value(row, "province", "Province")
+    tier = _first_value(row, "cityTier", "CityTier")
+    if not city["province"] and _is_value(province):
+        city["province"] = str(province).strip()
+    if not city["tier"] and _is_value(tier):
+        city["tier"] = str(tier).strip()
 
-    # 发布日期预处理
-    pub_date = None
-    if publish_date and not pd.isna(publish_date):
+    publish_date = _first_value(row, "Publish Date", "publish_date", "Date", "Post Date", "publishDate")
+    if _is_value(publish_date):
         try:
-            pub_date = str(pd.to_datetime(publish_date).date())
-        except Exception:
-            pub_date = str(publish_date)[:10]
+            publish_date = str(pd.to_datetime(publish_date).date())
+        except (TypeError, ValueError):
+            publish_date = str(publish_date)[:10]
+    else:
+        publish_date = None
 
     return {
-        "jobId": make_job_id(row, idx),
-        "title": str(title).strip() if title and not pd.isna(title) else "",
+        "jobId": make_job_id(row, index),
+        "title": str(title).strip() if _is_value(title) else "",
         "company": {
-            "name": str(company_name).strip() if company_name and not pd.isna(company_name) else "",
-            "size": str(company_size).strip() if company_size and not pd.isna(company_size) else None,
-            "industry": str(industry).strip() if industry and not pd.isna(industry) else None,
-            "type": str(company_type).strip() if company_type and not pd.isna(company_type) else None
+            "name": str(company_name).strip() if _is_value(company_name) else "",
+            "size": _optional_text(_first_value(row, "Company Size", "company_size", "Size", "companySize")),
+            "industry": _optional_text(_first_value(row, "Industry", "industry", "Sector")),
+            "type": _optional_text(_first_value(row, "Company Type", "company_type", "Type", "companyType")),
         },
         "salary": salary,
-        "city": city_info["city"],
-        "province": city_info["province"],
-        "cityTier": city_info["tier"],
-        "education": str(education).strip() if education and not pd.isna(education) else None,
-        "experience": str(experience).strip() if experience and not pd.isna(experience) else None,
-        "skills": skills,
-        "welfare": welfare_list,
-        "description": str(desc).strip() if desc and not pd.isna(desc) else None,
-        "publishDate": pub_date,
-        "sourceUrl": str(source_url).strip() if source_url and not pd.isna(source_url) else "",
-        "crawlTime": datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+        "city": city["city"],
+        "province": city["province"],
+        "cityTier": city["tier"],
+        "education": _optional_text(_first_value(row, "Qualification", "education", "Education", "Degree")),
+        "experience": _optional_text(_first_value(row, "Experience", "experience", "Seniority")),
+        "skills": _split_values(_first_value(row, "Skills", "skills", "Key Skills", "Technologies")),
+        "welfare": _split_values(_first_value(row, "Welfare", "welfare", "Benefits")),
+        "description": _optional_text(_first_value(
+            row, "Job Description", "job_description", "Description", "description", "Job_Description"
+        )),
+        "publishDate": publish_date,
+        "sourceUrl": _optional_text(_first_value(row, "source_url", "Source URL", "URL", "url", "sourceUrl")) or "",
+        "crawlTime": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
     }
 
 
-def main():
-    # 1. 确定文件路径
-    file_path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_CSV_PATH
-    print(f"[INFO] 数据源: {file_path}")
+def compute_source_md5(job: Mapping[str, Any]) -> str:
+    identity = f"{job.get('jobId')}|{job.get('sourceUrl') or ''}"
+    return hashlib.md5(identity.encode("utf-8")).hexdigest()
 
-    # 2. 根据后缀读取
-    if file_path.endswith(".csv"):
-        df = pd.read_csv(file_path, encoding="utf-8")
-    elif file_path.endswith((".xlsx", ".xls")):
-        df = pd.read_excel(file_path)
-    else:
-        print(f"[ERROR] 不支持的文件格式: {file_path}")
-        sys.exit(1)
 
-    print(f"[INFO] 总行数: {len(df)}")
+def enqueue_raw_job(
+    redis_client: Any,
+    job: dict[str, Any],
+    raw_queue: str = RAW_QUEUE,
+    raw_dedupe_set: str = RAW_DEDUPE_SET,
+) -> bool:
+    """Atomically add one source record only once per ``source_md5`` identity."""
+    source_md5 = compute_source_md5(job)
+    job["sourceMd5"] = source_md5
+    payload = json.dumps(job, ensure_ascii=False, sort_keys=True)
+    inserted = redis_client.eval(
+        RAW_ENQUEUE_SCRIPT,
+        2,
+        raw_queue,
+        raw_dedupe_set,
+        source_md5,
+        payload,
+    )
+    return bool(inserted)
 
-    # 3. 加载城市映射
-    city_map = load_city_mapping()
 
-    # 4. 连接 Redis
-    r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB,
-                    decode_responses=True)
-    r.ping()
-    print(f"[INFO] Redis 连接成功: {REDIS_HOST}:{REDIS_PORT}")
+def read_source_file(file_path: str | Path) -> pd.DataFrame:
+    path = Path(file_path)
+    if path.suffix.lower() == ".csv":
+        return pd.read_csv(path, encoding="utf-8-sig")
+    if path.suffix.lower() in {".xlsx", ".xls"}:
+        return pd.read_excel(path)
+    raise ValueError(f"Unsupported source file format: {path}")
 
-    # 5. 逐行处理
-    success = 0
-    skip = 0
-    for idx, (_, row) in enumerate(df.iterrows()):
-        job_json = row_to_json(row, idx, city_map)
 
-        # 跳过无效行：岗位名和公司名都为空
-        if not job_json["title"] and not job_json["company"]["name"]:
-            skip += 1
+def import_file(
+    file_path: str | Path,
+    redis_client: Any,
+    city_map: Mapping[str, Mapping[str, str]] | None = None,
+    raw_queue: str = RAW_QUEUE,
+    raw_dedupe_set: str = RAW_DEDUPE_SET,
+) -> dict[str, int]:
+    """Normalize and enqueue a source file, returning deterministic counters."""
+    dataframe = read_source_file(file_path)
+    mapping = load_city_mapping() if city_map is None else city_map
+    result = {"total": len(dataframe), "enqueued": 0, "duplicate": 0, "skipped": 0}
+    for index, (_, row) in enumerate(dataframe.iterrows()):
+        job = row_to_json(row, index, mapping)
+        if not job["title"] or not job["company"]["name"]:
+            result["skipped"] += 1
             continue
+        if enqueue_raw_job(redis_client, job, raw_queue, raw_dedupe_set):
+            result["enqueued"] += 1
+        else:
+            result["duplicate"] += 1
+    return result
 
-        json_str = json.dumps(job_json, ensure_ascii=False)
-        r.lpush(RAW_QUEUE, json_str)
-        success += 1
 
-        if success % BATCH_SIZE == 0:
-            print(f"  进度: {success} 条已导入...")
+def main() -> None:
+    import redis
 
-    # 6. 打印结果
-    queue_len = r.llen(RAW_QUEUE)
-    print(f"\n{'='*50}")
-    print(f"导入完成: 成功 {success} 条, 跳过 {skip} 条")
-    print(f"Redis List [{RAW_QUEUE}] 当前长度: {queue_len}")
-    print(f"{'='*50}")
+    file_path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_CSV_PATH
+    client = redis.Redis(
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        password=REDIS_PASSWORD,
+        db=REDIS_DB,
+        decode_responses=True,
+    )
+    try:
+        client.ping()
+        result = import_file(file_path, client)
+        print(
+            "[INFO] source rows={total} enqueued={enqueued} duplicates={duplicate} skipped={skipped}".format(
+                **result
+            )
+        )
+        print(f"[INFO] raw queue={RAW_QUEUE} pending={client.llen(RAW_QUEUE)}")
+    except ValueError as error:
+        print(f"[ERROR] {error}")
+        raise SystemExit(1) from error
+    finally:
+        client.close()
 
 
 if __name__ == "__main__":

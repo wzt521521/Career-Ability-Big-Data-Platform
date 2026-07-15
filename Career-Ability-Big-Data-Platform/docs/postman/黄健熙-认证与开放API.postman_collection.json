@@ -8,11 +8,11 @@
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
     { "key": "studentUsername", "value": "", "type": "string" },
-    { "key": "studentPassword", "value": "student123", "type": "string" },
+    { "key": "studentPassword", "value": "", "type": "string" },
     { "key": "studentAccessToken", "value": "", "type": "string" },
     { "key": "studentRefreshToken", "value": "", "type": "string" },
-    { "key": "adminUsername", "value": "admin", "type": "string" },
-    { "key": "adminPassword", "value": "admin123", "type": "string" },
+    { "key": "adminUsername", "value": "", "type": "string" },
+    { "key": "adminPassword", "value": "", "type": "string" },
     { "key": "adminAccessToken", "value": "", "type": "string" },
     { "key": "adminRefreshToken", "value": "", "type": "string" },
     { "key": "apiKey", "value": "", "type": "string" }

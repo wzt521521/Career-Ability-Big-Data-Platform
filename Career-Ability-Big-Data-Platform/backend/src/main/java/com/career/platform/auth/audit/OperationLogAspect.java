@@ -4,6 +4,7 @@ import com.career.platform.auth.entity.SysOperationLog;
 import com.career.platform.common.annotation.Log;
 import com.career.platform.common.security.CurrentUser;
 import com.career.platform.common.security.CurrentUserProvider;
+import com.career.platform.common.security.SensitiveDataRedactor;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -69,7 +70,7 @@ public class OperationLogAspect {
         operationLog.setDuration(System.currentTimeMillis() - startedAt);
         operationLog.setStatus(failure == null ? 1 : 0);
         if (failure != null) {
-            operationLog.setErrorMessage(truncate(failure.getMessage()));
+            operationLog.setErrorMessage(truncate(SensitiveDataRedactor.redact(failure.getMessage())));
         }
         logWriter.write(operationLog);
     }
@@ -96,10 +97,6 @@ public class OperationLogAspect {
         }
         HttpServletRequest request =
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
         return request.getRemoteAddr();
     }
 

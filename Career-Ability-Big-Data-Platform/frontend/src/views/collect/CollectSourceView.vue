@@ -95,7 +95,7 @@ onMounted(load)
   <div class="page">
     <div class="page-toolbar">
       <h2>数据源管理</h2>
-      <el-button type="primary" :icon="Plus" @click="openCreate">新增数据源</el-button>
+      <el-button v-permission="'collect:toggle'" type="primary" :icon="Plus" @click="openCreate">新增数据源</el-button>
     </div>
 
     <el-table :data="sources" v-loading="loading" stripe>
@@ -108,8 +108,8 @@ onMounted(load)
       <el-table-column prop="createTime" label="创建时间" width="170" />
       <el-table-column label="操作" width="140" fixed="right">
         <template #default="{ row }">
-          <el-button type="primary" link :icon="Edit" size="small" @click="openEdit(row)">编辑</el-button>
-          <el-button type="danger" link :icon="Delete" size="small" @click="handleDelete(row)">删除</el-button>
+          <el-button v-permission="'collect:toggle'" type="primary" link :icon="Edit" size="small" @click="openEdit(row)">编辑</el-button>
+          <el-button v-permission="'collect:toggle'" type="danger" link :icon="Delete" size="small" @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

@@ -37,6 +37,22 @@ export default defineConfig({
     }
   },
   test: {
-    environment: 'jsdom'
+    environment: 'jsdom',
+    outputFile: {
+      junit: 'test-results/vitest-junit.xml',
+    },
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{js,vue}'],
+      exclude: ['src/**/*.test.js'],
+      reporter: ['text', 'json-summary', 'lcov'],
+      reportsDirectory: 'coverage',
+      thresholds: {
+        statements: 30,
+        branches: 65,
+        functions: 35,
+        lines: 30,
+      },
+    },
   }
 })

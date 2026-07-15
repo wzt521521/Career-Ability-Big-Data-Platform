@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "job_position")
+@Table(name = "job_position", indexes = {
+        @Index(name = "idx_jp_city_publish_date", columnList = "city,publish_date,id"),
+        @Index(name = "idx_jp_education_publish_date", columnList = "education,publish_date"),
+        @Index(name = "idx_jp_company_publish_date", columnList = "company_id,publish_date")
+})
 public class JobPosition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,14 +49,14 @@ public class JobPosition {
     private String experience;
 
     @Convert(converter = StringListJsonConverter.class)
-    @Column
+    @Column(columnDefinition = "JSON")
     private List<String> skills = new ArrayList<>();
 
     @Convert(converter = StringListJsonConverter.class)
-    @Column
+    @Column(columnDefinition = "JSON")
     private List<String> welfare = new ArrayList<>();
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "publish_date")

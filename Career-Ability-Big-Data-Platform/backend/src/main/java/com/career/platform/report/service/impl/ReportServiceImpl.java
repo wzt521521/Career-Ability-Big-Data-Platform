@@ -12,20 +12,23 @@ import com.career.platform.report.entity.ReportTemplate;
 import com.career.platform.report.repository.ReportRecordRepository;
 import com.career.platform.report.repository.ReportTemplateRepository;
 import com.career.platform.report.service.AsyncReportGenerator;
+import com.career.platform.report.service.ReportGenerationRequestedEvent;
 import com.career.platform.report.service.ReportService;
+import com.career.platform.report.service.ReportSnapshotMapper;
+import com.career.platform.report.service.ReportStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,14 +41,20 @@ public class ReportServiceImpl implements ReportService {
 
     private final ReportTemplateRepository templateRepository;
     private final ReportRecordRepository recordRepository;
-    private final AsyncReportGenerator asyncReportGenerator;
+    private final ApplicationEventPublisher eventPublisher;
+    private final ReportSnapshotMapper snapshotMapper;
+    private final ReportStorage reportStorage;
 
     public ReportServiceImpl(ReportTemplateRepository templateRepository,
                             ReportRecordRepository recordRepository,
-                            AsyncReportGenerator asyncReportGenerator) {
+                            ApplicationEventPublisher eventPublisher,
+                            ReportSnapshotMapper snapshotMapper,
+                            ReportStorage reportStorage) {
         this.templateRepository = templateRepository;
         this.recordRepository = recordRepository;
-        this.asyncReportGenerator = asyncReportGenerator;
+        this.eventPublisher = eventPublisher;
+        this.snapshotMapper = snapshotMapper;
+        this.reportStorage = reportStorage;
     }
 
     @Override
@@ -60,19 +69,25 @@ public class ReportServiceImpl implements ReportService {
     public ReportRecordResponse generate(Long userId, GenerateReportRequest request) {
         ReportTemplate template = templateRepository.findById(request.getTemplateId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "报告模板不存在"));
+        if (!Integer.valueOf(1).equals(template.getStatus())) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "报告模板已禁用");
+        }
 
         ReportRecord record = new ReportRecord();
         record.setTemplateId(template.getId());
         record.setUserId(userId);
-        record.setReportTitle(request.getTitle());
+        record.setReportTitle(request.getTitle().trim());
         record.setTimeRangeStart(request.getTimeRangeStart());
         record.setTimeRangeEnd(request.getTimeRangeEnd());
+        record.setFilterCity(normalizeFilter(request.getCity()));
+        record.setFilterPosition(normalizeFilter(request.getPosition()));
+        record.setFilterIndustry(normalizeFilter(request.getIndustry()));
+        record.setAnalysisDimensions(snapshotMapper.serializeDimensions(template.getDimensions()));
         record.setStatus("PENDING");
         record = recordRepository.save(record);
 
-        // 通过注入的独立 Bean 调用 @Async，确保异步生效（避免自调用绕过代理）
-        asyncReportGenerator.generate(record.getId(), template.getTemplateFile(), request.getTitle(),
-                request.getTimeRangeStart(), request.getTimeRangeEnd());
+        // TransactionalEventListener dispatches only after this transaction commits.
+        eventPublisher.publishEvent(new ReportGenerationRequestedEvent(record.getId()));
 
         return new ReportRecordResponse(record, template.getTemplateName());
     }
@@ -81,6 +96,7 @@ public class ReportServiceImpl implements ReportService {
     @Transactional(readOnly = true)
     public PageResponse<ReportRecordResponse> listRecords(Long userId, String status, String keyword,
                                                           int page, int size) {
+        validateListRequest(status, keyword, page, size);
         PageRequest pageable = PageRequest.of(page - 1, size);
         boolean hasStatus = status != null && !status.isBlank();
         boolean hasKeyword = keyword != null && !keyword.isBlank();
@@ -138,10 +154,7 @@ public class ReportServiceImpl implements ReportService {
             throw new BusinessException(ErrorCode.NOT_FOUND, "报告文件不存在");
         }
 
-        File file = new File(record.getFilePath());
-        if (!file.exists()) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "报告文件已被删除");
-        }
+        Path file = reportStorage.resolveExisting(record.getFilePath());
         return new FileSystemResource(file);
     }
 
@@ -153,11 +166,35 @@ public class ReportServiceImpl implements ReportService {
         // 删除文件
         if (record.getFilePath() != null) {
             try {
-                Files.deleteIfExists(Paths.get(record.getFilePath()));
+                reportStorage.deleteIfManaged(record.getFilePath());
             } catch (Exception e) {
                 log.warn("删除报告文件失败: {}", record.getFilePath(), e);
             }
         }
         recordRepository.delete(record);
+    }
+
+    private String normalizeFilter(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private void validateListRequest(String status, String keyword, int page, int size) {
+        if (page < 1) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "page 必须大于等于 1");
+        }
+        if (size < 1 || size > 100) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "size 必须在 1 到 100 之间");
+        }
+        if (status != null && !status.isBlank()
+                && !Set.of("PENDING", "GENERATING", "COMPLETED", "FAILED").contains(status)) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "不支持的报告状态");
+        }
+        if (keyword != null && keyword.length() > 120) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "报告标题关键字最长120字符");
+        }
     }
 }

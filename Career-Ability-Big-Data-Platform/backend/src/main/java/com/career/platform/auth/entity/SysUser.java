@@ -42,7 +42,7 @@ public class SysUser {
     @Column(length = 100)
     private String college;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer status = 1;
 
     @CreationTimestamp

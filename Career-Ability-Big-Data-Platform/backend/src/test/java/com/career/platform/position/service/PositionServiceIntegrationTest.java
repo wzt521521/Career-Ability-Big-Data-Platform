@@ -1,6 +1,7 @@
 package com.career.platform.position.service;
 
 import com.career.platform.common.ResourceNotFoundException;
+import com.career.platform.common.security.PublicRecruitmentScopePolicy;
 import com.career.platform.position.dto.PositionFilter;
 import com.career.platform.position.entity.JobCompany;
 import com.career.platform.position.entity.JobPosition;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
-@Import(PositionService.class)
+@Import({PositionService.class, PublicRecruitmentScopePolicy.class})
 @ActiveProfiles("test")
 class PositionServiceIntegrationTest {
     @Autowired PositionService service;
@@ -75,6 +76,21 @@ class PositionServiceIntegrationTest {
         invalid.setPage(0);
         assertThatThrownBy(() -> service.search(invalid)).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> service.latest(101)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void suppliesSuggestionsAndPreservesTheUserSelectedComparisonOrder() {
+        List<JobPosition> all = positions.findAll();
+        Long second = all.get(1).getId();
+        Long first = all.get(0).getId();
+
+        assertThat(service.suggestPublicTitles("工程", 10))
+                .contains("Java开发工程师", "前端工程师");
+        assertThat(service.comparePublicRecruitment(List.of(second, first)))
+                .extracting("id")
+                .containsExactly(second, first);
+        assertThatThrownBy(() -> service.comparePublicRecruitment(List.of(first)))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     private JobCompany company(String name, String industry) {
