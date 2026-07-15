@@ -1,76 +1,139 @@
+x-logging: &default-logging
+  driver: local
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
-  # ============================================================
-  # 1. MySQL 8.0 — 核心业务数据库
-  # ============================================================
   mysql:
     image: mysql:8.0.40
     container_name: job-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local-development-password}
-      MYSQL_DATABASE: career_ability
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-career_ability}
       MYSQL_CHARSET: utf8mb4
       MYSQL_COLLATION: utf8mb4_unicode_ci
       TZ: Asia/Shanghai
-    ports:
-      - "3307:3306"
     volumes:
+      # The MySQL entrypoint executes init.sql only while mysql-data is empty.
       - mysql-data:/var/lib/mysql
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     networks:
       - job-data-net
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot --password=\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      # Use TCP instead of localhost's Unix socket so the temporary init server
+      # cannot mark the service healthy before init.sql has completed.
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -P 3306 -uroot --password=\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
       start_period: 40s
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --default-authentication-plugin=mysql_native_password
+      - --skip-name-resolve
+    stop_grace_period: 45s
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 1024M
 
-  # ============================================================
-  # 2. Redis 7 — 缓存 + 消息队列
-  # ============================================================
   redis:
     image: redis:7.4.2-alpine
     container_name: job-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD must be set}
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?REDIS_PASSWORD must be set}
+      TZ: Asia/Shanghai
     volumes:
       - redis-data:/data
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: ["/bin/sh", "-ec", "exec redis-server /usr/local/etc/redis/redis.conf --requirepass \"$${REDIS_PASSWORD}\""]
     networks:
       - job-data-net
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning ping | grep -qx PONG"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 15s
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 384M
 
-  # ============================================================
-  # 3. Spring Boot 后端 (需要先写好 Dockerfile)
-  # ============================================================
+  db-migrate:
+    image: career-ability-data-pipeline:${IMAGE_TAG:-local}
+    build:
+      context: ./data-pipeline
+      dockerfile: Dockerfile
+    container_name: job-db-migrate
+    restart: "no"
+    init: true
+    command: ["python", "scripts/run_migrations.py"]
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-career_ability}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}
+      MYSQL_APP_USER: ${MYSQL_APP_USER:-career_app}
+      MYSQL_APP_PASSWORD: ${MYSQL_APP_PASSWORD:?MYSQL_APP_PASSWORD must be set}
+      MYSQL_MIGRATOR_USER: ${MYSQL_MIGRATOR_USER:-career_migrator}
+      MYSQL_MIGRATOR_PASSWORD: ${MYSQL_MIGRATOR_PASSWORD:?MYSQL_MIGRATOR_PASSWORD must be set}
+      MIGRATION_LOCK_TIMEOUT_SECONDS: ${MIGRATION_LOCK_TIMEOUT_SECONDS:-60}
+      MYSQL_CONNECT_TIMEOUT_SECONDS: ${MYSQL_CONNECT_TIMEOUT_SECONDS:-180}
+      MIGRATIONS_DIR: /sql/migrations
+      TZ: Asia/Shanghai
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - job-data-net
+    volumes:
+      - ./sql:/sql:ro
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+
   backend:
+    image: career-ability-backend:${IMAGE_TAG:-local}
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: job-backend
     restart: unless-stopped
+    init: true
     ports:
+      # Kept on loopback for Compose E2E checks and a local reverse proxy.
       - "127.0.0.1:8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/career_ability?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local-development-password}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-career_ability}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_APP_USER:-career_app}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_APP_PASSWORD:?MYSQL_APP_PASSWORD must be set}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
+      SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD must be set}
       SPRING_CACHE_TYPE: redis
       SPRING_PROFILES_ACTIVE: production
-      SECURITY_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in .env}
+      SERVER_SHUTDOWN: graceful
+      SPRING_LIFECYCLE_TIMEOUT_PER_SHUTDOWN_PHASE: 30s
+      SECURITY_JWT_SECRET: ${SECURITY_JWT_SECRET:-${JWT_SECRET:?JWT_SECRET must be set in .env}}
       INITIAL_ADMIN_USERNAME: ${INITIAL_ADMIN_USERNAME:-}
       INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:-}
       SECURITY_CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:5173,http://127.0.0.1:5173}
@@ -83,6 +146,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     volumes:
       - report-data:/var/lib/career-ability/reports
     healthcheck:
@@ -92,17 +157,25 @@ services:
       retries: 5
       start_period: 45s
     networks:
+      - job-app-net
       - job-data-net
+    stop_signal: SIGTERM
+    stop_grace_period: 45s
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.50"
+          memory: 1024M
 
-  # ============================================================
-  # 4. Vue 前端 (需要先写好 Dockerfile)
-  # ============================================================
   frontend:
+    image: career-ability-frontend:${IMAGE_TAG:-local}
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: job-frontend
     restart: unless-stopped
+    init: true
     ports:
       - "80:80"
     depends_on:
@@ -115,25 +188,33 @@ services:
       retries: 5
       start_period: 15s
     networks:
-      - job-data-net
+      - job-app-net
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
 
-  # ============================================================
-  # 5. Python ETL 清洗脚本 (需要先写好 Dockerfile)
-  # ============================================================
   python-etl:
+    image: career-ability-data-pipeline:${IMAGE_TAG:-local}
     build:
       context: ./data-pipeline
       dockerfile: Dockerfile
     container_name: job-etl
     restart: unless-stopped
+    init: true
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD must be set}
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
-      MYSQL_USER: root
-      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local-development-password}
-      MYSQL_DATABASE: career_ability
+      MYSQL_USER: ${MYSQL_APP_USER:-career_app}
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD:?MYSQL_APP_PASSWORD must be set}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-career_ability}
       POSITION_DATA_VERSION_KEY: career:position-data-version
       CSV_PATH: /data/kaggle_jobs_500.csv
       ETL_HEARTBEAT_FILE: /tmp/etl-heartbeat
@@ -143,22 +224,35 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     volumes:
       - ./data:/data:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os, sys, time; path = os.getenv('ETL_HEARTBEAT_FILE', '/tmp/etl-heartbeat'); sys.exit(0 if os.path.exists(path) and time.time() - os.path.getmtime(path) < 90 else 1)"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - job-data-net
+    stop_signal: SIGTERM
+    stop_grace_period: 45s
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 768M
 
-# ============================================================
-# 数据卷
-# ============================================================
 volumes:
   mysql-data:
   redis-data:
   report-data:
 
-# ============================================================
-# 自定义网络
-# ============================================================
 networks:
+  job-app-net:
+    driver: bridge
   job-data-net:
     driver: bridge
+    internal: true

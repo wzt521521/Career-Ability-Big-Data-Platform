@@ -8,6 +8,9 @@ from dataclasses import dataclass
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+# Redis keeps backward compatibility with local instances that do not require
+# authentication while production Compose always supplies this value.
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD") or None
 REDIS_KEY_PREFIX = os.getenv("REDIS_KEY_PREFIX", "").strip(":")
 # Shared with the Java recommendation service. This key deliberately remains outside
 # queue namespaces so every successful production ETL batch invalidates recommendations.

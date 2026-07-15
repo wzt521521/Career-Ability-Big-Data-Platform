@@ -18,6 +18,7 @@ import com.career.platform.collect.entity.CollectTask;
 import com.career.platform.collect.repository.CollectLogRepository;
 import com.career.platform.collect.repository.CollectSourceRepository;
 import com.career.platform.collect.repository.CollectTaskRepository;
+import com.career.platform.common.observability.OperationalMetrics;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -49,6 +50,9 @@ class CollectTaskRuntimeServiceTest {
     @Mock
     private TaskScheduler scheduler;
 
+    @Mock
+    private OperationalMetrics operationalMetrics;
+
     private CollectTaskRuntimeService runtimeService;
     private CollectTask task;
     private CollectSource source;
@@ -56,7 +60,7 @@ class CollectTaskRuntimeServiceTest {
     @BeforeEach
     void setUp() {
         runtimeService = new CollectTaskRuntimeService(
-                taskRepository, sourceRepository, logRepository, executor, scheduler, true);
+                taskRepository, sourceRepository, logRepository, executor, scheduler, true, operationalMetrics);
         task = task("IDLE", 3);
         source = new CollectSource();
         source.setId(7L);
@@ -129,6 +133,7 @@ class CollectTaskRuntimeServiceTest {
 
         assertEquals("FAILED", task.getStatus());
         verify(logRepository, times(3)).save(any(CollectLog.class));
+        verify(operationalMetrics).recordCollectionTaskFailure(true);
     }
 
     @Test
@@ -145,6 +150,7 @@ class CollectTaskRuntimeServiceTest {
         verify(scheduler, times(1)).schedule(any(Runnable.class), any(Date.class));
         assertEquals("ERROR", task.getStatus());
         assertEquals(0, task.getRetryCount());
+        verify(operationalMetrics).recordCollectionTaskFailure(false);
     }
 
     @Test

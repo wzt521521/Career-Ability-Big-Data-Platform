@@ -49,14 +49,14 @@ public class JobPosition {
     private String experience;
 
     @Convert(converter = StringListJsonConverter.class)
-    @Column
+    @Column(columnDefinition = "JSON")
     private List<String> skills = new ArrayList<>();
 
     @Convert(converter = StringListJsonConverter.class)
-    @Column
+    @Column(columnDefinition = "JSON")
     private List<String> welfare = new ArrayList<>();
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "publish_date")

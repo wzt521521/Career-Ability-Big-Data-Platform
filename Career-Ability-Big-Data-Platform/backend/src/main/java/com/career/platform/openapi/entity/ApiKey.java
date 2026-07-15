@@ -26,7 +26,7 @@ public class ApiKey {
     @Column(name = "app_name", nullable = false, length = 100)
     private String appName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer status = 1;
 
     @Column(name = "rate_limit", nullable = false)

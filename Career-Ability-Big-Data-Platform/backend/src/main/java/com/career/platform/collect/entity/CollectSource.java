@@ -26,7 +26,7 @@ public class CollectSource {
     @Column(name = "import_frequency", length = 20)
     private String importFrequency;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private Integer status;
 
     @Column(length = 500)

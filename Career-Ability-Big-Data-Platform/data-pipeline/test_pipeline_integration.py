@@ -29,6 +29,7 @@ from config import (  # noqa: E402
     MYSQL_USER,
     REDIS_DB,
     REDIS_HOST,
+    REDIS_PASSWORD,
     REDIS_PORT,
     QueueKeys,
     build_queue_keys,
@@ -162,6 +163,7 @@ def isolated_pipeline():
     redis_client = redis.Redis(
         host=REDIS_HOST,
         port=REDIS_PORT,
+        password=REDIS_PASSWORD,
         db=test_redis_db,
         decode_responses=True,
     )

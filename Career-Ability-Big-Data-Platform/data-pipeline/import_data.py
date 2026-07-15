@@ -17,6 +17,7 @@ from config import (
     RAW_QUEUE,
     REDIS_DB,
     REDIS_HOST,
+    REDIS_PASSWORD,
     REDIS_PORT,
 )
 
@@ -232,7 +233,13 @@ def main() -> None:
     import redis
 
     file_path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_CSV_PATH
-    client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+    client = redis.Redis(
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        password=REDIS_PASSWORD,
+        db=REDIS_DB,
+        decode_responses=True,
+    )
     try:
         client.ping()
         result = import_file(file_path, client)
