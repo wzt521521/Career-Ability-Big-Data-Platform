@@ -87,6 +87,8 @@ mysql -h localhost -P 3307 -u root -p career_ability < sql/migrations/20260711_h
 mysql -h localhost -P 3307 -u root -p career_ability < sql/migrations/20260714_pipeline_source_md5_unique.sql
 mysql -h localhost -P 3307 -u root -p career_ability < sql/migrations/20260714_report_permissions_and_bootstrap_admin.sql
 mysql -h localhost -P 3307 -u root -p career_ability < sql/migrations/20260714_api_key_management_permission.sql
+mysql -h localhost -P 3307 -u root -p career_ability < sql/migrations/20260714_analytics_query_indexes.sql
+mysql -h localhost -P 3307 -u root -p career_ability < sql/migrations/20260714_report_reliability.sql
 ```
 
 ## 5. 本机质量门禁
